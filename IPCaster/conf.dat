@@ -1,0 +1,26 @@
+{
+   "EventMap" : [
+      {
+         "key" : "A",
+         "msgs" : [ "#T #C #P  \u88ab\u7f5a\u4e0b1", "#T #P #T #R \u88ab\u7f5a\u4e0b2" ],
+         "name" : "\u7ea2\u724c1"
+      },
+      {
+         "key" : "B",
+         "msgs" : [ "#P #C #T #R \u88ab\u7f5a\u4e0b3", "#T #C #T #R \u88ab\u7f5a\u4e0b4" ],
+         "name" : "\u7ea2\u724c2"
+      },
+      {
+         "key" : "C",
+         "msgs" : [ "#P #C #T \u88ab\u7f5a\u4e0b5", "#P #C #T #R \u88ab\u7f5a\u4e0b6" ],
+         "name" : "\u7ea2\u724c3"
+      }
+   ],
+   "LNfont" : "5",
+   "LOfont" : "1",
+   "ListenerName" : "22Listener",
+   "SNfont" : "5",
+   "SOfont" : "1",
+   "SpeakerName" : "Speaker"
+}
+

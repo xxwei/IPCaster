@@ -1,0 +1,274 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Window size="1280,720" mininfo="1280,720" caption="0,0,0,40" sizebox="4,4,4,4" roundcorner="4,4,4,4">
+	<Font id="0" name="微软雅黑" size="12" bold="false" default="true" />
+	<Font id="1" name="微软雅黑" size="14" bold="true"/>
+	<Font id="2" name="微软雅黑" size="16" bold="true"/>
+	<Font id="3" name="微软雅黑" size="18" bold="true"/>
+	<Font id="4" name="微软雅黑" size="20" bold="true"/>
+	<Font id="5" name="微软雅黑" size="22" bold="true"/>
+	<Font id="6" name="微软雅黑" size="24" bold="true"/>
+	<Font id="7" name="微软雅黑" size="26" bold="true"/>
+	<Font id="8" name="微软雅黑" size="28" bold="true"/>
+	<Font id="9" name="微软雅黑" size="30" bold="true"/>
+	<Default name="VScrollBar" value="button1normalimage=&quot;file='scrollbar.png' source='0,0,16,16'&quot; button1hotimage=&quot;file='scrollbar.png' source='16,0,32,16,16'&quot; button1pushedimage=&quot;file='scrollbar.png' source='32,0,48,16'&quot; button2normalimage=&quot;file='scrollbar.png' source='0,32,16,48'&quot; button2hotimage=&quot;file='scrollbar.png' source='16,32,32,48'&quot; button2pushedimage=&quot;file='scrollbar.png' source='32,32,48,48'&quot; thumbnormalimage=&quot;file='scrollbar.png' source='0,48,16,64' corner='0,2,0,2'&quot; thumbhotimage=&quot;file='scrollbar.png' source='16,48,32,64' corner='0,2,0,2'&quot; thumbpushedimage=&quot;file='scrollbar.png' source='32,48,48,64' corner='0,2,0,2'&quot; bknormalimage=&quot;file='scrollbar.png' source='0,16,16,32'&quot;" />
+	<VerticalLayout  bkcolor="#FFAEAEAE" vscrollbar="false"> 
+	
+	   <HorizontalLayout height="30">
+        <VerticalLayout width="160" inset="2,2,0,0">
+          <Label text="Electronic bulletin board" textcolor="#FFFFFFFF"align="center"/>
+        </VerticalLayout>
+        <VerticalLayout />
+        <VerticalLayout width="104">
+          <Button name="minbtn" float="true" pos="0,0,28,19" width="28" height="19" maxheight="19" maxwidth="28"  normalimage="file='btn_mini_normal.png'" hotimage="btn_mini_highlight.png" pushedimage="btn_mini_down.png"  />
+          <Button name="maxbtn" float="true" pos="28,0,56,19" width="28" height="19" maxheight="19" maxwidth="28"  normalimage="file='btn_max_normal.png'" hotimage="btn_max_highlight.png" pushedimage="btn_max_down.png"  />
+          <Button name="restorebtn" visible="false" float="true" pos="28,0,56,19" width="28" height="19" maxheight="19" maxwidth="28"  normalimage="file='btn_restore_normal.png'" hotimage="btn_restore_highlight.png" pushedimage="btn_restore_down.png"  />
+          <Button name="closebtn" float="true" pos="56,0,95,19" width="39" height="19" maxheight="19" maxwidth="39"  normalimage="file='btn_close_normal.png'" hotimage="btn_close_highlight.png" pushedimage="btn_close_down.png"  />
+        </VerticalLayout>
+      </HorizontalLayout>
+	    <!--固定信息显示栏-->
+		<HorizontalLayout bkcolor="#FFF8F8F8" padding="0,0,0,0" height="80" bordersize="1" bordercolor="#FFE2E2E2">
+			<Button name="headlogo" width="56" height="56" maxheight="56" maxwidth="56" bkimage="file='speaker.png' corner='5,5,5,5'" padding="66,10,0,0"/>
+			<VerticalLayout  padding="10,20,0,0"  width="120" > 				
+				<Text name="nickname" textcolor="#FF000000" font="5" text="Speaker" width="120" height="25" />
+				<Text name="ipaddr" textcolor="#FF000000" font="0" text="IP:192.168.3.102" width="120" height="16" />
+			</VerticalLayout>
+			<VerticalLayout />
+			<VerticalLayout  padding="0,0,0,0"  > 
+				<HorizontalLayout />
+				<Text name="time" textcolor="#FF000000" valign="center" align="center" height="80" font="7" text="16:45:12"  />
+				<HorizontalLayout />
+			</VerticalLayout> 
+			<VerticalLayout />
+			<VerticalLayout  padding="0,0,0,0"  width="400" > 
+				<HorizontalLayout />
+				<Text name="matchinfo" textcolor="#FF000000" valign="center" align="center" height="80" font="5" text="广州恒大淘宝队VS江苏苏宁易购队"  />
+				<HorizontalLayout />
+			</VerticalLayout> 
+		</HorizontalLayout>
+		<HorizontalLayout bkcolor="#FFBBBBBB" padding="0,0,0,0" >
+			<VerticalLayout   name="allfunction" bkcolor="#FF313949" padding="0,0,0,0"  width="186"> 
+				<Option font="3" name="infopub" float="false" text="信息发布" textpadding="0,40,0,2" foreimage="file='info_selected.png' dest='76,30,110,64'" width="186" height="136"  group="switch"  selected="true"  textcolor="#FF999999"  align="center" selectedtextcolor="#ffFFAF8C" />
+				<Option font="3" name="match" float="false" text="比赛信息" textpadding="0,40,0,2" foreimage="file='match.png' dest='76,30,110,64'" width="186" height="136"  group="switch"  textcolor="#FF999999"  align="center" selectedtextcolor="#ffFFAF8C" />
+				<Option font="3" name="messages" float="false" text="消息设置" textpadding="0,40,0,2" foreimage="file='messages.png' dest='76,30,110,64'" width="186" height="136"  group="switch"  textcolor="#FF999999"  align="center" selectedtextcolor="#ffFFAF8C" />
+				<Option font="3" name="settting" float="false" text="系统设置" textpadding="0,40,0,2" foreimage="file='setting.png' dest='76,30,110,64'" width="186" height="136"  group="switch"  textcolor="#FF999999"  align="center" selectedtextcolor="#ffFFAF8C" />
+
+			</VerticalLayout>
+			<VerticalLayout  padding="0,0,0,0"> 
+				<TabLayout name="pageswitch" selectedid="0" inset="0,0,0,0"><!-- 主体界面 -->
+					<VerticalLayout childpadding="8,0,0,0" bkcolor="#FFFFFFFF"><!-- 信息发布 -->
+						<HorizontalLayout>
+							<List name="memberlist" width="140" vscrollbar="true" bkcolor="#FFBBBBBB" itemalign="center"  itemshowhtml="true" header="hidden" inset="0,0,0,0"    itemalign="center" hscrollbar="false" menu="true">							
+							</List>
+							<VerticalLayout>
+								<List name="msglist" vscrollbar="true" bkcolor="#FFFFFFFF" itemalign="center"  itemshowhtml="true" header="hidden" inset="0,0,0,0"    itemalign="center" hscrollbar="false" menu="true">
+								</List>
+								<Container name="midtool" height="2" bkcolor="#FFEEEEEE">
+								</Container>
+								<HorizontalLayout height="184" padding="1,1,1,10" bkcolor="#FFF0F0F0">
+									<VerticalLayout>
+										<RichEdit name="editmsg" font="2" height="148" bkcolor="#FFFAFAFA" enabled="true" rich="false" readonly="false" wantreturn="false" wantctrlreturn="false"/>
+										<HorizontalLayout height="36"  bkcolor="#FFFAFAFA" >
+											<Control />
+											<Button  name="cancel"  text="取消" padding = "10,0,10,0"  height = "26" width = "90" normalimage="button.png" pushedimage="button_selected.png"/>
+											<Button padding = "10,0,10,0" name="send" height = "26" width = "90"  text="发送(Enter)"  normalimage="button.png" pushedimage="button_selected.png"/>
+										</HorizontalLayout>
+									</VerticalLayout>
+									<VerticalLayout name="eventtip" width="30" bkcolor = "#FFF0F0F0">
+										<HorizontalLayout height="30"   >
+											<Control />
+											<Option name="eventshow"  width="26" height="28" normalimage="eventshow.png" pushedimage="eventshow_selected.png" selectedimage="eventshow_selected.png"/>
+										</HorizontalLayout>
+										<TreeView name="eventtree" padding="1,5,0,0" height="0" width="0" itemtextcolor="#FF000000"  vscrollbar="true" >
+											<TreeNode name="eventtreenode"text="事件" height="25" width="0" bordersize="1"  bordercolor="#FFE5E5E5" />
+										</TreeView>
+									</VerticalLayout>
+								</HorizontalLayout>
+								
+							</VerticalLayout>
+						</HorizontalLayout>
+					</VerticalLayout>
+					<VerticalLayout childpadding="8,0,0,0" bkcolor="#FFF3F3F3"><!-- 比赛信息 -->
+						<VerticalLayout childpadding="8,0,0,0" bkcolor="#FFF3F3F3">
+						<HorizontalLayout padding="30,30,30,0">
+							<VerticalLayout padding="30,0,0,0">
+								<GroupBox name="matchteam" text="对阵信息" height="100" borderround="3,3"  font="1" bordercolor="#FFE5E5E5" textcolor="#FF000000">
+										<VerticalLayout>
+											<HorizontalLayout padding="30,30,30,0" >
+												<Label text="主队:" font="1"  width="40"/>
+												<Combo name="team1" bordersize="1" borderround="2,2" maxheight="25"  bordercolor="#FFCECECE" textpadding="9,3,9,5">
+													<ListLabelElement name="team1text" text="主队名称" selected="true"  />
+												</Combo>
+											</HorizontalLayout>
+											<HorizontalLayout padding="30,0,30,10" >
+												<Label text="客队:" font="1" width="40" />
+												<Combo name="team2" bordersize="1" borderround="2,2" maxheight="25"  bordercolor="#FFCECECE" textpadding="9,3,9,5">
+													<ListLabelElement name="team2text" text="客队名称" selected="true"  />
+												</Combo>
+											</HorizontalLayout>
+										</VerticalLayout>
+								</GroupBox>
+								<GroupBox name="matchreferee" text="官员信息" height="0" borderround="3,3"  font="1" bordercolor="#FFE5E5E5" textcolor="#FF000000">
+										<VerticalLayout>
+											<TreeView name="refereetree" padding="10,30,10,10" height="0"  itemtextcolor="#FF000000"  vscrollbar="true" >
+												
+												<TreeNode text="信息" height="33" width="0" bordersize="1"  bordercolor="#FFE5E5E5">
+													<Label text="通配符" width="60"/>
+												</TreeNode>
+												
+												<TreeNode name="wildcardR" text="裁判" height="33" width="0" bordersize="1" bordercolor="#FFE5E5E5">
+													<Label text="#R" width="60"/>
+													<TreeNode name="wildcardR1" text="主裁判" height="33" width="0" bordersize="1" bordercolor="#FFE5E5E5">
+														
+													</TreeNode>
+													<TreeNode name="wildcardR2" text="边裁" height="33" width="0" bordersize="1" bordercolor="#FFE5E5E5">
+														
+													</TreeNode>
+													<TreeNode name="wildcardR3" text="第四官员" height="33" width="0" bordersize="1" bordercolor="#FFE5E5E5">
+														
+													</TreeNode>
+												</TreeNode>
+												
+											</TreeView>
+										</VerticalLayout>
+								</GroupBox>
+								
+							</VerticalLayout>
+							<VerticalLayout padding="30,0,0,0">
+								<GroupBox name="team1" text="主队信息" height="0" borderround="3,3"  font="1" bordercolor="#FFE5E5E5" textcolor="#FF000000">
+										<VerticalLayout>
+											<TreeView name="team1tree" padding="10,30,10,10" height="0"  itemtextcolor="#FF000000"  vscrollbar="true" >
+												
+												<TreeNode text="信息" height="33" width="0" bordersize="1"  bordercolor="#FFE5E5E5">
+													<Label text="通配符" width="60"/>
+												</TreeNode>
+												<TreeNode name="wildcardT1" text="球队" height="33" width="0" bordersize="1" bordercolor="#FFE5E5E5">
+													<Label text="#T" width="60"/>
+												</TreeNode>
+												<TreeNode name="wildcardC1" text="教练" height="33" width="0" bordersize="1" bordercolor="#FFE5E5E5">
+													<Label text="#C" width="60"/>
+												</TreeNode>
+												<TreeNode name="wildcardP1" text="球员" height="33" width="0" bordersize="1" bordercolor="#FFE5E5E5">
+													<Label text="#P" width="60"/>
+													<TreeNode text="" height="33" width="0" bordersize="1"  bordercolor="#FFE5E5E5">
+														<Button name="addp1" text="+添加球员" textcolor="#FF0000FF" width="100"/>
+													</TreeNode>
+												</TreeNode>
+											</TreeView>
+										</VerticalLayout>
+								</GroupBox>
+							</VerticalLayout>
+							<VerticalLayout padding="30,0,0,0">
+								<GroupBox name="team2" text="客队信息" height="0" borderround="3,3"  font="1" bordercolor="#FFE5E5E5" textcolor="#FF000000">
+										<VerticalLayout>
+											<TreeView name="team2tree" padding="10,30,10,10" height="0"  itemtextcolor="#FF000000"  vscrollbar="true" >
+												
+												<TreeNode text="信息" height="33" width="0" bordersize="1"  bordercolor="#FFE5E5E5">
+													<Label text="通配符" width="60"/>
+												</TreeNode>
+												<TreeNode name="wildcardT2" text="球队" height="33" width="0" bordersize="1" bordercolor="#FFE5E5E5">
+													<Label text="#T" width="60"/>
+												</TreeNode>
+												<TreeNode name="wildcardC2" text="教练" height="33" width="0" bordersize="1" bordercolor="#FFE5E5E5">
+													<Label text="#C" width="60"/>
+												</TreeNode>
+												<TreeNode name="wildcardP2" text="球员" height="33" width="0" bordersize="1" bordercolor="#FFE5E5E5">
+													<Label text="#P" width="60"/>
+													<TreeNode text="" height="33" width="0" bordersize="1"  bordercolor="#FFE5E5E5">
+														<Button name="addp2" text="+添加球员" textcolor="#FF0000FF" width="100"/>
+													</TreeNode>
+												</TreeNode>
+											</TreeView>
+										</VerticalLayout>
+								</GroupBox>
+							</VerticalLayout>
+						</HorizontalLayout>
+						<HorizontalLayout padding="30,0,100,0" height="50" >
+							<Control />
+							<Button name="save" text="保存" padding = "10,0,10,0"  height = "26" width = "90" normalimage="button.png" pushedimage="button_selected.png"/>
+							<Button name="import" text="导入" padding = "10,0,10,0"  height = "26" width = "90" normalimage="button.png" pushedimage="button_selected.png"/>
+						</HorizontalLayout>
+						</VerticalLayout>
+					</VerticalLayout>
+					<VerticalLayout childpadding="8,0,0,0" inset="124,50,0,0" bkcolor="#FFF3F3F3"><!-- 消息设置 -->
+						<Label text="消息设置" font="3" />
+						<Control height="1" bkcolor="#FFC8C8C8" width="500"/>
+						<TreeView name="msgtree" padding="10,30,10,10" height="0" width="500" itemtextcolor="#FF000000"  vscrollbar="true" >											
+							<TreeNode name="eventnode"text="常用消息" height="33" width="0" bordersize="1"  bordercolor="#FFE5E5E5">
+								<Label text="代码" width="60"/>
+								<!--
+								<TreeNode name="event1" text="点球" height="33" width="0" bordersize="1" bordercolor="#FFE5E5E5">
+									<Label text="A" width="60"/>
+									<TreeNode text="" height="33" width="0" bordersize="1"  bordercolor="#FFE5E5E5">
+										<Button name="addmsg" text="+添加消息" textcolor="#FF0000FF" width="100"/>
+									</TreeNode>
+								</TreeNode>
+								-->
+								<TreeNode text="" height="33" width="0" bordersize="1"  bordercolor="#FFE5E5E5" userdata="addmatchevent">
+									<Button name="addmatchevent" text="+添加事件" textcolor="#FF0000FF" width="100"/>
+								</TreeNode>
+							</TreeNode>
+						</TreeView>
+					</VerticalLayout>
+
+					<VerticalLayout childpadding="0,0,0,0" inset="124,50,0,0" bkcolor="#FFF3F3F3" ><!-- 设置页面 -->
+						<Label text="代号设置" font="3" />
+						<Control height="1" bkcolor="#FFC8C8C8" width="500"/>
+						<VerticalLayout padding="10,10,0,0">
+							<HorizontalLayout inset="0,5,0,0" height ="30" width="300" > 
+								<Label text="本机代号:" font="1" width="80" />
+								<RichEdit name="localnickname" bkcolor="#FFFFFFFF" width="200" bordersize="1" borderround="2,2" bordercolor="#FFCECECE" maxheight="30" textpadding="9,3,9,5" multiline="false" enabled="true" rich="false" readonly="false" wantreturn="false" wantctrlreturn="false"/>
+							</HorizontalLayout>
+						</VerticalLayout>
+						<Label text="最新消息文本设置" font="3" />
+						<Control height="1" bkcolor="#FFC8C8C8" width="500"/>
+						<HorizontalLayout childpadding="0,10,0,0" width="300" height ="100"> 
+							<VerticalLayout padding="10,10,0,0">
+								<HorizontalLayout childpadding="0,10,0,0" width="200" height ="35"> 
+										<Label text="字体:" font="1" width="80" />
+										<Combo name="nfont" bordersize="1" borderround="2,2" maxheight="25" width="100" bordercolor="#FFCECECE" textpadding="9,3,9,5">
+											<ListLabelElement text="微软雅黑" selected="true"  />
+										</Combo>
+								</HorizontalLayout>
+								<HorizontalLayout childpadding="0,10,0,0" width="200"  height ="35"> 
+										<Label text="大小:" font="1" width="80"/>
+										<Combo name="nfontsize" bordersize="1" borderround="2,2" maxheight="25" width="100" bordercolor="#FFCECECE" textpadding="9,3,9,5">
+											<ListLabelElement text="22" selected="true" userdata="5" />
+											<ListLabelElement text="24" userdata="6"/>
+											<ListLabelElement text="26" userdata="7"/>
+											<ListLabelElement text="28" userdata="8"/>
+											<ListLabelElement text="30" userdata="9"/>
+										</Combo>
+								</HorizontalLayout>
+							</VerticalLayout>
+							<Label name="npreview"  padding="0,10,0,0" text="球" font="5" width="80" height="80"  bordersize="1" borderround="2,2" align="center" valign="center" bordercolor="#FFCECECE"/>
+						</HorizontalLayout>
+						<Label text="历史消息文本设置" font="3" />
+						<Control height="1" bkcolor="#FFC8C8C8" width="500"/>
+						<HorizontalLayout childpadding="0,10,0,0" width="300" height ="100"> 
+							<VerticalLayout padding="10,10,0,0">
+								<HorizontalLayout childpadding="0,10,0,0" width="200" height ="35"> 
+										<Label text="字体:" font="1" width="80" />
+										<Combo name="ofont" bordersize="1" borderround="2,2" maxheight="25" width="100" bordercolor="#FFCECECE" textpadding="9,3,35,5">
+											<ListLabelElement text="微软雅黑" selected="true"  />
+										</Combo>
+								</HorizontalLayout>
+								<HorizontalLayout childpadding="0,10,0,0" width="200"  height ="35"> 
+										<Label text="大小:" font="1" width="80"/>
+										<Combo name="ofontsize" bordersize="1" borderround="2,2" maxheight="25" width="100" bordercolor="#FFCECECE" textpadding="9,3,35,5">
+											<ListLabelElement text="14" selected="true" userdata="1" />
+											<ListLabelElement text="16" userdata="2" />
+											<ListLabelElement text="18" userdata="3" />
+											<ListLabelElement text="20" userdata="4" />
+											<ListLabelElement text="22" userdata="5" />
+										</Combo>
+								</HorizontalLayout>
+							</VerticalLayout>
+							<Label name="opreview"  padding="0,10,0,0" text="球" font="1" width="80" height="80"  bordersize="1" borderround="2,2" align="center" valign="center" bordercolor="#FFCECECE"/>
+						</HorizontalLayout>
+						<Control />
+					</VerticalLayout>
+				</TabLayout>
+			</VerticalLayout>
+		</HorizontalLayout>
+	</VerticalLayout>
+</Window>

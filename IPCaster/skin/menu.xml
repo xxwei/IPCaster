@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Window>
+  <Font id="0" name="微软雅黑" size="12" bold="false" default="true" />
+  <Font id="1" name="微软雅黑" size="12" bold="true"/>
+  <Default name="Menu" value="inset=&quot;2,2,2,2&quot; itemtextpadding=&quot;30,0,0,0&quot;hole=&quot;false&quot;" />
+  <Menu bkcolor="#FFAAAAAA">
+  </Menu>
+</Window>
