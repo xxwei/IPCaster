@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include "StateManger.h"
 using namespace DuiLib;
@@ -46,20 +46,20 @@ private:
 	int				m_CurrentFindPos = 0;
 	CDuiString		m_CurrentMsgStr;
 	StateManger		*pStateManger = NULL;
-	//Í¨Åä·ûP
+	//é€šé…ç¬¦P
 	list<wstring>		Plist;
 	list<wstring>		P1list;
 	list<wstring>		P2list;
-	//Í¨Åä·ûC
+	//é€šé…ç¬¦C
 	list<wstring>		Clist;
 	list<wstring>		C1list;
 	list<wstring>		C2list;
-	//Í¨Åä·ûT
+	//é€šé…ç¬¦T
 	list<wstring>		Tlist;
-	//Í¨Åä·ûR
+	//é€šé…ç¬¦R
 	list<wstring>		Rlist;
 
-	//ÏûÏ¢ÁĞ±í
+	//æ¶ˆæ¯åˆ—è¡¨
 	EventMap			EMmap;
 
 	map<wstring, bool>		CacheKeyMap;
@@ -102,6 +102,7 @@ public:
 	void UpdateMatchInfo();
 	void UpdateMsgInfo();
 	void UpdateMainUI();
+	void UpdateSettingUI();
 
 
 	void SaveMatchInfo();

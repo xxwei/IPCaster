@@ -59,22 +59,7 @@ void  ListenerWindow::InitWindow()
 	wstring ip = pStateManger->GetLocalIP();
 	pControl->SetText(ip.c_str());
 	//读取配置
-	CRichEditUI *pNickNameControl = static_cast<CRichEditUI*>(m_PaintManager.FindControl(_T("localnickname")));
-	if (pNickNameControl)
-	{
-		
-		if (pStateManger->GetListenerNickName() == L"")
-		{
-			int pos = ip.find_last_of('.');
-			wstring nickname = L"listener" + ip.substr(pos + 1, ip.length());
-			pNickNameControl->SetText(nickname.c_str());
-		}
-		else
-		{
-			pNickNameControl->SetText(pStateManger->GetListenerNickName().c_str());
-		}
-		pStateManger->SetListenerNickName(wstring(pStateManger->GetListenerNickName()));
-	}
+	UpdateSettingUI();
 	UpdateMainUI();
 
 
@@ -308,6 +293,7 @@ void ListenerWindow::Notify(TNotifyUI& msg)
 			//设置名称
 			pStateManger->SetListenerNickName(wstring(msg.pSender->GetText()));
 			UpdateMainUI();
+			pStateManger->SaveCasterSetting();
 		}
 	}
 	else if (msg.sType == _T("return"))
@@ -338,7 +324,7 @@ void ListenerWindow::Notify(TNotifyUI& msg)
 					}
 				}
 			}
-			
+			pStateManger->SaveCasterSetting();
 			
 		}
 		if (name == L"nfontsize")
@@ -357,6 +343,7 @@ void ListenerWindow::Notify(TNotifyUI& msg)
 					}
 				}
 			}
+			pStateManger->SaveCasterSetting();
 		}
 	}
 
@@ -494,6 +481,35 @@ void ListenerWindow::UpdateMainUI()
 
 	}
 }
+void ListenerWindow::UpdateSettingUI()
+{
+	wstring ip = pStateManger->GetLocalIP();
+	CRichEditUI *pNickNameControl = static_cast<CRichEditUI*>(m_PaintManager.FindControl(_T("localnickname")));
+	if (pNickNameControl)
+	{
+
+		if (pStateManger->GetListenerNickName() == L"")
+		{
+			int pos = ip.find_last_of('.');
+			wstring nickname = L"listener" + ip.substr(pos + 1, ip.length());
+			pNickNameControl->SetText(nickname.c_str());
+		}
+		else
+		{
+			pNickNameControl->SetText(pStateManger->GetListenerNickName().c_str());
+		}
+		pStateManger->SetListenerNickName(wstring(pStateManger->GetListenerNickName()));
+	}
+	CComboUI *pComboControl = static_cast<CComboUI*>(m_PaintManager.FindControl(_T("nfontsize")));
+	pComboControl->SetInternVisible();
+	int lnfont = atoi(pStateManger->SettingValue["LNfont"].asCString());
+	pComboControl->SelectItem(lnfont - 5);
+	pComboControl = static_cast<CComboUI*>(m_PaintManager.FindControl(_T("ofontsize")));
+	pComboControl->SetInternVisible();
+	int lofont = atoi(pStateManger->SettingValue["LOfont"].asCString());
+	pComboControl->SelectItem(lofont-1);
+}
+
 void ListenerWindow::SaveSetting()
 {
 

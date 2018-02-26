@@ -1,4 +1,4 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 #include "SpeakerWindow.h"
 #include "GroupBoxUI.h"
 #include "UIMenu.h"
@@ -13,21 +13,21 @@ const TCHAR* const kRestoreButtonControlName = _T("restorebtn");
 void  SpeakerWindow::InitWindow()
 {
 
-	CacheKeyMap.insert(pair<wstring, bool>(L"A", false));
-	CacheKeyMap.insert(pair<wstring, bool>(L"B", false));
-	CacheKeyMap.insert(pair<wstring, bool>(L"C", false));
-	CacheKeyMap.insert(pair<wstring, bool>(L"D", false));
+	CacheKeyMap.insert(pair<wstring, bool>(L"0", false));
+	CacheKeyMap.insert(pair<wstring, bool>(L"1", false));
+	CacheKeyMap.insert(pair<wstring, bool>(L"2", false));
+	CacheKeyMap.insert(pair<wstring, bool>(L"3", false));
+	CacheKeyMap.insert(pair<wstring, bool>(L"4", false));
+	CacheKeyMap.insert(pair<wstring, bool>(L"5", false));
+	CacheKeyMap.insert(pair<wstring, bool>(L"6", false));
+	CacheKeyMap.insert(pair<wstring, bool>(L"7", false));
+	CacheKeyMap.insert(pair<wstring, bool>(L"8", false));
+	CacheKeyMap.insert(pair<wstring, bool>(L"9", false));
+	CacheKeyMap.insert(pair<wstring, bool>(L"Q", false));
+	CacheKeyMap.insert(pair<wstring, bool>(L"W", false));
 	CacheKeyMap.insert(pair<wstring, bool>(L"E", false));
-	CacheKeyMap.insert(pair<wstring, bool>(L"F", false));
-	CacheKeyMap.insert(pair<wstring, bool>(L"H", false));
-	CacheKeyMap.insert(pair<wstring, bool>(L"I", false));
-	CacheKeyMap.insert(pair<wstring, bool>(L"J", false));
-	CacheKeyMap.insert(pair<wstring, bool>(L"K", false));
-	CacheKeyMap.insert(pair<wstring, bool>(L"L", false));
-	CacheKeyMap.insert(pair<wstring, bool>(L"M", false));
-	CacheKeyMap.insert(pair<wstring, bool>(L"N", false));
 	HWND hwnd = m_PaintManager.GetPaintWindow();
-	SetWindowText(hwnd, L"µç×Ó¹«¸æÀ¸");
+	SetWindowText(hwnd, L"ç”µå­å…¬å‘Šæ ");
 	SetTimer(hwnd, 1, 1000, NULL);
 	CTreeViewUI* pTreeViewControl = static_cast<CTreeViewUI*>(m_PaintManager.FindControl(_T("eventtree")));
 	pTreeViewControl->SetVisible(false);
@@ -69,6 +69,7 @@ void  SpeakerWindow::InitWindow()
 	UpdateMatchInfo();
 	UpdateMsgInfo();
 	UpdateMainUI();
+	UpdateSettingUI();
 
 	
 }
@@ -225,7 +226,7 @@ LRESULT SpeakerWindow::HandleCustomMessage(UINT uMsg, WPARAM wParam, LPARAM lPar
 			}
 			else
 			{
-				//Ìæ»»×Ö·û´®
+				//æ›¿æ¢å­—ç¬¦ä¸²
 				m_CurrentMsgStr = ReplaceOneItem(m_CurrentMsgStr, m_CurrentFindPos - 2, 2, strMenuName);
 				//m_CurrentMsgStr.Replace(m_CurrentReplaceStr, strMenuName);
 				pRControl->SetText(m_CurrentMsgStr);	
@@ -265,14 +266,14 @@ LRESULT SpeakerWindow::MessageHandler(UINT uMsg, WPARAM wParam, LPARAM lParam, b
 			int ret = ::GetKeyState(VK_SHIFT); //>0 up <0 down
 			if (ret < 0)
 			{
-				//ÇĞ»»µ½Listener
+				//åˆ‡æ¢åˆ°Listener
 				pStateManger->ChangeToListener();
 				break;
 
 			}
 			else
 			{
-				//ÆÁ±ÎESCÍË³ö
+				//å±è”½ESCé€€å‡º
 				return S_OK;
 			}
 			return S_OK;
@@ -283,11 +284,11 @@ LRESULT SpeakerWindow::MessageHandler(UINT uMsg, WPARAM wParam, LPARAM lParam, b
 			break;
 		}
 		}
-		if ((wParam >= 'A'&&wParam <= 'N')|| (wParam >= 'a'&&wParam <= 'n'))
+		if ((wParam >= '0'&&wParam <= '9')|| wParam == 'q'|| wParam == 'Q'|| wParam == 'w'|| wParam == 'W'|| wParam == 'e'|| wParam == 'E')
 		{
-			if (GetKeyState(VK_SHIFT) < 0&& m_CurrentCanShotKey)
+			if (GetKeyState(VK_CONTROL) < 0&& m_CurrentCanShotKey)
 			{
-				//´¥·¢ÊÂ¼şÑ¡È¡
+				//è§¦å‘äº‹ä»¶é€‰å–
 				CDuiString key;
 				key.Format(_T("%c"), wParam);
 
@@ -509,13 +510,13 @@ void SpeakerWindow::Notify(TNotifyUI& msg)
 		if (classname == L"Edit")
 		{
 			msg.pSender->SetAttribute(L"bkcolor", L"#FFF3F3F3");
-			//ÉèÖÃÃû³Æ
+			//è®¾ç½®åç§°
 
-			//¸üĞÂ±ÈÈüĞÅÏ¢
+			//æ›´æ–°æ¯”èµ›ä¿¡æ¯
 			UpdateMatchInfo();
-			//¸üĞÂ³£ÓÃÏûÏ¢
+			//æ›´æ–°å¸¸ç”¨æ¶ˆæ¯
 			UpdateMsgInfo();
-			//¸üĞÂÖ÷½çÃæÉÏĞÅÏ¢
+			//æ›´æ–°ä¸»ç•Œé¢ä¸Šä¿¡æ¯
 			UpdateMainUI();
 		}
 		
@@ -541,7 +542,6 @@ void SpeakerWindow::Notify(TNotifyUI& msg)
 				}
 			}
 
-
 		}
 		if (name == L"nfontsize")
 		{
@@ -563,11 +563,17 @@ void SpeakerWindow::Notify(TNotifyUI& msg)
 		if (name == L"team1combo")
 		{
 			SelectTeam1(wstring(msg.pSender->GetText()));
+
+			CComboUI* pControl = static_cast<CComboUI*>(msg.pSender);
+			pStateManger->SetTeam1(pControl->GetCurSel());
 		}
 		if (name == L"team2combo")
 		{
 			SelectTeam2(wstring(msg.pSender->GetText()));
+			CComboUI* pControl = static_cast<CComboUI*>(msg.pSender);
+			pStateManger->SetTeam2(pControl->GetCurSel());
 		}
+		pStateManger->SaveCasterSetting();
 	}
 }
 void SpeakerWindow::OnListenerOnLine(usermap map)
@@ -650,7 +656,7 @@ int SpeakerWindow::AddNewMessage(wstring str)
 
 	if (itemcount)
 	{
-		//ÓĞ¼ÇÂ¼
+		//æœ‰è®°å½•
 
 		CListContainerElementUI *max_node = static_cast<CListContainerElementUI*>(pControl->GetItemAt(itemcount));
 		CLabelUI *max_item = static_cast<CLabelUI*>(max_node->GetItemAt(0));
@@ -677,7 +683,7 @@ int SpeakerWindow::AddNewMessage(wstring str)
 			SIZE px;
 			int linecount = 1;
 			HDC hdc = m_PaintManager.GetPaintDC();
-			int dis_num = 0, line_width = 0;//ÇøÓòÄÚ¿ÉÏÔÊ¾µÄ×Ö·û¸öÊı£¬¼°ÇøÓò´óĞ¡£¨ÏñËØµãµÄ·¶Î§£©
+			int dis_num = 0, line_width = 0;//åŒºåŸŸå†…å¯æ˜¾ç¤ºçš„å­—ç¬¦ä¸ªæ•°ï¼ŒåŠåŒºåŸŸå¤§å°ï¼ˆåƒç´ ç‚¹çš„èŒƒå›´ï¼‰
 			BOOL c_back = TRUE;
 			c_back = ::GetTextExtentExPoint(hdc, oldmsg, lstrlen(oldmsg), line_width, &dis_num, NULL, &px);
 			int max_width = pControl->GetWidth();
@@ -1014,7 +1020,7 @@ int SpeakerWindow::AddEvent(wstring str, bool bfocus)
 		wstring key = GetFreeKey();
 		CTreeNodeUI *pControl = static_cast<CTreeNodeUI*>(m_PaintManager.FindControl(_T("eventnode")));
 		
-		//Ìí¼ÓÏûÏ¢ÀàĞÍ
+		//æ·»åŠ æ¶ˆæ¯ç±»å‹
 		CTreeNodeUI *EditNode = new CTreeNodeUI();
 		EditNode->SetAttribute(L"height", L"33");
 		EditNode->SetAttribute(L"width", L"0");
@@ -1042,7 +1048,7 @@ int SpeakerWindow::AddEvent(wstring str, bool bfocus)
 		InfoLayout->SetUserData(key.c_str());
 		EditNode->Add(InfoLayout);
 
-		//Ìí¼Ó±¾ÏûÏ¢°´Å¥
+		//æ·»åŠ æœ¬æ¶ˆæ¯æŒ‰é’®
 		CTreeNodeUI *AddNode = new CTreeNodeUI();
 		AddNode->SetAttribute(L"height", L"33");
 		AddNode->SetAttribute(L"width", L"0");
@@ -1050,7 +1056,7 @@ int SpeakerWindow::AddEvent(wstring str, bool bfocus)
 		AddNode->SetAttribute(L"bordercolor", L"#FFE5E5E5");
 		AddNode->SetUserData(L"addmsg");
 		CButtonUI * AddBtn = new CButtonUI();
-		AddBtn->SetText(L"+Ìí¼ÓÏûÏ¢");
+		AddBtn->SetText(L"+æ·»åŠ æ¶ˆæ¯");
 		AddBtn->SetAttribute(L"textcolor", L"#FF0000FF");
 		AddBtn->SetAttribute(L"textpadding", L"0,0,0,0");
 		AddBtn->SetAttribute(L"name", L"addmsg");
@@ -1405,7 +1411,7 @@ void SpeakerWindow::UpdateMsgInfo()
 	{
 		CTreeNodeUI *pEventChildControl = pControl->GetChildNode(i);
 		CDuiString userdata = pEventChildControl->GetUserData();
-		if (userdata != L"addmatchevent") //·Ç°´Å¥
+		if (userdata != L"addmatchevent") //éæŒ‰é’®
 		{
 			CHorizontalLayoutUI *pLayOut = static_cast<CHorizontalLayoutUI*>(pControl->GetChildNode(i)->GetItemAt(1));
 			int nc = pLayOut->GetCount();
@@ -1422,7 +1428,7 @@ void SpeakerWindow::UpdateMsgInfo()
 			}
 			else
 			{
-				//´ËÀàĞÍÊÂ¼ş
+				//æ­¤ç±»å‹äº‹ä»¶
 				
 				map<wstring, EventMsg>::iterator item = EMmap.find(wstring(key));
 				if (item == EMmap.end())
@@ -1431,13 +1437,13 @@ void SpeakerWindow::UpdateMsgInfo()
 					em.EventName = wstring(text);
 					EMmap.insert(pair<wstring, EventMsg>(wstring(key), em));
 				}
-				int nCount = pEventChildControl->GetCountChild();//´ËÀàÊÂ¼şµÄÏûÏ¢¸öÊı
+				int nCount = pEventChildControl->GetCountChild();//æ­¤ç±»äº‹ä»¶çš„æ¶ˆæ¯ä¸ªæ•°
 				for (int j = 0; j < nCount; j++)
 				{
-					CTreeNodeUI * pMsgChildControl = pEventChildControl->GetChildNode(j); //ÏûÏ¢Ìå
+					CTreeNodeUI * pMsgChildControl = pEventChildControl->GetChildNode(j); //æ¶ˆæ¯ä½“
 					userdata = pMsgChildControl->GetUserData();
 					int nc = pMsgChildControl->GetCount();
-					if (userdata != L"addmsg")//·Ç°´Å¥
+					if (userdata != L"addmsg")//éæŒ‰é’®
 					{
 						CDuiString  msgtext = pMsgChildControl->GetItemAt(1)->GetText();
 						if (msgtext == L"")
@@ -1448,7 +1454,7 @@ void SpeakerWindow::UpdateMsgInfo()
 						}
 						else
 						{
-							//ÓĞÊäÈë
+							//æœ‰è¾“å…¥
 							map<wstring, EventMsg>::iterator item = EMmap.find(wstring(key));
 							if (item != EMmap.end())
 							{
@@ -1471,7 +1477,7 @@ void SpeakerWindow::UpdateMsgInfo()
 		}
 	}
 
-	//EMmapĞÅÏ¢¸üĞÂµ½JSON¶ÔÏóÖĞ
+	//EMmapä¿¡æ¯æ›´æ–°åˆ°JSONå¯¹è±¡ä¸­
 	pStateManger->SetEventMap(EMmap);
 	pStateManger->SaveCasterSetting();
 }
@@ -1481,17 +1487,17 @@ void SpeakerWindow::UpdateMainUI()
 	CTextUI* pControl = static_cast<CTextUI*>(m_PaintManager.FindControl(_T("ipaddr")));
 	wstring ip = pStateManger->GetLocalIP();
 	pControl->SetText(ip.c_str());
-	//¶ÔÕóĞÅÏ¢
+	//å¯¹é˜µä¿¡æ¯
 	pControl = static_cast<CTextUI*>(m_PaintManager.FindControl(_T("matchinfo")));
 	pControl->SetText(pStateManger->GetMatchInfo().c_str());
-	//êÇ³ÆĞÅÏ¢
+	//æ˜µç§°ä¿¡æ¯
 	CTextUI *pNickNameControl = static_cast<CTextUI*>(m_PaintManager.FindControl(_T("nickname")));
 	if (pNickNameControl)
 	{
 		pNickNameControl->SetText(pStateManger->GetSpeakerNickName().c_str());
 
 	}
-	///ÊÂ¼şĞÅÏ¢
+	///äº‹ä»¶ä¿¡æ¯
 	CTreeNodeUI *pMainEventControl = static_cast<CTreeNodeUI*>(m_PaintManager.FindControl(_T("eventtreenode")));
 	while (pMainEventControl->IsHasChild())
 	{
@@ -1507,7 +1513,7 @@ void SpeakerWindow::UpdateMainUI()
 		EditNode->SetAttribute(L"bordercolor", L"#FFE5E5E5");
 
 		CDuiString str;
-		str.Append(L"(SHIFT+");
+		str.Append(L"(CTRL+");
 		str.Append(item->first.c_str());
 		str.Append(L")");
 		str.Append(L"    ");
@@ -1517,6 +1523,24 @@ void SpeakerWindow::UpdateMainUI()
 		
 	}
 }
+
+void SpeakerWindow::UpdateSettingUI()
+{
+	CComboUI *pComboControl = static_cast<CComboUI*>(m_PaintManager.FindControl(_T("nfontsize")));
+	pComboControl->SetInternVisible();
+	int lnfont = atoi(pStateManger->SettingValue["SNfont"].asCString());
+	pComboControl->SelectItem(lnfont - 5);
+	pComboControl = static_cast<CComboUI*>(m_PaintManager.FindControl(_T("ofontsize")));
+	pComboControl->SetInternVisible();
+	int lofont = atoi(pStateManger->SettingValue["SOfont"].asCString());
+	pComboControl->SelectItem(lofont-1);
+
+	pComboControl = static_cast<CComboUI*>(m_PaintManager.FindControl(_T("team1combo")));
+	pComboControl->SelectItem(pStateManger->GetTeam1());
+	pComboControl = static_cast<CComboUI*>(m_PaintManager.FindControl(_T("team2combo")));
+	pComboControl->SelectItem(pStateManger->GetTeam2());
+}
+
 void SpeakerWindow::ClearMatchUIInfo()
 {
 
@@ -1725,9 +1749,9 @@ bool SpeakerWindow::ImportMatchInfo(wstring path)
 		ofn.hwndOwner = *this;
 		ofn.lpstrFile = szFile;
 		ofn.nMaxFile = sizeof(szFile);
-		ofn.lpstrFilter = _T("MatchÎÄ¼ş(*.match)\0*.match\0ËùÓĞÎÄ¼ş(*.*)\0*.*\0");;
+		ofn.lpstrFilter = _T("Matchæ–‡ä»¶(*.match)\0*.match\0æ‰€æœ‰æ–‡ä»¶(*.*)\0*.*\0");;
 		ofn.nFilterIndex = 1;
-		ofn.lpstrFileTitle = L"µ¼Èë";
+		ofn.lpstrFileTitle = L"å¯¼å…¥";
 		ofn.nMaxFileTitle = 0;
 		ofn.lpstrInitialDir = L".\\";
 		ofn.Flags = OFN_EXPLORER | OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
@@ -1736,7 +1760,7 @@ bool SpeakerWindow::ImportMatchInfo(wstring path)
 		{
 			//std::vector<string_t> vctString(1, szFile);
 			pStateManger->ReadMatchInfo(WString2String(wstring(szFile)));
-			//¸üĞÂ±ÈÈüĞÅÏ¢
+			//æ›´æ–°æ¯”èµ›ä¿¡æ¯
 			ClearMatchUIInfo();
 			if (!pStateManger->MatchValue["R1"].isNull())
 			{
@@ -1791,7 +1815,7 @@ bool SpeakerWindow::ImportMatchInfo(wstring path)
 	{
 		//std::vector<string_t> vctString(1, szFile);
 		pStateManger->ReadMatchInfo(WString2String(path));
-		//¸üĞÂ±ÈÈüĞÅÏ¢
+		//æ›´æ–°æ¯”èµ›ä¿¡æ¯
 		ClearMatchUIInfo();
 		if (!pStateManger->MatchValue["R1"].isNull())
 		{
@@ -1833,10 +1857,10 @@ bool SpeakerWindow::ImportMatchInfo(wstring path)
 			}
 			CComboUI *pComboControl = static_cast<CComboUI*>(m_PaintManager.FindControl(_T("team1combo")));
 			pComboControl->SetInternVisible();
-			pComboControl->SelectItem(0);
+			//pComboControl->SelectItem(0);
 			pComboControl = static_cast<CComboUI*>(m_PaintManager.FindControl(_T("team2combo")));
 			pComboControl->SetInternVisible();
-			pComboControl->SelectItem(1);
+			//pComboControl->SelectItem(1);
 
 		}
 
@@ -1855,10 +1879,10 @@ void SpeakerWindow::SaveMatchInfo()
 	ofn.hwndOwner = *this;
 	ofn.lpstrFile = szFile;
 	ofn.nMaxFile = sizeof(szFile);
-	ofn.lpstrFilter = _T("MatchÎÄ¼ş(*.match)\0*.match\0ËùÓĞÎÄ¼ş(*.*)\0*.*\0");;
+	ofn.lpstrFilter = _T("Matchæ–‡ä»¶(*.match)\0*.match\0æ‰€æœ‰æ–‡ä»¶(*.*)\0*.*\0");;
 	ofn.nFilterIndex = 1;
 	ofn.lpstrDefExt = L".match";
-	ofn.lpstrFileTitle = L"±£´æÎª";
+	ofn.lpstrFileTitle = L"ä¿å­˜ä¸º";
 	ofn.nMaxFileTitle = 0;
 	ofn.lpstrInitialDir = L".\\";
 	ofn.Flags = OFN_EXPLORER | OFN_PATHMUSTEXIST ;

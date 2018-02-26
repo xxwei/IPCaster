@@ -52,6 +52,7 @@ private:
 	StateManger		*pStateManger = NULL;
 	wstring			m_newmsg = L"";
 	void UpdateMainUI();
+	void UpdateSettingUI();
 public:
 	void SetStateManger(StateManger *pSm);
 	int AddNewMessage(wstring str);

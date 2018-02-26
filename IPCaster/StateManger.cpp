@@ -1,4 +1,4 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 #include "StateManger.h"
 
 
@@ -14,7 +14,7 @@ StateManger::~StateManger()
 }
 void StateManger::InitCasterState()
 {
-	//¶ÁÈ¡ÅäÖÃ
+	//è¯»å–é…ç½®
 	ReadCasterSettting();
 
 
@@ -117,10 +117,10 @@ void StateManger::ReadCasterSettting()
 	assert(ifs.is_open());
 	if (!m_JsonReader.parse(ifs, SettingValue, false))
 	{
-		//´íÎó
+		//é”™è¯¯
 	}
 	ifs.close();
-	//Ö÷ÒªÅäÖÃÏî
+	//ä¸»è¦é…ç½®é¡¹
 	//listener
 	//SettingValue["ListenerName"]
 	//SettingValue["LastSpeakerIP"]
@@ -153,7 +153,7 @@ void StateManger::ReadMatchInfo(string path)
 	assert(ifs.is_open());
 	if (!m_JsonReader.parse(ifs, MatchValue, false))
 	{
-		//´íÎó
+		//é”™è¯¯
 	}
 	ifs.close();
 }
@@ -200,6 +200,23 @@ void StateManger::SetMatchInfo(wstring info)
 	{
 		m_speakEcho->SetMatchInfo(WString2String(info));
 	}
+}
+int StateManger::GetTeam1()
+{
+	return SettingValue["Team1ID"].asInt();
+}
+int StateManger::GetTeam2()
+{
+	return SettingValue["Team2ID"].asInt();
+}
+
+void StateManger::SetTeam1(int id)
+{
+	SettingValue["Team1ID"] = id;
+}
+void StateManger::SetTeam2(int id)
+{
+	SettingValue["Team2ID"] = id;
 }
 wstring StateManger::GetSpeakerNickName()
 {
@@ -309,7 +326,7 @@ void StateManger::SetEventMap(EventMap em)
 }
 void StateManger::GetEventMap(EventMap &emap)
 {
-	//³ÌĞòÆô¶¯ÊÇµ÷ÓÃ
+	//ç¨‹åºå¯åŠ¨æ˜¯è°ƒç”¨
 	emap.clear();
 	if (!SettingValue["EventMap"].isNull())
 	{

@@ -10,6 +10,8 @@
 	<Font id="7" name="微软雅黑" size="26" bold="true"/>
 	<Font id="8" name="微软雅黑" size="28" bold="true"/>
 	<Font id="9" name="微软雅黑" size="30" bold="true"/>
+	<Font id="10" name="微软雅黑" size="36" bold="true"/>
+	<Font id="11" name="微软雅黑" size="72" bold="true"/>
 	<Default name="VScrollBar" value="button1normalimage=&quot;file='scrollbar.png' source='0,0,16,16'&quot; button1hotimage=&quot;file='scrollbar.png' source='16,0,32,16,16'&quot; button1pushedimage=&quot;file='scrollbar.png' source='32,0,48,16'&quot; button2normalimage=&quot;file='scrollbar.png' source='0,32,16,48'&quot; button2hotimage=&quot;file='scrollbar.png' source='16,32,32,48'&quot; button2pushedimage=&quot;file='scrollbar.png' source='32,32,48,48'&quot; thumbnormalimage=&quot;file='scrollbar.png' source='0,48,16,64' corner='0,2,0,2'&quot; thumbhotimage=&quot;file='scrollbar.png' source='16,48,32,64' corner='0,2,0,2'&quot; thumbpushedimage=&quot;file='scrollbar.png' source='32,48,48,64' corner='0,2,0,2'&quot; bknormalimage=&quot;file='scrollbar.png' source='0,16,16,32'&quot;" />
 	<VerticalLayout  bkcolor="#FFAEAEAE" vscrollbar="false"> 
 	
@@ -94,18 +96,20 @@
 								<VerticalLayout padding="10,10,0,0">
 									<HorizontalLayout childpadding="0,10,0,0" width="200" height ="35"> 
 											<Label text="字体:" font="1" width="80" />
-											<Combo name="nfont" bordersize="1" borderround="2,2" maxheight="25" width="100" bordercolor="#FFCECECE" textpadding="9,3,9,5">
+											<Combo name="nfont" bordersize="1" borderround="2,2" maxheight="25" width="100" bordercolor="#FFCECECE" textpadding="9,3,9,5" vscrollbar="true">
 												<ListLabelElement text="微软雅黑" selected="true"  />
 											</Combo>
 									</HorizontalLayout>
 									<HorizontalLayout childpadding="0,10,0,0" width="200"  height ="35"> 
 											<Label text="大小:" font="1" width="80"/>
-											<Combo name="nfontsize" bordersize="1" borderround="2,2" maxheight="25" width="100" bordercolor="#FFCECECE" textpadding="9,3,9,5">
+											<Combo name="nfontsize" bordersize="1" borderround="2,2" maxheight="25" width="100" bordercolor="#FFCECECE" textpadding="9,3,9,5" vscrollbar="true">
 												<ListLabelElement text="22" selected="true" userdata="5" />
 												<ListLabelElement text="24" userdata="6"/>
 												<ListLabelElement text="26" userdata="7"/>
 												<ListLabelElement text="28" userdata="8"/>
 												<ListLabelElement text="30" userdata="9"/>
+												<ListLabelElement text="36" userdata="10"/>
+												<ListLabelElement text="72" userdata="11"/>
 											</Combo>
 									</HorizontalLayout>
 								</VerticalLayout>
@@ -117,13 +121,13 @@
 								<VerticalLayout padding="10,10,0,0">
 									<HorizontalLayout childpadding="0,10,0,0" width="200" height ="35"> 
 											<Label text="字体:" font="1" width="80" />
-											<Combo name="ofont" bordersize="1" borderround="2,2" maxheight="25" width="100" bordercolor="#FFCECECE" textpadding="9,3,35,5">
+											<Combo name="ofont" bordersize="1" borderround="2,2" maxheight="25" width="100" bordercolor="#FFCECECE" textpadding="9,3,35,5" vscrollbar="true">
 												<ListLabelElement text="微软雅黑" selected="true"  />
 											</Combo>
 									</HorizontalLayout>
 									<HorizontalLayout childpadding="0,10,0,0" width="200"  height ="35"> 
 											<Label text="大小:" font="1" width="80"/>
-											<Combo name="ofontsize" bordersize="1" borderround="2,2" maxheight="25" width="100" bordercolor="#FFCECECE" textpadding="9,3,35,5">
+											<Combo name="ofontsize" bordersize="1" borderround="2,2" maxheight="25" width="100" bordercolor="#FFCECECE" textpadding="9,3,35,5" vscrollbar="true">
 												<ListLabelElement text="14" selected="true" userdata="1" />
 												<ListLabelElement text="16" userdata="2" />
 												<ListLabelElement text="18" userdata="3" />

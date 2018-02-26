@@ -1,26 +1,31 @@
 {
    "EventMap" : [
       {
-         "key" : "A",
-         "msgs" : [ "#T #C #P  \u88ab\u7f5a\u4e0b1", "#T #P #T #R \u88ab\u7f5a\u4e0b2" ],
+         "key" : "0",
+         "msgs" : [ "#T #P \u88ab\u7f5a\u4e0b", "#T #P \u88ab\u66ff\u6362" ],
          "name" : "\u7ea2\u724c1"
       },
       {
-         "key" : "B",
-         "msgs" : [ "#P #C #T #R \u88ab\u7f5a\u4e0b3", "#T #C #T #R \u88ab\u7f5a\u4e0b4" ],
+         "key" : "1",
+         "msgs" : [
+            "#T #P \u548c#R\u53d1\u751f\u51b2\u7a81",
+            "#T #P \u548c#T #P\u53d1\u751f\u51b2\u7a81"
+         ],
          "name" : "\u7ea2\u724c2"
       },
       {
-         "key" : "C",
-         "msgs" : [ "#P #C #T \u88ab\u7f5a\u4e0b5", "#P #C #T #R \u88ab\u7f5a\u4e0b6" ],
+         "key" : "2",
+         "msgs" : [ "#T #P \u8d8a\u754c" ],
          "name" : "\u7ea2\u724c3"
       }
    ],
-   "LNfont" : "5",
+   "LNfont" : "11",
    "LOfont" : "1",
    "ListenerName" : "22Listener",
-   "SNfont" : "5",
+   "SNfont" : "11",
    "SOfont" : "1",
-   "SpeakerName" : "Speaker"
+   "SpeakerName" : "Speaker",
+   "Team1ID" : 1,
+   "Team2ID" : 0
 }
 

@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include "MessageMQ.h"
 #include "FindSpeakerLoop.h"
 //#include <bson.h>
@@ -34,15 +34,25 @@ public:
 	void ReadMatchInfo(string path);
 	void SaveMatchInfo(string path);
 
+
+
 	void SetListenerCB(MessageCallBack *pMCB);
 	void SetSpeakerCB(MessageCallBack *pMCB);
-//¹«ÓÃ
+//å…¬ç”¨
 	void AddChatlog(wstring time, wstring text);
 	wstring GetLocalIP();
 //speaker
 	
 	wstring GetMatchInfo();
 	void SetMatchInfo(wstring info);
+
+	int GetTeam1();
+	int GetTeam2();
+
+	void SetTeam1(int id);
+	void SetTeam2(int id);
+
+
 	wstring GetSpeakerNickName();
 	void SetSpeakerNickName(wstring name);
 
