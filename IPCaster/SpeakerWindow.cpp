@@ -66,7 +66,6 @@ void  SpeakerWindow::InitWindow()
 	}
 	
 	ImportMatchInfo(L"default.match");
-	
 	UpdateMatchInfo();
 	UpdateMsgInfo();
 	UpdateMainUI();
@@ -141,10 +140,11 @@ void SpeakerWindow::SelectItem()
 					std::copy(Tlist.begin(), Tlist.end(), std::back_inserter(templist));
 				}
 
-				if (templist.size() <= 1)
+				if (templist.size() == 1)
 				{
 					list<wstring>::iterator item = templist.begin();
-					m_CurrentMsgStr.Replace(m_CurrentReplaceStr, (*item).c_str());
+					m_CurrentMsgStr = ReplaceOneItem(m_CurrentMsgStr, m_CurrentFindPos - 2, 2, (*item).c_str());
+					//m_CurrentMsgStr.Replace(m_CurrentReplaceStr, (*item).c_str());
 					pRControl->SetText(m_CurrentMsgStr);
 					int pos = m_CurrentMsgStr.Find('#');
 					if (pos >= 0)
@@ -153,7 +153,7 @@ void SpeakerWindow::SelectItem()
 
 					}
 				}
-				else
+				else if(templist.size()>1)
 				{
 
 					CDuiString key;
@@ -189,6 +189,17 @@ void SpeakerWindow::SelectItem()
 		}
 	}
 }
+CDuiString SpeakerWindow::ReplaceOneItem(CDuiString Dst, int Pos, int len, CDuiString src)
+{
+	CDuiString newStr;
+	CDuiString left = Dst.Left(Pos);
+	CDuiString right = Dst.Right(Dst.GetLength() - Pos - len);
+	newStr.Append(left);
+	newStr.Append(src);
+	newStr.Append(right);
+	return newStr;
+
+}
 LRESULT SpeakerWindow::HandleCustomMessage(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
 	if (uMsg == WM_MENUCLICK)
@@ -215,7 +226,8 @@ LRESULT SpeakerWindow::HandleCustomMessage(UINT uMsg, WPARAM wParam, LPARAM lPar
 			else
 			{
 				//Ìæ»»×Ö·û´®
-				m_CurrentMsgStr.Replace(m_CurrentReplaceStr, strMenuName);
+				m_CurrentMsgStr = ReplaceOneItem(m_CurrentMsgStr, m_CurrentFindPos - 2, 2, strMenuName);
+				//m_CurrentMsgStr.Replace(m_CurrentReplaceStr, strMenuName);
 				pRControl->SetText(m_CurrentMsgStr);	
 				if (m_bStartSelectTeam)
 				{
@@ -426,6 +438,7 @@ void SpeakerWindow::Notify(TNotifyUI& msg)
 
 			pControl->SelectItem(1);
 			m_CurrentCanShotKey = false;
+			
 		}
 		else if (name == _T("messages"))
 		{
@@ -774,7 +787,7 @@ int SpeakerWindow::AddR1(wstring str)
 		InfoEdit->SetAttribute(L"bkcolor", L"#FFF3F3F3");
 		InfoEdit->SetText(str.c_str());
 		EditNode->Add(InfoEdit);
-		pR1Control->AddAt(EditNode, 0);
+		pR1Control->AddAt(EditNode, pR1Control->GetCountChild());
 		return 0;
 	}
 	return -1;
@@ -797,7 +810,7 @@ int SpeakerWindow::AddR2(wstring str)
 		InfoEdit->SetAttribute(L"bkcolor", L"#FFF3F3F3");
 		InfoEdit->SetText(str.c_str());
 		EditNode->Add(InfoEdit);
-		pR1Control->AddAt(EditNode, 0);
+		pR1Control->AddAt(EditNode, pR1Control->GetCountChild());
 		return 0;
 	}
 	return -1;
@@ -820,7 +833,7 @@ int SpeakerWindow::AddR3(wstring str)
 		InfoEdit->SetAttribute(L"bkcolor", L"#FFF3F3F3");
 		InfoEdit->SetText(str.c_str());
 		EditNode->Add(InfoEdit);
-		pR1Control->AddAt(EditNode, 0);
+		pR1Control->AddAt(EditNode, pR1Control->GetCountChild());
 		return 0;
 	}
 	return -1;
@@ -850,7 +863,7 @@ int SpeakerWindow::AddP1(wstring str, bool bfocus)
 		//pTControl->AddAt(EditNode, pControl->GetNodeIndex() + 1);
 		//EditNode->SetParentNode(pControl);
 		int index = pControl->GetCountChild();
-		pControl->AddAt(EditNode, 0);
+		pControl->AddAt(EditNode,pControl->GetCountChild()-1);
 		return 0;
 	}
 	return -1;
@@ -874,7 +887,7 @@ int SpeakerWindow::AddC1(wstring str)
 		InfoEdit->SetText(str.c_str());
 		InfoEdit->SetAttribute(L"bkcolor", L"#FFF3F3F3");
 		EditNode->Add(InfoEdit);
-		pControl->AddAt(EditNode, 0);
+		pControl->AddAt(EditNode, pControl->GetCountChild());
 		return 0;
 	}
 	return -1;
@@ -899,7 +912,7 @@ int SpeakerWindow::AddT1(wstring str)
 		
 		InfoEdit->SetAttribute(L"bkcolor", L"#FFF3F3F3");
 		EditNode->Add(InfoEdit);
-		pControl->AddAt(EditNode, 0);
+		pControl->AddAt(EditNode, pControl->GetCountChild());
 		
 		return 0;
 	}
@@ -926,7 +939,7 @@ int SpeakerWindow::AddP2(wstring str, bool bfocus)
 		if (!bfocus)
 			InfoEdit->SetAttribute(L"bkcolor", L"#FFF3F3F3");
 		EditNode->Add(InfoEdit);
-		pControl->AddAt(EditNode, 0);
+		pControl->AddAt(EditNode, pControl->GetCountChild()-1);
 		return 0;
 	}
 	return -1;
@@ -950,7 +963,7 @@ int SpeakerWindow::AddC2(wstring str)
 		InfoEdit->SetText(str.c_str());
 		InfoEdit->SetAttribute(L"bkcolor", L"#FFF3F3F3");
 		EditNode->Add(InfoEdit);
-		pControl->AddAt(EditNode, 0);
+		pControl->AddAt(EditNode, pControl->GetCountChild());
 		return 0;
 	}
 	return -1;
@@ -974,7 +987,7 @@ int SpeakerWindow::AddT2(wstring str)
 		InfoEdit->SetText(str.c_str());
 		InfoEdit->SetAttribute(L"bkcolor", L"#FFF3F3F3");
 		EditNode->Add(InfoEdit);
-		pControl->AddAt(EditNode, 0);
+		pControl->AddAt(EditNode, pControl->GetCountChild());
 		return 0;
 	}
 	return -1;
@@ -1046,7 +1059,7 @@ int SpeakerWindow::AddEvent(wstring str, bool bfocus)
 		AddBtn->SetMaxWidth(100);
 		AddNode->Add(AddBtn);
 		EditNode->Add(AddNode);
-		pControl->AddAt(EditNode, 0);		
+		pControl->AddAt(EditNode, pControl->GetCountChild()-1);		
 		return 0;
 	}
 	return -1;
@@ -1069,7 +1082,7 @@ int SpeakerWindow::AddMsg(wstring str, wstring type, bool bfocus)
 			InfoEdit->SetAttribute(L"bkcolor", L"#FFF3F3F3");
 		InfoEdit->SetText(str.c_str());
 		EditNode->Add(InfoEdit);
-		pControl->AddAt(EditNode, 0);
+		pControl->AddAt(EditNode, pControl->GetCountChild()-1);
 		return 0;
 	}
 	return -1;
@@ -1507,10 +1520,10 @@ void SpeakerWindow::UpdateMainUI()
 void SpeakerWindow::ClearMatchUIInfo()
 {
 
-	CComboUI *pComboControl = static_cast<CComboUI*>(m_PaintManager.FindControl(_T("team1")));
-
-	pComboControl = static_cast<CComboUI*>(m_PaintManager.FindControl(_T("team2")));
-
+	CComboUI *pComboControl = static_cast<CComboUI*>(m_PaintManager.FindControl(_T("team1combo")));
+	pComboControl->RemoveAll();
+	pComboControl = static_cast<CComboUI*>(m_PaintManager.FindControl(_T("team2combo")));
+	pComboControl->RemoveAll();
 	CTreeNodeUI *pControl = static_cast<CTreeNodeUI*>(m_PaintManager.FindControl(_T("wildcardP1")));
 	int count = pControl->GetCountChild();
 	for (int i = 0; i < count; i++)
@@ -1819,8 +1832,10 @@ bool SpeakerWindow::ImportMatchInfo(wstring path)
 				AddTeam(String2WString(string(U2G(pStateManger->MatchValue["teams"][i]["T"][0].asCString()))));
 			}
 			CComboUI *pComboControl = static_cast<CComboUI*>(m_PaintManager.FindControl(_T("team1combo")));
+			pComboControl->SetInternVisible();
 			pComboControl->SelectItem(0);
 			pComboControl = static_cast<CComboUI*>(m_PaintManager.FindControl(_T("team2combo")));
+			pComboControl->SetInternVisible();
 			pComboControl->SelectItem(1);
 
 		}

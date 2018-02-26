@@ -109,4 +109,6 @@ public:
 	void ClearMatchUIInfo();
 	void ClearT1UIInfo();
 	void ClearT2UIInfo();
+
+	CDuiString ReplaceOneItem(CDuiString Dst, int Pos, int len, CDuiString src);
 };
