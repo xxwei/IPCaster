@@ -13,7 +13,7 @@ const TCHAR* const kRestoreButtonControlName = _T("restorebtn");
 void  SpeakerWindow::InitWindow()
 {
 
-	CacheKeyMap.insert(pair<wstring, bool>(L"0", false));
+	//CacheKeyMap.insert(pair<wstring, bool>(L"0", false));
 	CacheKeyMap.insert(pair<wstring, bool>(L"1", false));
 	CacheKeyMap.insert(pair<wstring, bool>(L"2", false));
 	CacheKeyMap.insert(pair<wstring, bool>(L"3", false));
@@ -98,7 +98,7 @@ void SpeakerWindow::SelectItem()
 			CMenuUI* rootMenu = pMenu->GetMenuUI();
 
 			list<wstring>   templist;
-
+			bool	bPerson = false;
 			if (rootMenu != NULL)
 			{
 				if (m_CurrentReplaceStr == L"#P")
@@ -106,17 +106,22 @@ void SpeakerWindow::SelectItem()
 					if (m_CurrentTeam == 0)
 					{
 						std::copy(Plist.begin(), Plist.end(), std::back_inserter(templist));
+						bPerson = true;
 					}
 					if (m_CurrentTeam == 1)
 					{
 						std::copy(P1list.begin(), P1list.end(), std::back_inserter(templist));
+						bPerson = true;
 					}
 					if (m_CurrentTeam == 2)
 					{
 						std::copy(P2list.begin(), P2list.end(), std::back_inserter(templist));
+						bPerson = true;
 					}
+
+
 				}
-				if (m_CurrentReplaceStr == L"#C")
+				else if (m_CurrentReplaceStr == L"#C")
 				{
 					if (m_CurrentTeam == 0)
 					{
@@ -131,14 +136,45 @@ void SpeakerWindow::SelectItem()
 						std::copy(C2list.begin(), C2list.end(), std::back_inserter(templist));
 					}
 				}
-				if (m_CurrentReplaceStr == L"#R")
+				else if (m_CurrentReplaceStr == L"#R")
 				{
 					std::copy(Rlist.begin(), Rlist.end(), std::back_inserter(templist));
 				}
-				if (m_CurrentReplaceStr == L"#T")
+				
+				else if (m_CurrentReplaceStr == L"#T")
 				{
 					m_bStartSelectTeam = true;
 					std::copy(Tlist.begin(), Tlist.end(), std::back_inserter(templist));
+				}
+				else
+				{
+					list<wstring>::iterator item = Ulist.begin();
+					for (; item != Ulist.end(); item++)
+					{
+						if (wstring(m_CurrentReplaceStr) == (*item))
+						{
+							//pStateManger->MatchValue["userdata"]
+							if (!pStateManger->MatchValue["userdata"].isNull())
+							{
+								int count = pStateManger->MatchValue["userdata"].size();
+								for (int i = 0; i < count; i++)
+								{
+									wstring currkey = String2WString(string(U2G(pStateManger->MatchValue["userdata"][i]["key"].asCString())));
+									if (currkey == wstring(m_CurrentReplaceStr))
+									{
+										if (!pStateManger->MatchValue["userdata"][i]["value"].isNull())
+										{
+											int vcount = pStateManger->MatchValue["userdata"][i]["value"].size();
+											for (int j = 0; j < vcount; j++)
+											{
+												templist.push_back(String2WString(string(U2G(pStateManger->MatchValue["userdata"][i]["value"][j].asCString()))));
+											}
+										}
+									}
+								}
+							}
+						}
+					}
 				}
 
 				if (templist.size() == 1)
@@ -159,24 +195,31 @@ void SpeakerWindow::SelectItem()
 
 					CDuiString key;
 					list<wstring>::iterator item = templist.begin();
-					for (int i = 0; item != templist.end(); item++, i++)
+					int nSize = templist.size();
+					for (int i = 1; item != templist.end(); item++, i++)
 					{
 						CMenuElementUI* pNew = new CMenuElementUI;
 						pNew->SetName((*item).c_str());
 						CDuiString text;
-						if (i < 10)
+						if (bPerson)
 						{
-							key.Format(_T("%d"), i);
-							text.Format(_T("%s  (%d)"), (*item).c_str(), i);
+							i = std::stoi(WString2String((*item)));
+						}
+						if (nSize > 9)
+						{
+							key.Format(_T("%02d"), i);
+							text.Format(_T("%s  (%02d)"), (*item).c_str(), i);
 						}
 						else
 						{
-							text.Format(_T("%s"), (*item).c_str());
+							key.Format(_T("%d"), i);
+							text.Format(_T("%s  (%d)"), (*item).c_str(), i);
 						}
 						pNew->SetText(text);
 						pNew->SetUserData(key);
 						rootMenu->Add(pNew);
 					}
+					pMenu->bMutilKey = bPerson;
 					pMenu->ResizeMenu();
 					RECT rc;
 					GetWindowRect(pMenu->GetHWND(), &rc);
@@ -284,7 +327,7 @@ LRESULT SpeakerWindow::MessageHandler(UINT uMsg, WPARAM wParam, LPARAM lParam, b
 			break;
 		}
 		}
-		if ((wParam >= '0'&&wParam <= '9')|| wParam == 'q'|| wParam == 'Q'|| wParam == 'w'|| wParam == 'W'|| wParam == 'e'|| wParam == 'E')
+		if ((wParam >= '1'&&wParam <= '9')|| wParam == 'q'|| wParam == 'Q'|| wParam == 'w'|| wParam == 'W'|| wParam == 'e'|| wParam == 'E')
 		{
 			if (GetKeyState(VK_CONTROL) < 0&& m_CurrentCanShotKey)
 			{
@@ -306,15 +349,23 @@ LRESULT SpeakerWindow::MessageHandler(UINT uMsg, WPARAM wParam, LPARAM lParam, b
 					CMenuUI* rootMenu = pMenu->GetMenuUI();
 					if (rootMenu != NULL)
 					{
-						
+						int nSize = item->second.MsgList.size();
 						list<wstring>::iterator childitem = item->second.MsgList.begin();
-						for (int i=0; childitem != item->second.MsgList.end(); childitem++,i++)
+						for (int i=1; childitem != item->second.MsgList.end(); childitem++,i++)
 						{
 							CMenuElementUI* pNew = new CMenuElementUI;
 							pNew->SetName((*childitem).c_str());
-							key.Format(_T("%d"), i);
 							CDuiString text;
-							text.Format(_T("%s  (%d)"), (*childitem).c_str(),i);
+							if (nSize > 9)
+							{
+								key.Format(_T("%02d"), i);
+								text.Format(_T("%s  (%02d)"), (*childitem).c_str(), i);
+							}
+							else
+							{
+								key.Format(_T("%d"), i);
+								text.Format(_T("%s  (%d)"), (*childitem).c_str(), i);
+							}
 							pNew->SetText(text);
 							pNew->SetUserData(key);
 							rootMenu->Add(pNew);
@@ -666,6 +717,7 @@ int SpeakerWindow::AddNewMessage(wstring str)
 			CListContainerElementUI *new_node = new CListContainerElementUI;
 			new_node->SetAttribute(L"inset", L"60,5,60,5");
 			new_node->SetAttribute(L"enabled", L"false");
+			//new_node->SetAttribute(L"float", L"true");
 			CRichEditUI *pOldMsg = new CRichEditUI();
 			pOldMsg->SetAttribute(L"bkcolor", L"0xFFEEEEEE");
 			pOldMsg->SetAttribute(L"align", L"center");
@@ -679,48 +731,99 @@ int SpeakerWindow::AddNewMessage(wstring str)
 			rc.bottom = 10;
 			pOldMsg->SetInset(rc);
 			pOldMsg->SetText(oldmsg);
+			
 
 			SIZE px;
 			int linecount = 1;
+			TFontInfo *tfi = m_PaintManager.GetFontInfo(_wtoi(pStateManger->GetOFont()));
+			TFontInfo *dtfi = m_PaintManager.GetDefaultFontInfo();
 			HDC hdc = m_PaintManager.GetPaintDC();
 			int dis_num = 0, line_width = 0;//区域内可显示的字符个数，及区域大小（像素点的范围）
 			BOOL c_back = TRUE;
 			c_back = ::GetTextExtentExPoint(hdc, oldmsg, lstrlen(oldmsg), line_width, &dis_num, NULL, &px);
+			int str_width = px.cx;
+			int str_height = px.cy;
+			str_width = str_width*tfi->tm.tmHeight / dtfi->tm.tmHeight;
+			str_height = str_height*tfi->tm.tmHeight / dtfi->tm.tmHeight;
 			int max_width = pControl->GetWidth();
 			if (c_back)
 			{
-				linecount = px.cx / (max_width - 140) + 1;
+				linecount = str_width / (max_width - 140) + 1;
 			}
-			int height = 30 + linecount * (px.cy + 8);
+			int height = 30 + linecount * (str_height *1.5);
 			new_node->SetMinHeight(height);
 			new_node->SetMaxHeight(height);
 
 			if (linecount == 1)
 			{
 				wchar_t insetstr[64] = { 0 };
-				int inset_x = (max_width - 20 - px.cx) / 2;
+				int inset_x = (max_width - 20 - str_width*1.2) / 2;
 				wsprintf(insetstr, L"%d,5,%d,5", inset_x, inset_x);
 				new_node->SetAttribute(L"inset", insetstr);
 			}
 			new_node->Add(pOldMsg);
 			pControl->AddAt(new_node, itemcount - 1);
+
+			// 更新文本
+			tfi = m_PaintManager.GetFontInfo(_wtoi(pStateManger->GetNFont()));
+			c_back = ::GetTextExtentExPoint(hdc, str.c_str(), str.length(), line_width, &dis_num, NULL, &px);
+			str_width = px.cx;
+			str_height = px.cy;
+			str_width = str_width*tfi->tm.tmHeight / dtfi->tm.tmHeight;
+			str_height = str_height*tfi->tm.tmHeight / dtfi->tm.tmHeight;
+			max_width = pControl->GetWidth();
+			if (c_back)
+			{
+				linecount = str_width / max_width + 1;
+			}
+			height = 30 + linecount * (str_height + 8);
+
+			wchar_t insetstr[64] = { 0 };
+			int inset_y = (500 - height) / 2;
+			wsprintf(insetstr, L"0,%d,0,5", inset_y);
+			max_item->SetAttribute(L"textpadding", insetstr);
+			max_item->SetAttribute(L"font", pStateManger->GetNFont());
+			max_item->SetText(str.c_str());
 		}
-		max_item->SetAttribute(L"font", pStateManger->GetNFont());
-		max_item->SetText(str.c_str());
-
-
 	}
 	else
 	{
 		CListContainerElementUI *max_node = new CListContainerElementUI;
 		max_node->SetAttribute(L"inset", L"60,5,60,5");
 		max_node->SetAttribute(L"enabled", L"false");
+
+		int linecount = 1;
+		SIZE px;
+		TFontInfo *tfi = m_PaintManager.GetFontInfo(_wtoi(pStateManger->GetNFont()));
+		TFontInfo *dtfi = m_PaintManager.GetDefaultFontInfo();
+		HDC hdc = m_PaintManager.GetPaintDC();
+		int dis_num = 0, line_width = 0;//区域内可显示的字符个数，及区域大小（像素点的范围）
+		BOOL c_back = TRUE;
+		c_back = ::GetTextExtentExPoint(hdc, str.c_str() , str.length(), line_width, &dis_num, NULL, &px);
+		int str_width = px.cx;
+		int str_height = px.cy;
+		str_width = str_width*tfi->tm.tmHeight / dtfi->tm.tmHeight;
+		str_height = str_height*tfi->tm.tmHeight / dtfi->tm.tmHeight;
+		int max_width = pControl->GetWidth();
+		if (c_back)
+		{
+			linecount = str_width / (max_width - 140) + 1;
+		}
+		int height = 30 + linecount * (str_height + 8);
+
 		CLabelUI *pMaxMsg = new CLabelUI();
 		pMaxMsg->SetAttribute(L"bkcolor", L"0xFFD4F3FC");
 		pMaxMsg->SetAttribute(L"align", L"center");
-		pMaxMsg->SetAttribute(L"valign", L"center");
+		pMaxMsg->SetAttribute(L"valign", L"vcenter");
 		pMaxMsg->SetAttribute(L"borderround", L"10,10");
+		pMaxMsg->SetAttribute(L"multiline", L"true");
 		pMaxMsg->SetAttribute(L"font", pStateManger->GetNFont());
+		wchar_t insetstr[64] = { 0 };
+		int inset_x = (max_width - 20 - str_width*1.2) / 2;
+		int inset_y = (500 - height) / 2;
+		wsprintf(insetstr, L"0,%d,0,5", inset_y);
+		pMaxMsg->SetAttribute(L"textpadding", insetstr);
+
 		pMaxMsg->SetText(str.c_str());
 		max_node->SetMinHeight(500);
 		max_node->SetMaxHeight(500);
@@ -864,6 +967,7 @@ int SpeakerWindow::AddP1(wstring str, bool bfocus)
 		InfoEdit->SetText(str.c_str());
 		if(!bfocus)
 			InfoEdit->SetAttribute(L"bkcolor", L"#FFF3F3F3");
+
 		EditNode->Add(InfoEdit);
 		
 		//pTControl->AddAt(EditNode, pControl->GetNodeIndex() + 1);
@@ -1806,7 +1910,15 @@ bool SpeakerWindow::ImportMatchInfo(wstring path)
 				pComboControl->SelectItem(1);
 
 			}
-
+			Ulist.clear();
+			if (!pStateManger->MatchValue["userdata"].isNull())
+			{
+				int count = pStateManger->MatchValue["userdata"].size();
+				for (int i = 0; i < count; i++)
+				{
+					Ulist.push_back(String2WString(string(U2G(pStateManger->MatchValue["userdata"][i]["key"].asCString()))));
+				}
+			}
 			UpdateMatchInfo();
 			UpdateMainUI();
 		}
@@ -1863,7 +1975,15 @@ bool SpeakerWindow::ImportMatchInfo(wstring path)
 			//pComboControl->SelectItem(1);
 
 		}
-
+		Ulist.clear();
+		if (!pStateManger->MatchValue["userdata"].isNull())
+		{
+			int count = pStateManger->MatchValue["userdata"].size();
+			for (int i = 0; i < count; i++)
+			{
+				Ulist.push_back(String2WString(string(U2G(pStateManger->MatchValue["userdata"][i]["key"].asCString()))));
+			}
+		}
 		UpdateMatchInfo();
 		UpdateMainUI();
 	}

@@ -1,29 +1,48 @@
 {
    "EventMap" : [
       {
-         "key" : "0",
-         "msgs" : [ "#T #P \u88ab\u7f5a\u4e0b", "#T #P \u88ab\u66ff\u6362" ],
-         "name" : "\u7ea2\u724c1"
-      },
-      {
          "key" : "1",
-         "msgs" : [
-            "#T #P \u548c#R\u53d1\u751f\u51b2\u7a81",
-            "#T #P \u548c#T #P\u53d1\u751f\u51b2\u7a81"
-         ],
-         "name" : "\u7ea2\u724c2"
+         "msgs" : [ "\u6b64\u753b\u9762\u7531#D \u673a\u4f4d\u63d0\u4f9b" ],
+         "name" : "\u673a\u4f4d\u89d2\u5ea6"
       },
       {
          "key" : "2",
-         "msgs" : [ "#T #P \u8d8a\u754c" ],
-         "name" : "\u7ea2\u724c3"
+         "msgs" : [
+            "\u5df2\u5bf9\u4e8b\u4ef6\u8fdb\u884c\u56de\u770b\u5206\u6790\u3002\u56de\u770b\u5206\u6790\u8868\u660e\uff0c\u7403\u5df2\u7ecf\u8d8a\u8fc7\u7403\u95e8\u7ebf\uff0c\u5224\u5b9a #T \u8fdb\u7403\u6709\u6548\u3002",
+            "\u5df2\u5bf9\u4e8b\u4ef6\u8fdb\u884c\u56de\u770b\u5206\u6790\u3002\u56de\u770b\u5206\u6790\u8868\u660e\uff0c\u8fdb\u7403\u524d #T #P #B\uff0c#T \u8fdb\u7403\u65e0\u6548\u3002"
+         ],
+         "name" : "\u8fdb\u7403\u4e8b\u4ef6"
+      },
+      {
+         "key" : "3",
+         "msgs" : [
+            "\u5df2\u5bf9\u4e8b\u4ef6\u8fdb\u884c\u56de\u770b\u5206\u6790\u3002\u56de\u770b\u5206\u6790\u8868\u660e\uff0c#T #P #B\uff0c\u5224\u4e88 #T \u7403\u70b9\u7403\u3002",
+            "\u5df2\u5bf9\u4e8b\u4ef6\u8fdb\u884c\u56de\u770b\u5206\u6790\u3002\u56de\u770b\u5206\u6790\u8868\u660e\uff0c #T \u5728\u7f5a\u7403\u533a\u5185\u5b9e\u65bd\u4e86\u72af\u89c4\uff0c\u5224\u4e88 #T \u7403\u70b9\u7403\u3002"
+         ],
+         "name" : "\u7403\u70b9\u7403\u4e8b\u4ef6"
+      },
+      {
+         "key" : "4",
+         "msgs" : [
+            "\u5df2\u5bf9\u4e8b\u4ef6\u8fdb\u884c\u56de\u770b\u5206\u6790\u3002\u56de\u770b\u5206\u6790\u8868\u660e\uff0c\u6b64\u524d #T #P #B\uff0c\u53d6\u6d88 #T #P \u56e0\u7834\u574f\u660e\u663e\u5f97\u5206\u673a\u4f1a\u800c\u5f97\u5230\u7684\u7ea2\u724c",
+            "\u5df2\u5bf9\u4e8b\u4ef6\u8fdb\u884c\u56de\u770b\u5206\u6790\u3002\u56de\u770b\u5206\u6790\u8868\u660e\uff0c\u6b64\u524d\u5bf9\u65b9\u8fdb\u653b\u65f6\uff0c\u7403\u5df2\u7ecf\u79bb\u5f00\u6bd4\u8d5b\u573a\u5730\uff0c\u53d6\u6d88 #T #P \u56e0\u7834\u574f\u660e\u663e\u5f97\u5206\u673a\u4f1a\u800c\u5f97\u5230\u7684\u7ea2\u724c"
+         ],
+         "name" : "\u7ea2\u724c\u4e8b\u4ef6"
+      },
+      {
+         "key" : "5",
+         "msgs" : [
+            "\u5df2\u5bf9\u4e8b\u4ef6\u8fdb\u884c\u56de\u770b\u5206\u6790\u3002\u53d6\u6d88#T #P \u9ec4\u724c\u3002\u5411#T #P\u51fa\u793a\u9ec4\u724c",
+            "\u5df2\u5bf9\u4e8b\u4ef6\u8fdb\u884c\u56de\u770b\u5206\u6790\u3002\u53d6\u6d88#T #P \u7ea2\u724c\u3002\u5411#T #P \u51fa\u793a\u7ea2\u724c\u3002"
+         ],
+         "name" : "\u8eab\u4efd\u8bc6\u522b\u95ee\u9898"
       }
    ],
    "LNfont" : "11",
    "LOfont" : "1",
-   "ListenerName" : "22Listener",
-   "SNfont" : "11",
-   "SOfont" : "1",
+   "ListenerName" : "Listener",
+   "SNfont" : "7",
+   "SOfont" : "5",
    "SpeakerName" : "Speaker",
    "Team1ID" : 1,
    "Team2ID" : 0

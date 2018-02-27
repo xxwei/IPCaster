@@ -372,13 +372,13 @@ int ListenerWindow::AddNewMessage(wstring str)
 	int itemcount = pControl->GetCount();
 	wsprintf(timestr, L"%02d:%02d:%02d", (st.wHour + 8) % 24, st.wMinute, st.wSecond);
 	CListLabelElementUI *time_node = new CListLabelElementUI();
+	time_node->SetAttribute(L"text", timestr);
 	time_node->SetAttribute(L"height", L"25");
 	time_node->SetAttribute(L"enabled", L"false");
-	time_node->SetAttribute(L"text", timestr);
 	time_node->SetAttribute(L"align", L"center");
 	if (itemcount)
 	{
-		pControl->AddAt(time_node,itemcount-1);
+		pControl->AddAt(time_node, itemcount - 1);
 	}
 	else
 	{
@@ -388,15 +388,16 @@ int ListenerWindow::AddNewMessage(wstring str)
 	if (itemcount)
 	{
 		//有记录
-		
+
 		CListContainerElementUI *max_node = static_cast<CListContainerElementUI*>(pControl->GetItemAt(itemcount));
 		CLabelUI *max_item = static_cast<CLabelUI*>(max_node->GetItemAt(0));
-		if(max_item)
+		if (max_item)
 		{
 			CDuiString oldmsg = max_item->GetText();
 			CListContainerElementUI *new_node = new CListContainerElementUI;
 			new_node->SetAttribute(L"inset", L"60,5,60,5");
 			new_node->SetAttribute(L"enabled", L"false");
+			//new_node->SetAttribute(L"float", L"true");
 			CRichEditUI *pOldMsg = new CRichEditUI();
 			pOldMsg->SetAttribute(L"bkcolor", L"0xFFEEEEEE");
 			pOldMsg->SetAttribute(L"align", L"center");
@@ -411,47 +412,98 @@ int ListenerWindow::AddNewMessage(wstring str)
 			pOldMsg->SetInset(rc);
 			pOldMsg->SetText(oldmsg);
 
+
 			SIZE px;
 			int linecount = 1;
+			TFontInfo *tfi = m_PaintManager.GetFontInfo(_wtoi(pStateManger->GetOFont()));
+			TFontInfo *dtfi = m_PaintManager.GetDefaultFontInfo();
 			HDC hdc = m_PaintManager.GetPaintDC();
 			int dis_num = 0, line_width = 0;//区域内可显示的字符个数，及区域大小（像素点的范围）
 			BOOL c_back = TRUE;
 			c_back = ::GetTextExtentExPoint(hdc, oldmsg, lstrlen(oldmsg), line_width, &dis_num, NULL, &px);
+			int str_width = px.cx;
+			int str_height = px.cy;
+			str_width = str_width*tfi->tm.tmHeight / dtfi->tm.tmHeight;
+			str_height = str_height*tfi->tm.tmHeight / dtfi->tm.tmHeight;
 			int max_width = pControl->GetWidth();
 			if (c_back)
 			{
-				linecount = px.cx / (max_width - 140) + 1;
+				linecount = str_width / (max_width - 140) + 1;
 			}
-			int height = 30 + linecount * (px.cy + 8);
+			int height = 30 + linecount * (str_height *1.5);
 			new_node->SetMinHeight(height);
 			new_node->SetMaxHeight(height);
 
 			if (linecount == 1)
 			{
 				wchar_t insetstr[64] = { 0 };
-				int inset_x = (max_width - 40 - px.cx) / 2;
+				int inset_x = (max_width - 20 - str_width*1.2) / 2;
 				wsprintf(insetstr, L"%d,5,%d,5", inset_x, inset_x);
 				new_node->SetAttribute(L"inset", insetstr);
 			}
 			new_node->Add(pOldMsg);
 			pControl->AddAt(new_node, itemcount - 1);
+
+			// 更新文本
+			tfi = m_PaintManager.GetFontInfo(_wtoi(pStateManger->GetNFont()));
+			c_back = ::GetTextExtentExPoint(hdc, str.c_str(), str.length(), line_width, &dis_num, NULL, &px);
+			str_width = px.cx;
+			str_height = px.cy;
+			str_width = str_width*tfi->tm.tmHeight / dtfi->tm.tmHeight;
+			str_height = str_height*tfi->tm.tmHeight / dtfi->tm.tmHeight;
+			max_width = pControl->GetWidth();
+			if (c_back)
+			{
+				linecount = str_width / max_width + 1;
+			}
+			height = 30 + linecount * (str_height + 8);
+
+			wchar_t insetstr[64] = { 0 };
+			int inset_y = (500 - height) / 2;
+			wsprintf(insetstr, L"0,%d,0,5", inset_y);
+			max_item->SetAttribute(L"textpadding", insetstr);
+			max_item->SetAttribute(L"font", pStateManger->GetNFont());
+			max_item->SetText(str.c_str());
 		}
-		max_item->SetAttribute(L"font", pStateManger->GetNFont());
-		max_item->SetText(str.c_str());
-		
-		
 	}
 	else
 	{
 		CListContainerElementUI *max_node = new CListContainerElementUI;
 		max_node->SetAttribute(L"inset", L"60,5,60,5");
 		max_node->SetAttribute(L"enabled", L"false");
+
+		int linecount = 1;
+		SIZE px;
+		TFontInfo *tfi = m_PaintManager.GetFontInfo(_wtoi(pStateManger->GetNFont()));
+		TFontInfo *dtfi = m_PaintManager.GetDefaultFontInfo();
+		HDC hdc = m_PaintManager.GetPaintDC();
+		int dis_num = 0, line_width = 0;//区域内可显示的字符个数，及区域大小（像素点的范围）
+		BOOL c_back = TRUE;
+		c_back = ::GetTextExtentExPoint(hdc, str.c_str(), str.length(), line_width, &dis_num, NULL, &px);
+		int str_width = px.cx;
+		int str_height = px.cy;
+		str_width = str_width*tfi->tm.tmHeight / dtfi->tm.tmHeight;
+		str_height = str_height*tfi->tm.tmHeight / dtfi->tm.tmHeight;
+		int max_width = pControl->GetWidth();
+		if (c_back)
+		{
+			linecount = str_width / (max_width - 140) + 1;
+		}
+		int height = 30 + linecount * (str_height + 8);
+
 		CLabelUI *pMaxMsg = new CLabelUI();
 		pMaxMsg->SetAttribute(L"bkcolor", L"0xFFD4F3FC");
 		pMaxMsg->SetAttribute(L"align", L"center");
-		pMaxMsg->SetAttribute(L"valign", L"center");
+		pMaxMsg->SetAttribute(L"valign", L"vcenter");
 		pMaxMsg->SetAttribute(L"borderround", L"10,10");
+		pMaxMsg->SetAttribute(L"multiline", L"true");
 		pMaxMsg->SetAttribute(L"font", pStateManger->GetNFont());
+		wchar_t insetstr[64] = { 0 };
+		int inset_x = (max_width - 20 - str_width*1.2) / 2;
+		int inset_y = (500 - height) / 2;
+		wsprintf(insetstr, L"0,%d,0,5", inset_y);
+		pMaxMsg->SetAttribute(L"textpadding", insetstr);
+
 		pMaxMsg->SetText(str.c_str());
 		max_node->SetMinHeight(500);
 		max_node->SetMaxHeight(500);
@@ -459,13 +511,13 @@ int ListenerWindow::AddNewMessage(wstring str)
 		pControl->Add(max_node);
 	}
 
-	wsprintf(timestr, L"%04d-%02d-%02d %02d:%02d:%02d:%04d",st.wYear,st.wMonth,st.wDay, (st.wHour + 8) % 24, st.wMinute, st.wSecond,st.wMilliseconds);
+	wsprintf(timestr, L"%04d-%02d-%02d %02d:%02d:%02d:%04d", st.wYear, st.wMonth, st.wDay, (st.wHour + 8) % 24, st.wMinute, st.wSecond, st.wMilliseconds);
 	pStateManger->AddChatlog(wstring(timestr), str);
-	HWND hwnd = m_PaintManager.GetPaintWindow();
-	SetTimer(hwnd, 2, 60, NULL);
+	pControl->EndDown();
 	return 0;
 
 }
+
 void ListenerWindow::UpdateMainUI()
 {
 	CTextUI *pNickNameControl = static_cast<CTextUI*>(m_PaintManager.FindControl(_T("nickname")));

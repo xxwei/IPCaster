@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+ï»¿#include "StdAfx.h"
 
 #include "UIMenu.h"
 
@@ -173,7 +173,7 @@ void CMenuWnd::Init(CMenuElementUI* pOwner, STRINGorID xml, POINT point,
 	m_xml = xml;
 	m_dwAlignment = dwAlignment;
 
-	// Èç¹ûÊÇÒ»¼¶²Ëµ¥µÄ´´½¨
+	// å¦‚æžœæ˜¯ä¸€çº§èœå•çš„åˆ›å»º
 	if (pOwner == NULL)
 	{
 		ASSERT(pMainPaintManager != NULL);
@@ -344,7 +344,7 @@ void CMenuWnd::ResizeMenu()
 	szAvailable = pRoot->EstimateSize(szAvailable);
 	m_pm.SetInitSize(szAvailable.cx, szAvailable.cy);
 
-	//±ØÐëÊÇMenu±êÇ©×÷ÎªxmlµÄ¸ù½Úµã
+	//å¿…é¡»æ˜¯Menuæ ‡ç­¾ä½œä¸ºxmlçš„æ ¹èŠ‚ç‚¹
 	CMenuUI *pMenuRoot = static_cast<CMenuUI*>(pRoot);
 	ASSERT(pMenuRoot);
 
@@ -376,6 +376,16 @@ void CMenuWnd::ResizeMenu()
 	SetWindowPos(m_hWnd, HWND_TOPMOST, rc.left, rc.top,
 		rc.GetWidth(), rc.GetHeight() + pMenuRoot->GetInset().bottom + pMenuRoot->GetInset().top,
 		SWP_SHOWWINDOW);
+	int nCount = GetMenuUI()->GetCount();
+	if (nCount > 9|| bMutilKey)
+	{
+		m_MutilKey = 2;
+	}
+	else
+	{
+		m_MutilKey = 1;
+	}
+	
 }
 
 void CMenuWnd::ResizeSubMenu()
@@ -544,18 +554,47 @@ LRESULT CMenuWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 		}
 		else
 		{
-			CDuiString key;
-			key.Format(_T("%c"), wParam);
-			key.MakeUpper();
-			int count = GetMenuUI()->GetCount();
-			for (int i = 0; i < count; i++)
+			if (m_MutilKey > 1)
 			{
-				CMenuElementUI* pControl = static_cast<CMenuElementUI*>(GetMenuUI()->GetItemAt(i));
-				if (pControl->GetUserData() == key)
+				if (m_LastKey == 0)
 				{
-					TEventUI ev;
-					ev.Type = UIEVENT_BUTTONUP;
-					pControl->DoEvent(ev);
+					m_LastKey = wParam;
+				}
+				else
+				{
+					CDuiString key;
+					key.Format(_T("%c%c"), m_LastKey,wParam);
+					key.MakeUpper();
+					int count = GetMenuUI()->GetCount();
+					for (int i = 0; i < count; i++)
+					{
+						CMenuElementUI* pControl = static_cast<CMenuElementUI*>(GetMenuUI()->GetItemAt(i));
+						if (pControl->GetUserData() == key)
+						{
+							TEventUI ev;
+							ev.Type = UIEVENT_BUTTONUP;
+							pControl->DoEvent(ev);
+							break;
+						}
+					}
+					m_LastKey = 0;
+				}
+			}
+			else
+			{
+				CDuiString key;
+				key.Format(_T("%c"), wParam);
+				key.MakeUpper();
+				int count = GetMenuUI()->GetCount();
+				for (int i = 0; i < count; i++)
+				{
+					CMenuElementUI* pControl = static_cast<CMenuElementUI*>(GetMenuUI()->GetItemAt(i));
+					if (pControl->GetUserData() == key)
+					{
+						TEventUI ev;
+						ev.Type = UIEVENT_BUTTONUP;
+						pControl->DoEvent(ev);
+					}
 				}
 			}
 

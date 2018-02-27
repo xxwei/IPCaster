@@ -59,6 +59,9 @@ private:
 	//通配符R
 	list<wstring>		Rlist;
 
+	//通配符类别
+	list<wstring>		Ulist;
+	
 	//消息列表
 	EventMap			EMmap;
 

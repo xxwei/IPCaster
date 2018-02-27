@@ -1,4 +1,4 @@
-#ifndef __UIMENU_H__
+﻿#ifndef __UIMENU_H__
 #define __UIMENU_H__
 
 #pragma once
@@ -27,22 +27,22 @@ enum MenuAlignment
 
 enum MenuItemDefaultInfo
 {
-	ITEM_DEFAULT_HEIGHT = 30,		//ÿһ��item��Ĭ�ϸ߶ȣ�ֻ����״����ʱ�Զ��壩
-	ITEM_DEFAULT_WIDTH = 130,		//���ڵ�Ĭ�Ͽ���
+	ITEM_DEFAULT_HEIGHT = 30,		//每一个item的默认高度（只在竖状排列时自定义）
+	ITEM_DEFAULT_WIDTH = 130,		//窗口的默认宽度
 
-	ITEM_DEFAULT_ICON_WIDTH = 26,	//Ĭ��ͼ����ռ����
-	ITEM_DEFAULT_ICON_SIZE = 16,	//Ĭ��ͼ��Ĵ�С
+	ITEM_DEFAULT_ICON_WIDTH = 26,	//默认图标所占宽度
+	ITEM_DEFAULT_ICON_SIZE = 16,	//默认图标的大小
 
-	ITEM_DEFAULT_EXPLAND_ICON_WIDTH = 20,	//Ĭ���¼��˵���չͼ����ռ����
+	ITEM_DEFAULT_EXPLAND_ICON_WIDTH = 20,	//默认下级菜单扩展图标所占宽度
 
-	DEFAULT_LINE_LEFT_INSET = ITEM_DEFAULT_ICON_WIDTH + 3,	//Ĭ�Ϸָ��ߵ���߾�
-	DEFAULT_LINE_RIGHT_INSET = 7,	//Ĭ�Ϸָ��ߵ��ұ߾�
-	DEFAULT_LINE_HEIGHT = 6,		//Ĭ�Ϸָ�����ռ�߶�
-	DEFAULT_LINE_COLOR = 0xFFBCBFC4	//Ĭ�Ϸָ�����ɫ
+	DEFAULT_LINE_LEFT_INSET = ITEM_DEFAULT_ICON_WIDTH + 3,	//默认分隔线的左边距
+	DEFAULT_LINE_RIGHT_INSET = 7,	//默认分隔线的右边距
+	DEFAULT_LINE_HEIGHT = 6,		//默认分隔线所占高度
+	DEFAULT_LINE_COLOR = 0xFFBCBFC4	//默认分隔线颜色
 
 };
 
-#define WM_MENUCLICK WM_USER + 121  //�������հ�ť��������Ϣ
+#define WM_MENUCLICK WM_USER + 121  //用来接收按钮单击的消息
 
 
 ///////////////////////////////////////////////
@@ -272,12 +272,12 @@ public:
 	~CMenuWnd();
 
 	/*
-	*	@pOwner һ���˵���Ҫָ��������������ǲ˵��ڲ�ʹ�õ�
-	*	@xml	�˵��Ĳ����ļ�
-	*	@point	�˵������Ͻ�����
-	*	@pMainPaintManager	�˵��ĸ����������ָ��
-	*	@pMenuCheckInfo	����˵��ĵ�ѡ�͸�ѡ��Ϣ�ṹָ��
-	*	@dwAlignment		�˵��ĳ���λ�ã�Ĭ�ϳ������������²ࡣ
+	*	@pOwner 一级菜单不要指定这个参数，这是菜单内部使用的
+	*	@xml	菜单的布局文件
+	*	@point	菜单的左上角坐标
+	*	@pMainPaintManager	菜单的父窗体管理器指针
+	*	@pMenuCheckInfo	保存菜单的单选和复选信息结构指针
+	*	@dwAlignment		菜单的出现位置，默认出现在鼠标的右下侧。
 	*/
 	static CMenuWnd* CreateMenu(CMenuElementUI* pOwner, STRINGorID xml, POINT point,
 		CPaintManagerUI* pMainPaintManager, std::map<CDuiString, bool>* pMenuCheckInfo = NULL,
@@ -298,16 +298,16 @@ public:
 
 	BOOL Receive(ContextMenuParam param);
 
-	// ��ȡ���˵��ؼ������ڶ�̬�����Ӳ˵�
+	// 获取根菜单控件，用于动态添加子菜单
 	CMenuUI* GetMenuUI();
 
-	// ���µ����˵��Ĵ�С
+	// 重新调整菜单的大小
 	void ResizeMenu();
 
-	// ���µ����Ӳ˵��Ĵ�С
+	// 重新调整子菜单的大小
 	void ResizeSubMenu();
 
-
+	bool	bMutilKey = false;
 private:
 	friend class CMenuElementUI;
 	void Init(CMenuElementUI* pOwner, STRINGorID xml, POINT point,
@@ -320,9 +320,13 @@ private:
     CPaintManagerUI m_pm;
     CMenuElementUI* m_pOwner;
     CMenuUI*		m_pLayout;
-	DWORD			m_dwAlignment;	//�˵����뷽ʽ
+	DWORD			m_dwAlignment;	//菜单对齐方式
 
-	static CDuiString	s_clickedMenuItem;	//�������Ĳ˵�������
+	static CDuiString	s_clickedMenuItem;	//被单击的菜单项名字
+
+	int				m_MutilKey = 1;
+	WPARAM			m_LastKey = 0;
+
 };
 
 class CListContainerElementUI;
@@ -367,11 +371,11 @@ public:
 protected:
 	CMenuWnd*	m_pWindow;
 
-	bool		m_bDrawLine;	//���ָ���
-	DWORD		m_dwLineColor;  //�ָ�����ɫ
-	RECT		m_rcLinePadding;//�ָ��ߵ����ұ߾�
+	bool		m_bDrawLine;	//画分隔线
+	DWORD		m_dwLineColor;  //分隔线颜色
+	RECT		m_rcLinePadding;//分割线的左右边距
 
-	SIZE		m_szIconSize; 	//��ͼ��
+	SIZE		m_szIconSize; 	//画图标
 	bool		m_bCheckItem;
 	//CImageAttribute m_icon;
 
