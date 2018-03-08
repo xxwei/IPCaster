@@ -61,8 +61,7 @@ void  ListenerWindow::InitWindow()
 	//读取配置
 	UpdateSettingUI();
 	UpdateMainUI();
-
-
+	m_bInit = true;
 }
 LRESULT ListenerWindow::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
@@ -91,6 +90,12 @@ LRESULT ListenerWindow::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 		{
 			AddNewMessage(m_newmsg);
 			KillTimer(m_hWnd, 3);
+			Sleep(50);
+			CListUI* pListControl = static_cast<CListUI*>(m_PaintManager.FindControl(_T("msglist")));
+			if (pListControl)
+			{
+				pListControl->EndDown();
+			}
 		}
 		if (wParam == 4)
 		{
@@ -146,6 +151,113 @@ LRESULT ListenerWindow::MessageHandler(UINT uMsg, WPARAM wParam, LPARAM lParam, 
 	//}
 	return __super::MessageHandler(uMsg, wParam, lParam, bHandled);
 }
+LRESULT ListenerWindow::OnSize(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+{
+	LRESULT ret = __super::OnSize(uMsg, wParam, lParam, bHandled);
+	if (m_bInit)
+	{
+		CListUI* pControl = static_cast<CListUI*>(m_PaintManager.FindControl(_T("msglist")));
+		if (!pControl)
+			return -1;
+		wchar_t insetstr[64] = { 0 };
+		int width = LOWORD(lParam);
+		int height = HIWORD(lParam);
+		int nCount = pControl->GetCount();
+		for (int i = 0; i < nCount; i++)
+		{
+			if (pControl->GetItemAt(i)->GetUserData() == L"msga")
+			{
+				ReSizeMsgaNode(width - 426, static_cast<CListContainerElementUI*>(pControl->GetItemAt(i)));
+			}
+			else if (pControl->GetItemAt(i)->GetUserData() == L"mmsg")
+			{
+				ReSizeMaxMsgNode(width - 426, static_cast<CListContainerElementUI*>(pControl->GetItemAt(i)));
+			}
+		}
+	}
+	return ret;
+}
+void ListenerWindow::ReSizeMsgaNode(int max_width, CListContainerElementUI *new_node)
+{
+	SIZE px;
+	int linecount = 1;
+	TFontInfo *tfi = m_PaintManager.GetFontInfo(_wtoi(pStateManger->GetOFont()));
+	TFontInfo *dtfi = m_PaintManager.GetDefaultFontInfo();
+	HDC hdc = m_PaintManager.GetPaintDC();
+	CDuiString msg = new_node->GetItemAt(0)->GetText();
+	int dis_num = 0, line_width = 0;//区域内可显示的字符个数，及区域大小（像素点的范围）
+	BOOL c_back = TRUE;
+	c_back = ::GetTextExtentExPoint(hdc, msg, lstrlen(msg), line_width, &dis_num, NULL, &px);
+	int str_width = px.cx;
+	int str_height = px.cy;
+	str_width = str_width*tfi->tm.tmHeight / dtfi->tm.tmHeight;
+	str_height = str_height*tfi->tm.tmHeight / dtfi->tm.tmHeight;
+	//int max_width = pList->GetWidth();
+	if (c_back)
+	{
+		linecount = str_width / (max_width - 140) + 1;
+	}
+	int height = 30 + linecount * (str_height *1.5);
+	new_node->SetMinHeight(height);
+	new_node->SetMaxHeight(height);
+
+	if (linecount == 1)
+	{
+		wchar_t insetstr[64] = { 0 };
+		int inset_x = (max_width - 20 - str_width*1.2) / 2;
+		wsprintf(insetstr, L"%d,5,%d,5", inset_x, inset_x);
+		OutputDebugString(insetstr);
+		new_node->SetAttribute(L"inset", insetstr);
+	}
+	else
+	{
+		wchar_t insetstr[64] = { 0 };
+		wsprintf(insetstr, L"%d,5,%d,5", 0, 0);
+		OutputDebugString(insetstr);
+		new_node->SetAttribute(L"inset", insetstr);
+	}
+}
+
+void ListenerWindow::ReSizeMaxMsgNode(int max_width, CListContainerElementUI *max_node)
+{
+	CLabelUI *max_item = static_cast<CLabelUI*>(max_node->GetItemAt(0));
+	if (max_item)
+	{
+		SIZE px;
+		int linecount = 1;
+		HDC hdc = m_PaintManager.GetPaintDC();
+		CDuiString msg = max_node->GetItemAt(0)->GetText();
+		int dis_num = 0, line_width = 0;//区域内可显示的字符个数，及区域大小（像素点的范围）
+		BOOL c_back = TRUE;
+		c_back = ::GetTextExtentExPoint(hdc, msg, lstrlen(msg), line_width, &dis_num, NULL, &px);
+		TFontInfo *tfi = m_PaintManager.GetFontInfo(_wtoi(pStateManger->GetNFont()));
+		TFontInfo *dtfi = m_PaintManager.GetDefaultFontInfo();
+		int str_width = px.cx;
+		int str_height = px.cy;
+		str_width = str_width*tfi->tm.tmHeight / dtfi->tm.tmHeight;
+		str_height = str_height*tfi->tm.tmHeight / dtfi->tm.tmHeight;
+		//int max_width = pList->GetWidth();
+		if (c_back)
+		{
+			linecount = str_width / max_width + 1;
+		}
+		int height = 30 + linecount * (str_height + 8);
+		int labheight = height + 100;
+		if (linecount < 4)
+		{
+			labheight = str_height * 3 + 100;
+		}
+		wchar_t insetstr[64] = { 0 };
+		int inset_y = (labheight - height) / 2;
+		wsprintf(insetstr, L"0,%d,0,5", inset_y);
+		max_item->SetAttribute(L"textpadding", insetstr);
+		max_item->SetAttribute(L"font", pStateManger->GetNFont());
+		max_node->SetMinHeight(labheight);
+		max_node->SetMaxHeight(labheight);
+
+	}
+}
+
 bool isIPAddressValid(const char* pszIPAddr)
 {
 	if (!pszIPAddr) return false; //若pszIPAddr为空    
@@ -376,6 +488,7 @@ int ListenerWindow::AddNewMessage(wstring str)
 	time_node->SetAttribute(L"height", L"25");
 	time_node->SetAttribute(L"enabled", L"false");
 	time_node->SetAttribute(L"align", L"center");
+	time_node->SetUserData(L"time");
 	if (itemcount)
 	{
 		pControl->AddAt(time_node, itemcount - 1);
@@ -397,6 +510,7 @@ int ListenerWindow::AddNewMessage(wstring str)
 			CListContainerElementUI *new_node = new CListContainerElementUI;
 			new_node->SetAttribute(L"inset", L"60,5,60,5");
 			new_node->SetAttribute(L"enabled", L"false");
+			new_node->SetUserData(L"msga");
 			//new_node->SetAttribute(L"float", L"true");
 			CRichEditUI *pOldMsg = new CRichEditUI();
 			pOldMsg->SetAttribute(L"bkcolor", L"0xFFEEEEEE");
@@ -452,14 +566,23 @@ int ListenerWindow::AddNewMessage(wstring str)
 			str_width = str_width*tfi->tm.tmHeight / dtfi->tm.tmHeight;
 			str_height = str_height*tfi->tm.tmHeight / dtfi->tm.tmHeight;
 			max_width = pControl->GetWidth();
-			if (c_back)
+			if (c_back&&max_width)
 			{
 				linecount = str_width / max_width + 1;
 			}
 			height = 30 + linecount * (str_height + 8);
 
+			int labheight = height + 100;
+			if (linecount < 4)
+			{
+				labheight = str_height * 3 + 100;
+			}
+
 			wchar_t insetstr[64] = { 0 };
-			int inset_y = (500 - height) / 2;
+			int inset_x = (max_width - 20 - str_width*1.2) / 2;
+			int inset_y = (labheight - height) / 2;
+			max_node->SetMinHeight(labheight);
+			max_node->SetMaxHeight(labheight);
 			wsprintf(insetstr, L"0,%d,0,5", inset_y);
 			max_item->SetAttribute(L"textpadding", insetstr);
 			max_item->SetAttribute(L"font", pStateManger->GetNFont());
@@ -471,7 +594,7 @@ int ListenerWindow::AddNewMessage(wstring str)
 		CListContainerElementUI *max_node = new CListContainerElementUI;
 		max_node->SetAttribute(L"inset", L"60,5,60,5");
 		max_node->SetAttribute(L"enabled", L"false");
-
+		max_node->SetUserData(L"mmsg");
 		int linecount = 1;
 		SIZE px;
 		TFontInfo *tfi = m_PaintManager.GetFontInfo(_wtoi(pStateManger->GetNFont()));
@@ -498,15 +621,24 @@ int ListenerWindow::AddNewMessage(wstring str)
 		pMaxMsg->SetAttribute(L"borderround", L"10,10");
 		pMaxMsg->SetAttribute(L"multiline", L"true");
 		pMaxMsg->SetAttribute(L"font", pStateManger->GetNFont());
+
+		int labheight = height + 100;
+		if (linecount < 4)
+		{
+			labheight = str_height * 3 + 100;
+		}
+
 		wchar_t insetstr[64] = { 0 };
 		int inset_x = (max_width - 20 - str_width*1.2) / 2;
-		int inset_y = (500 - height) / 2;
+		int inset_y = (labheight - height) / 2;
 		wsprintf(insetstr, L"0,%d,0,5", inset_y);
 		pMaxMsg->SetAttribute(L"textpadding", insetstr);
 
 		pMaxMsg->SetText(str.c_str());
-		max_node->SetMinHeight(500);
-		max_node->SetMaxHeight(500);
+
+
+		max_node->SetMinHeight(labheight);
+		max_node->SetMaxHeight(labheight);
 		max_node->Add(pMaxMsg);
 		pControl->Add(max_node);
 	}

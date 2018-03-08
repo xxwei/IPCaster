@@ -34,7 +34,7 @@ public:
 	void ReadMatchInfo(string path);
 	void SaveMatchInfo(string path);
 
-
+	void ReadFlow();
 
 	void SetListenerCB(MessageCallBack *pMCB);
 	void SetSpeakerCB(MessageCallBack *pMCB);
@@ -75,9 +75,13 @@ public:
 	CDuiString GetOFont();
 
 	bool SendMsg(Message msg);
+
+	void	ExitState();
 public:
 	Value			SettingValue;
 	Value			MatchValue;
+	Value			FlowValue;
+	Value			CurrentFlowValue;
 private:
 	int				m_nState = 0;
 	FindSpeakerLoop *m_findSpeaker = NULL;
@@ -85,12 +89,18 @@ private:
 	CDuiString		m_nfontid = L"5";
 	CDuiString		m_ofontid = L"1";
 	map<wstring, wstring> m_chatlog_map;
-
-
+	mutex			mapMutex;
+	std::ofstream	ChatFileStream;
+	bool			m_bStartSaveChat = false;
 	wstring			m_matchinfo = L" ";
 
 	Reader			m_JsonReader;
 	StyledWriter		m_JsonWriter;
+
+	void			ChatToFileThread();
+
+
+
 
 };
 

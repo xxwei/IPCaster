@@ -5,7 +5,7 @@
 #include "IPCaster.h"
 #include "ListenerWindow.h"
 #include "SpeakerWindow.h"
-
+#include "SpeakerWindowSample.h"
 
 //#ifdef _DEBUG
 //#pragma comment(lib, "DuiLib_d.lib")
@@ -14,6 +14,8 @@
 //#pragma comment(lib, "DuiLib.lib")
 //#pragma comment(lib, "libzmq.lib")
 //#endif
+
+#define SAMPLE
 
 #ifdef _DEBUG
 #pragma comment(lib, "DuiLib_ud.lib")
@@ -73,6 +75,7 @@ RESTART:
 	pLFrame->CenterWindow();
 	pLFrame->ShowModal();
 
+#ifndef SAMPLE
 
 	if (m_pStateManger->GetCurrentState() > 0)
 	{
@@ -88,10 +91,25 @@ RESTART:
 			goto RESTART;
 		}
 	}
-	
+#else
+	if (m_pStateManger->GetCurrentState() > 0)
+	{
+		SpeakerWindowSample *pSFrame = new SpeakerWindowSample();
+		pSFrame->SetStateManger(m_pStateManger);
+		m_pStateManger->SetSpeakerCB(pSFrame);
+		pSFrame->Create(NULL, _T("电子公告栏"), UI_WNDSTYLE_FRAME, WS_EX_WINDOWEDGE);
+		pSFrame->ShowWindow();
+		pSFrame->CenterWindow();
+		pSFrame->ShowModal();
+		if (m_pStateManger->GetCurrentState() == 0)
+		{
+			goto RESTART;
+		}
+	}
+#endif	
 
 	m_pStateManger->SaveCasterSetting();
-
+	m_pStateManger->ExitState();
 	//退出程序并释放COM库
 	::CoUninitialize();
 	return 0;

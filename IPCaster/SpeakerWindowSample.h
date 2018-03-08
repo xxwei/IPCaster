@@ -5,7 +5,7 @@ using namespace DuiLib;
 
 
 
-class SpeakerWindow :public WindowImplBase, public MessageCallBack
+class SpeakerWindowSample :public WindowImplBase, public MessageCallBack
 {
 public:
 	CControlUI* CreateControl(LPCTSTR pstrClassName);
@@ -21,13 +21,13 @@ public:
 	};
 	LPCTSTR GetWindowClassName() const
 	{
-		return L"SW";
+		return L"SWS";
 	}
 	UINT GetClassStyle() const {
 		return UI_CLASSSTYLE_FRAME | CS_DBLCLKS;
 	}
 	CDuiString GetSkinFile() {
-		return L"sw.xml";
+		return L"sws.xml";
 	}
 	CDuiString GetSkinFolder()
 	{
@@ -76,6 +76,13 @@ private:
 	int					m_CurrentCanShotKey = true;
 	bool				m_bStartSelectTeam = false;
 	bool				m_bInit = false;
+
+	int					m_lastwidth = 0;
+	int					m_lastheight = 0;
+	bool				m_bAuto = false;
+	CDuiString				m_CurrentTypeMsg = L"";
+
+	
 public:
 
 	void SelectItem();
@@ -112,6 +119,8 @@ public:
 	void UpdateSettingUI();
 
 
+	void UpdateFlowItem(int step);
+
 	void SaveMatchInfo();
 	bool ImportMatchInfo(wstring path=L"");
 	void ClearMatchUIInfo();
@@ -120,6 +129,9 @@ public:
 
 	CDuiString ReplaceOneItem(CDuiString Dst, int Pos, int len, CDuiString src);
 
-	void ReSizeMsgaNode(int max_width,CListContainerElementUI *node);
-	void ReSizeMaxMsgNode(int max_width, CListContainerElementUI *node);
+	void ReSizeItem(int max_width,int max_height);
+	void ClickItem(CDuiString ItemName,bool bSecond = false);
+
+
+	
 };

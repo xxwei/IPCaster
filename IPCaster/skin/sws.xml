@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Window size="1280,720" mininfo="1280,720" caption="0,0,0,40" sizebox="4,4,4,4" roundcorner="4,4,4,4">
+<Window size="1280,720" mininfo="1000,700" caption="0,0,0,40" sizebox="4,4,4,4" roundcorner="4,4,4,4">
 	<Font id="0" name="微软雅黑" size="12" bold="false" default="true" />
 	<Font id="1" name="微软雅黑" size="14" bold="true"/>
 	<Font id="2" name="微软雅黑" size="16" bold="true"/>
@@ -10,9 +10,13 @@
 	<Font id="7" name="微软雅黑" size="26" bold="true"/>
 	<Font id="8" name="微软雅黑" size="28" bold="true"/>
 	<Font id="9" name="微软雅黑" size="30" bold="true"/>
-		<Font id="10" name="微软雅黑" size="36" bold="true"/>
+	<Font id="10" name="微软雅黑" size="36" bold="true"/>
 	<Font id="11" name="微软雅黑" size="72" bold="true"/>
+	<!--
+	<Default name="VScrollBar" value="button1normalimage=&quot;file='scrollbar.png' source='0,0,16,16'&quot; button1hotimage=&quot;file='scrollbar.png' source='16,0,32,16,16'&quot; button1pushedimage=&quot;file='scrollbar.png' source='32,0,48,16'&quot; button2normalimage=&quot;file='scrollbar.png' source='0,32,16,48'&quot; button2hotimage=&quot;file='scrollbar.png' source='16,32,32,48'&quot; button2pushedimage=&quot;file='scrollbar.png' source='32,32,48,48'&quot; thumbnormalimage=&quot;file='scrollbar.png' source='0,48,16,64' corner='0,2,0,2'&quot; thumbhotimage=&quot;file='scrollbar.png' source='16,48,32,64' corner='0,2,0,2'&quot; thumbpushedimage=&quot;file='scrollbar.png' source='32,48,48,64' corner='0,2,0,2'&quot; bknormalimage=&quot;file='scrollbar.png' source='0,16,16,32'&quot;" />
+	-->
 	<Default name="VScrollBar" value="thumbnormalimage=&quot;file='scrollbar_n.png' source='0,0,12,500' corner='0,2,0,2'&quot;thumbhotimage=&quot;file='scrollbar_n.png' source='0,0,12,500' corner='0,2,0,2'&quot; thumbpushedimage=&quot;file='scrollbar_n.png' source='0,0,12,500' corner='0,2,0,2'&quot;showbutton1=&quot;false&quot;showbutton2=&quot;false&quot;bknormalimage=&quot;file='scrollbar_n.png' source='0,0,14,20'&quot;" />
+
 	<VerticalLayout  bkcolor="#FFAEAEAE" vscrollbar="false"> 
 	
 	   <HorizontalLayout height="30">
@@ -55,34 +59,30 @@
 				<Option font="3" name="settting" float="false" text="系统设置" textpadding="0,40,0,2" foreimage="file='setting.png' dest='61,30,95,64'" width="156" height="136"  group="switch"  textcolor="#FF999999"  align="center" selectedtextcolor="#ffFFAF8C" />
 
 			</VerticalLayout>
-			<VerticalLayout  padding="0,0,1,1" bordersize="1" bordercolor="#FF00FFFF" > 
+			<VerticalLayout  padding="0,0,1,1" bordersize="1" bordercolor="#FF0000FF" > 
 				<TabLayout name="pageswitch" selectedid="0" inset="0,0,0,0" ><!-- 主体界面 -->
 					<VerticalLayout childpadding="8,0,0,0" bkcolor="#FFFFFFFF"><!-- 信息发布 -->
 						<HorizontalLayout>
 							<List name="memberlist" width="140" vscrollbar="true" bkcolor="#FFBBBBBB" itemalign="center"  itemshowhtml="true" header="hidden" inset="0,0,0,0"    itemalign="center" hscrollbar="false" menu="true">							
 							</List>
 							<VerticalLayout>
-								<List name="msglist" vscrollbar="true" bkcolor="#FFFFFFFF" itemalign="center"  itemshowhtml="true" header="hidden" inset="0,0,0,0"    itemalign="center" hscrollbar="false" menu="true">
-								</List>
+								<HorizontalLayout>
+									<TileLayout name="flowitem" bkcolor="#FFFFFFFF">
+										
+									</TileLayout>
+									<list name="msgitem" width = "120" vscrollbar="true" bkcolor="#FFBBBBBB" itemalign="center"  itemshowhtml="true" header="hidden" inset="0,0,0,0"    itemalign="center" hscrollbar="false" menu="true" ></list>
+								</HorizontalLayout>
 								<Container name="midtool" height="2" bkcolor="#FFEEEEEE">
 								</Container>
-								<HorizontalLayout height="184" padding="1,1,1,10" bkcolor="#FFF0F0F0">
+								<HorizontalLayout height="104" padding="1,1,1,10" bkcolor="#FFF0F0F0">
 									<VerticalLayout>
-										<RichEdit name="editmsg" font="2" height="148" bkcolor="#FFFAFAFA" enabled="true" rich="false" readonly="false" wantreturn="false" wantctrlreturn="false"/>
+										<RichEdit name="editmsg" font="2" height="68" bkcolor="#FFFAFAFA" enabled="true" rich="false" readonly="false" wantreturn="false" wantctrlreturn="false"/>
 										<HorizontalLayout height="36"  bkcolor="#FFFAFAFA" >
 											<Control />
+											<Option name="auto"  text="自动发送" padding = "10,0,10,0"  height = "26" width = "90" normalimage="button.png" pushedimage="button_selected.png" selectedimage="button_selected.png"/>
 											<Button  name="cancel"  text="取消" padding = "10,0,10,0"  height = "26" width = "90" normalimage="button.png" pushedimage="button_selected.png"/>
 											<Button padding = "10,0,10,0" name="send" height = "26" width = "90"  text="发送(Enter)"  normalimage="button.png" pushedimage="button_selected.png"/>
 										</HorizontalLayout>
-									</VerticalLayout>
-									<VerticalLayout name="eventtip" width="30" bkcolor = "#FFF0F0F0">
-										<HorizontalLayout height="30"   >
-											<Control />
-											<Option name="eventshow"  width="26" height="28" normalimage="eventshow.png" pushedimage="eventshow_selected.png" selectedimage="eventshow_selected.png"/>
-										</HorizontalLayout>
-										<TreeView name="eventtree" padding="1,5,0,0" height="0" width="0" itemtextcolor="#FF000000"  vscrollbar="true" >
-											<TreeNode name="eventtreenode"text="事件" height="25" width="0" bordersize="1"  bordercolor="#FFE5E5E5" />
-										</TreeView>
 									</VerticalLayout>
 								</HorizontalLayout>
 								
@@ -97,14 +97,12 @@
 										<VerticalLayout>
 											<HorizontalLayout padding="30,30,30,0" >
 												<Label text="主队:" font="1"  width="40"/>
-												<Combo name="team1" bordersize="1" borderround="2,2" maxheight="25"  bordercolor="#FFCECECE" textpadding="9,3,9,5">
-													<ListLabelElement name="team1text" text="主队名称" selected="true"  />
+												<Combo name="team1combo" bordersize="1" borderround="2,2" maxheight="25"  bordercolor="#FFCECECE" textpadding="9,3,9,5">
 												</Combo>
 											</HorizontalLayout>
 											<HorizontalLayout padding="30,0,30,10" >
 												<Label text="客队:" font="1" width="40" />
-												<Combo name="team2" bordersize="1" borderround="2,2" maxheight="25"  bordercolor="#FFCECECE" textpadding="9,3,9,5">
-													<ListLabelElement name="team2text" text="客队名称" selected="true"  />
+												<Combo name="team2combo" bordersize="1" borderround="2,2" maxheight="25"  bordercolor="#FFCECECE" textpadding="9,3,9,5">
 												</Combo>
 											</HorizontalLayout>
 										</VerticalLayout>
@@ -117,7 +115,7 @@
 													<Label text="通配符" width="60"/>
 												</TreeNode>
 												
-												<TreeNode name="wildcardR" text="裁判" height="33" width="0" bordersize="1" bordercolor="#FFE5E5E5">
+												<TreeNode name="wildcardR" text="官员" height="33" width="0" bordersize="1" bordercolor="#FFE5E5E5">
 													<Label text="#R" width="60"/>
 													<TreeNode name="wildcardR1" text="主裁判" height="33" width="0" bordersize="1" bordercolor="#FFE5E5E5">
 														
@@ -186,15 +184,15 @@
 						</HorizontalLayout>
 						<HorizontalLayout padding="30,0,100,0" height="50" >
 							<Control />
-							<Button name="save" text="保存" padding = "10,0,10,0"  height = "26" width = "90" normalimage="button.png" pushedimage="button_selected.png"/>
+							<Button name="reset" text="重置" padding = "10,0,10,0"  height = "26" width = "90" normalimage="button.png" pushedimage="button_selected.png"/>
 							<Button name="import" text="导入" padding = "10,0,10,0"  height = "26" width = "90" normalimage="button.png" pushedimage="button_selected.png"/>
 						</HorizontalLayout>
 						</VerticalLayout>
 					</VerticalLayout>
 					<VerticalLayout childpadding="8,0,0,0" inset="124,50,0,0" bkcolor="#FFF3F3F3"><!-- 消息设置 -->
 						<Label text="消息设置" font="3" />
-						<Control height="1" bkcolor="#FFC8C8C8" width="500"/>
-						<TreeView name="msgtree" padding="10,30,10,10" height="0" width="500" itemtextcolor="#FF000000"  vscrollbar="true" >											
+						<Control height="1" bkcolor="#FFC8C8C8" padding="0,0,10,0"/>
+						<TreeView name="msgtree" padding="10,30,10,10" height="0"  itemtextcolor="#FF000000"  vscrollbar="true" hscrollbar="true">											
 							<TreeNode name="eventnode"text="常用消息" height="33" width="0" bordersize="1"  bordercolor="#FFE5E5E5">
 								<Label text="代码" width="60"/>
 								<!--
@@ -227,18 +225,20 @@
 							<VerticalLayout padding="10,10,0,0">
 								<HorizontalLayout childpadding="0,10,0,0" width="200" height ="35"> 
 										<Label text="字体:" font="1" width="80" />
-										<Combo name="nfont" bordersize="1" borderround="2,2" maxheight="25" width="100" bordercolor="#FFCECECE" textpadding="9,3,9,5">
+										<Combo name="nfont" bordersize="1" borderround="2,2" maxheight="25" width="100" bordercolor="#FFCECECE" textpadding="9,3,9,5" vscrollbar="true">
 											<ListLabelElement text="微软雅黑" selected="true"  />
 										</Combo>
 								</HorizontalLayout>
 								<HorizontalLayout childpadding="0,10,0,0" width="200"  height ="35"> 
 										<Label text="大小:" font="1" width="80"/>
-										<Combo name="nfontsize" bordersize="1" borderround="2,2" maxheight="25" width="100" bordercolor="#FFCECECE" textpadding="9,3,9,5">
+										<Combo name="nfontsize" bordersize="1" borderround="2,2" maxheight="25" width="100" bordercolor="#FFCECECE" textpadding="9,3,9,5" vscrollbar="true" dropboxsize="0,200">
 											<ListLabelElement text="22" selected="true" userdata="5" />
 											<ListLabelElement text="24" userdata="6"/>
 											<ListLabelElement text="26" userdata="7"/>
 											<ListLabelElement text="28" userdata="8"/>
 											<ListLabelElement text="30" userdata="9"/>
+											<ListLabelElement text="36" userdata="10"/>
+											<ListLabelElement text="72" userdata="11"/>
 										</Combo>
 								</HorizontalLayout>
 							</VerticalLayout>
@@ -250,13 +250,13 @@
 							<VerticalLayout padding="10,10,0,0">
 								<HorizontalLayout childpadding="0,10,0,0" width="200" height ="35"> 
 										<Label text="字体:" font="1" width="80" />
-										<Combo name="ofont" bordersize="1" borderround="2,2" maxheight="25" width="100" bordercolor="#FFCECECE" textpadding="9,3,35,5">
+										<Combo name="ofont" bordersize="1" borderround="2,2" maxheight="25" width="100" bordercolor="#FFCECECE" textpadding="9,3,35,5" vscrollbar="true">
 											<ListLabelElement text="微软雅黑" selected="true"  />
 										</Combo>
 								</HorizontalLayout>
 								<HorizontalLayout childpadding="0,10,0,0" width="200"  height ="35"> 
 										<Label text="大小:" font="1" width="80"/>
-										<Combo name="ofontsize" bordersize="1" borderround="2,2" maxheight="25" width="100" bordercolor="#FFCECECE" textpadding="9,3,35,5">
+										<Combo name="ofontsize" bordersize="1" borderround="2,2" maxheight="25" width="100" bordercolor="#FFCECECE" textpadding="9,3,35,5" vscrollbar="true" dropboxsize="0,200">
 											<ListLabelElement text="14" selected="true" userdata="1" />
 											<ListLabelElement text="16" userdata="2" />
 											<ListLabelElement text="18" userdata="3" />

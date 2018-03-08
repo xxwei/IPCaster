@@ -10,7 +10,10 @@
 	<Font id="7" name="微软雅黑" size="26" bold="true"/>
 	<Font id="8" name="微软雅黑" size="28" bold="true"/>
 	<Font id="9" name="微软雅黑" size="30" bold="true"/>
+	<!--
 	<Default name="VScrollBar" value="button1normalimage=&quot;file='scrollbar.png' source='0,0,16,16'&quot; button1hotimage=&quot;file='scrollbar.png' source='16,0,32,16,16'&quot; button1pushedimage=&quot;file='scrollbar.png' source='32,0,48,16'&quot; button2normalimage=&quot;file='scrollbar.png' source='0,32,16,48'&quot; button2hotimage=&quot;file='scrollbar.png' source='16,32,32,48'&quot; button2pushedimage=&quot;file='scrollbar.png' source='32,32,48,48'&quot; thumbnormalimage=&quot;file='scrollbar.png' source='0,48,16,64' corner='0,2,0,2'&quot; thumbhotimage=&quot;file='scrollbar.png' source='16,48,32,64' corner='0,2,0,2'&quot; thumbpushedimage=&quot;file='scrollbar.png' source='32,48,48,64' corner='0,2,0,2'&quot; bknormalimage=&quot;file='scrollbar.png' source='0,16,16,32'&quot;" />
+	-->
+	<Default name="VScrollBar" value="thumbnormalimage=&quot;file='scrollbar_n.png' source='0,0,12,500' corner='0,2,0,2'&quot;thumbhotimage=&quot;file='scrollbar_n.png' source='0,0,12,500' corner='0,2,0,2'&quot; thumbpushedimage=&quot;file='scrollbar_n.png' source='0,0,12,500' corner='0,2,0,2'&quot;showbutton1=&quot;false&quot;showbutton2=&quot;false&quot;bknormalimage=&quot;file='scrollbar_n.png' source='0,0,14,20'&quot;" />
 	<VerticalLayout  bkcolor="#FFAEAEAE" vscrollbar="false"> 
 	
 	<!--标题栏-->
@@ -54,19 +57,15 @@
 		</HorizontalLayout>
 	<!--主控区-->	
 		<HorizontalLayout bkcolor="#FFBBBBBB" padding="0,0,0,0" >
-			<VerticalLayout  bkcolor="#FF313949" padding="0,0,0,0"  width="186"> 
-				<Option font="3" name="page0" float="false" text="消息" textpadding="0,40,0,2" foreimage="file='info_selected.png' dest='76,30,110,64'" width="186" height="136"  group="switch"  selected="true"  textcolor="#FF999999"  align="center" selectedtextcolor="#ffFFAF8C" />
-				<Option font="3" name="page1" float="false" text="设置" textpadding="0,40,0,2" foreimage="file='setting.png' dest='76,30,110,64'" width="186" height="136"  group="switch"  textcolor="#FF999999"  align="center" selectedtextcolor="#ffFFAF8C" />
+			<VerticalLayout  bkcolor="#FF313949" padding="0,0,0,0"  width="156"> 
+				<Option font="3" name="page0" float="false" text="消息" textpadding="0,40,0,2" foreimage="file='info_selected.png' dest='61,30,95,64'" width="156" height="136"  group="switch"  selected="true"  textcolor="#FF999999"  align="center" selectedtextcolor="#ffFFAF8C" />
+				<Option font="3" name="page1" float="false" text="设置" textpadding="0,40,0,2" foreimage="file='setting.png' dest='61,30,95,64'" width="156" height="136"  group="switch"  textcolor="#FF999999"  align="center" selectedtextcolor="#ffFFAF8C" />
 			</VerticalLayout>
-			<VerticalLayout  padding="0,0,0,0" > 
+			<VerticalLayout  padding="0,0,1,1" bordersize="1" bordercolor="#FF0000FF" > 
 				<TabLayout name="pageswitch" selectedid="0" inset="0,0,0,0" ><!-- 主体界面 -->
 						<VerticalLayout childpadding="8,0,0,0" bkcolor="#FF900090" ><!-- 信息页 -->
 						<List name="msglist" vscrollbar="true" bkcolor="#FFFFFFFF" itemalign="center"  itemshowhtml="true" header="hidden" inset="0,0,0,0"    itemalign="center" hscrollbar="false" menu="true">
-								<!--
-								<ListContainerElement height="50" font="3" text="{h1}11111111111{/h1}"/>
-								<ListContainerElement  width="200" height="30" font="3" enabled="false" text=""/>
-								<ListContainerElement  height="50" font="3" text="{h1}11111111111{/h1}"/>
-								-->
+
 						</List>
 						</VerticalLayout>
 						

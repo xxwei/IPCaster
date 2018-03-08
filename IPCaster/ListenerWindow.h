@@ -48,11 +48,19 @@ public:
 	virtual void OnSpeakerOnLine(wstring ip, wstring name);
 	virtual void OnSpeakerOffLine();
 	virtual void OnRecvMessage(Message *msg);
+
+
+	LRESULT OnSize(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) override;
+
+	void ReSizeMsgaNode(int max_width, CListContainerElementUI *node);
+	void ReSizeMaxMsgNode(int max_width, CListContainerElementUI *node);
+
 private:
 	StateManger		*pStateManger = NULL;
 	wstring			m_newmsg = L"";
 	void UpdateMainUI();
 	void UpdateSettingUI();
+	bool	m_bInit = false;
 public:
 	void SetStateManger(StateManger *pSm);
 	int AddNewMessage(wstring str);

@@ -2,7 +2,8 @@
 #include "StateManger.h"
 
 
-#define CONFIGFIILE "conf.dat"
+#define CONFIGFILE "conf.dat"
+#define FLOWFILE "flow.dat"
 
 StateManger::StateManger()
 {
@@ -14,11 +15,10 @@ StateManger::~StateManger()
 }
 void StateManger::InitCasterState()
 {
+	
 	//读取配置
 	ReadCasterSettting();
-
-
-
+	ReadFlow();
 	//listener
 	m_nState = 0;
 	m_findSpeaker = new FindSpeakerLoop();
@@ -113,7 +113,7 @@ int StateManger::GetCurrentState()
 void StateManger::ReadCasterSettting()
 {
 	ifstream ifs;
-	ifs.open(CONFIGFIILE);
+	ifs.open(CONFIGFILE);
 	assert(ifs.is_open());
 	if (!m_JsonReader.parse(ifs, SettingValue, false))
 	{
@@ -136,10 +136,61 @@ void StateManger::ReadCasterSettting()
 
 
 }
+
+void StateManger::ReadFlow()
+{
+	ifstream ifs;
+	ifs.open(FLOWFILE);
+	assert(ifs.is_open());
+	if (!m_JsonReader.parse(ifs, FlowValue, false))
+	{
+		//错误
+	}
+	ifs.close();
+}
+
+static wstring unicode2string(const char * str) {
+	wstring rst;
+	bool escape = false;
+	int len = strlen(str);
+	int intHex;
+	char tmp[5];
+	memset(tmp, 0, 5);
+	for (int i = 0; i < len; i++)
+	{
+		char c = str[i];
+		switch (c)
+		{
+		case '//':
+		case '%':
+			escape = true;
+			break;
+		case 'u':
+		case 'U':
+			if (escape)
+			{
+				memcpy(tmp, str + i + 1, 4);
+				sscanf(tmp, "%x", &intHex); //把16进制字符转换为数字  
+				rst.push_back(intHex);
+				i += 4;
+				escape = false;
+			}
+			else {
+				rst.push_back(c);
+			}
+			break;
+		default:
+			rst.push_back(c);
+			break;
+		}
+	}
+	return rst;
+}
+
 void StateManger::SaveCasterSetting()
 {
 	string setting = m_JsonWriter.write(SettingValue);
-	ofstream out(CONFIGFIILE);
+	ofstream out(CONFIGFILE);
 	if (out.is_open())
 	{
 		out << setting << endl;
@@ -169,7 +220,9 @@ void StateManger::SaveMatchInfo(string path)
 }
 void StateManger::AddChatlog(wstring time, wstring text)
 {
+	mapMutex.lock();
 	m_chatlog_map.insert(pair<wstring, wstring>(time, text));
+	mapMutex.unlock();
 	if (m_nState == 1) //speaker
 	{
 		Message msg;
@@ -177,6 +230,12 @@ void StateManger::AddChatlog(wstring time, wstring text)
 		msg.AppendMsg(L"time", time);
 		msg.AppendMsg(L"text", text);
 		m_speakEcho->SendMsg(msg.ToString());
+	}
+	if (!m_bStartSaveChat)
+	{
+		m_bStartSaveChat = true;
+		std::thread ChatFileThread = thread(std::bind(&StateManger::ChatToFileThread,this));
+		ChatFileThread.detach();
 	}
 }
 
@@ -344,8 +403,6 @@ void StateManger::GetEventMap(EventMap &emap)
 			}
 			emap.insert(pair<wstring, EventMsg>(key, em));
 		}
-		
-
 	}
 }
 bool StateManger::SendMsg(Message msg)
@@ -363,4 +420,56 @@ bool	StateManger::ConnectSpeaker(wstring ip)
 		return m_findSpeaker->ConnectSpeaker(WString2String(ip));
 	}
 	return false;
+}
+void	StateManger::ExitState()
+{
+	m_nState = -1;
+}
+void StateManger::ChatToFileThread()
+{
+	int nOldState = m_nState;
+	m_bStartSaveChat = true;
+	while (m_nState >= 0)
+	{
+		
+		if (m_chatlog_map.size())
+		{
+			if (nOldState != m_nState)
+			{
+				//重新创建文件
+				if (ChatFileStream.is_open())
+				{
+					ChatFileStream.close();
+				}
+			}
+
+			if (!ChatFileStream.is_open())
+			{
+				time_t rawtime;
+				struct tm  timeinfo;
+				time(&rawtime);
+				localtime_s(&timeinfo, &rawtime);
+				char filename[80];
+				strftime(filename, 80, "%F-%H-%M-%S.txt",&timeinfo);
+				string filestr = WString2String(m_matchinfo) + string(filename);
+				ChatFileStream.open(filestr.c_str());
+			}
+			if (mapMutex.try_lock())
+			{
+				map<wstring, wstring>::iterator item = m_chatlog_map.begin();
+				for (; item != m_chatlog_map.end(); item++)
+				{
+					ChatFileStream << WString2String(item->first)<<" ";
+					ChatFileStream << WString2String(item->second)<<endl;
+				}
+				m_chatlog_map.clear();
+				mapMutex.unlock();
+			}
+
+			ChatFileStream.flush();
+		}
+		
+		std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+	}
+	m_bStartSaveChat = false;
 }

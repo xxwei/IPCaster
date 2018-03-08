@@ -153,8 +153,10 @@
     <ClInclude Include="IPCaster.h" />
     <ClInclude Include="ListenerWindow.h" />
     <ClInclude Include="MessageMQ.h" />
+    <ClInclude Include="P2PLog.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="SpeakerWindow.h" />
+    <ClInclude Include="SpeakerWindowSample.h" />
     <ClInclude Include="StateManger.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
@@ -166,7 +168,9 @@
     <ClCompile Include="IPCaster.cpp" />
     <ClCompile Include="ListenerWindow.cpp" />
     <ClCompile Include="MessageMQ.cpp" />
+    <ClCompile Include="P2PLog.cpp" />
     <ClCompile Include="SpeakerWindow.cpp" />
+    <ClCompile Include="SpeakerWindowSample.cpp" />
     <ClCompile Include="StateManger.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

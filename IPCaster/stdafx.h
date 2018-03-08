@@ -40,6 +40,8 @@ using namespace DuiLib;
 #include <thread>
 #include <fstream>
 #include <iterator>
+
+#include "P2PLog.h"
 using namespace std;
 
 #define lengthof(x) (sizeof(x)/sizeof(*x))

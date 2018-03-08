@@ -1,5 +1,5 @@
 ﻿#include "stdafx.h"
-#include "SpeakerWindow.h"
+#include "SpeakerWindowSample.h"
 #include "GroupBoxUI.h"
 #include "UIMenu.h"
 
@@ -10,7 +10,10 @@ const TCHAR* const kMinButtonControlName = _T("minbtn");
 const TCHAR* const kMaxButtonControlName = _T("maxbtn");
 const TCHAR* const kRestoreButtonControlName = _T("restorebtn");
 
-void  SpeakerWindow::InitWindow()
+
+
+
+void  SpeakerWindowSample::InitWindow()
 {
 
 	//CacheKeyMap.insert(pair<wstring, bool>(L"0", false));
@@ -29,9 +32,6 @@ void  SpeakerWindow::InitWindow()
 	HWND hwnd = m_PaintManager.GetPaintWindow();
 	SetWindowText(hwnd, L"电子公告栏");
 	SetTimer(hwnd, 1, 1000, NULL);
-	CTreeViewUI* pTreeViewControl = static_cast<CTreeViewUI*>(m_PaintManager.FindControl(_T("eventtree")));
-	pTreeViewControl->SetVisible(false);
-	pTreeViewControl->SetEnabled(false);
 	CTextUI* pControl = static_cast<CTextUI*>(m_PaintManager.FindControl(_T("ipaddr")));
 	wstring ip = pStateManger->GetLocalIP();
 	pControl->SetText(ip.c_str());
@@ -64,39 +64,24 @@ void  SpeakerWindow::InitWindow()
 			AddMsg(*itemc, item->first);
 		}
 	}
-	
 	ImportMatchInfo(L"default.match");
 	UpdateMatchInfo();
 	UpdateMsgInfo();
-	UpdateMainUI();
 	UpdateSettingUI();
-
-	CVerticalLayoutUI* pControl1 = static_cast<CVerticalLayoutUI*>(m_PaintManager.FindControl(_T("eventtip")));
-	if (pControl1->GetWidth() < 100)
-	{
-		pControl1->SetFixedWidth(180);
-		CTreeViewUI* pControl2 = static_cast<CTreeViewUI*>(m_PaintManager.FindControl(_T("eventtree")));
-		pControl2->SetVisible(true);
-		pControl2->SetEnabled(false);
-		COptionUI* pControl3 = static_cast<COptionUI*>(m_PaintManager.FindControl(_T("eventshow")));
-		pControl3->Selected(true);
-		
-	}
-
+	UpdateFlowItem(0);
 	m_bInit = true;
+	LOGI("简版电子公告栏启动");
 }
-CControlUI* SpeakerWindow::CreateControl(LPCTSTR pstrClassName)
+CControlUI* SpeakerWindowSample::CreateControl(LPCTSTR pstrClassName)
 {
 	if (_tcsicmp(pstrClassName, kGroupBoxUIInterFace) == 0)
 		return  new CGroupBoxUI();
 	return NULL;
 }
-void SpeakerWindow::SelectItem()
+void SpeakerWindowSample::SelectItem()
 {
 	CRichEditUI *pRControl = static_cast<CRichEditUI*>(m_PaintManager.FindControl(_T("editmsg")));
-	pRControl->GetPos();
-	CDuiPoint point(pRControl->GetX(), pRControl->GetY());
-	ClientToScreen(m_hWnd, &point);
+	m_CurrentMsgStr = pRControl->GetText();
 	m_CurrentFindPos = 0;
 	if (pRControl)
 	{
@@ -106,81 +91,75 @@ void SpeakerWindow::SelectItem()
 		{
 			m_CurrentReplaceStr = m_CurrentMsgStr.Mid(m_CurrentFindPos, 2);
 			m_CurrentFindPos += 2;
-			CMenuWnd* pMenu = CMenuWnd::CreateMenu(NULL, _T("menu.xml"), point, &m_PaintManager, NULL);
-			CMenuUI* rootMenu = pMenu->GetMenuUI();
-			rootMenu->SetItemFont(2);
 			list<wstring>   templist;
 			bool	bPerson = false;
-			if (rootMenu != NULL)
+
+			if (m_CurrentReplaceStr == L"#P")
 			{
-				if (m_CurrentReplaceStr == L"#P")
+				if (m_CurrentTeam == 0)
 				{
-					if (m_CurrentTeam == 0)
-					{
-						std::copy(Plist.begin(), Plist.end(), std::back_inserter(templist));
-						bPerson = true;
-					}
-					if (m_CurrentTeam == 1)
-					{
-						std::copy(P1list.begin(), P1list.end(), std::back_inserter(templist));
-						bPerson = true;
-					}
-					if (m_CurrentTeam == 2)
-					{
-						std::copy(P2list.begin(), P2list.end(), std::back_inserter(templist));
-						bPerson = true;
-					}
+					std::copy(Plist.begin(), Plist.end(), std::back_inserter(templist));
+					bPerson = true;
+				}
+				if (m_CurrentTeam == 1)
+				{
+					std::copy(P1list.begin(), P1list.end(), std::back_inserter(templist));
+					bPerson = true;
+				}
+				if (m_CurrentTeam == 2)
+				{
+					std::copy(P2list.begin(), P2list.end(), std::back_inserter(templist));
+					bPerson = true;
+				}
 
 
-				}
-				else if (m_CurrentReplaceStr == L"#C")
+			}
+			else if (m_CurrentReplaceStr == L"#C")
+			{
+				if (m_CurrentTeam == 0)
 				{
-					if (m_CurrentTeam == 0)
-					{
-						std::copy(Clist.begin(), Clist.end(), std::back_inserter(templist));
-					}
-					if (m_CurrentTeam == 1)
-					{
-						std::copy(C1list.begin(), C1list.end(), std::back_inserter(templist));
-					}
-					if (m_CurrentTeam == 2)
-					{
-						std::copy(C2list.begin(), C2list.end(), std::back_inserter(templist));
-					}
+					std::copy(Clist.begin(), Clist.end(), std::back_inserter(templist));
 				}
-				else if (m_CurrentReplaceStr == L"#R")
+				if (m_CurrentTeam == 1)
 				{
-					std::copy(Rlist.begin(), Rlist.end(), std::back_inserter(templist));
+					std::copy(C1list.begin(), C1list.end(), std::back_inserter(templist));
 				}
-				
-				else if (m_CurrentReplaceStr == L"#T")
+				if (m_CurrentTeam == 2)
 				{
-					m_bStartSelectTeam = true;
-					std::copy(Tlist.begin(), Tlist.end(), std::back_inserter(templist));
+					std::copy(C2list.begin(), C2list.end(), std::back_inserter(templist));
 				}
-				else
+			}
+			else if (m_CurrentReplaceStr == L"#R")
+			{
+				std::copy(Rlist.begin(), Rlist.end(), std::back_inserter(templist));
+			}				
+			else if (m_CurrentReplaceStr == L"#T")
+			{
+				m_bStartSelectTeam = true;
+				std::copy(Tlist.begin(), Tlist.end(), std::back_inserter(templist));
+			}
+			else
+			{
+				list<wstring>::iterator item = Ulist.begin();
+				for (; item != Ulist.end(); item++)
 				{
-					list<wstring>::iterator item = Ulist.begin();
-					for (; item != Ulist.end(); item++)
+					if (wstring(m_CurrentReplaceStr) == (*item))
 					{
-						if (wstring(m_CurrentReplaceStr) == (*item))
+						//pStateManger->MatchValue["userdata"]
+						if (!pStateManger->MatchValue["userdata"].isNull())
 						{
-							//pStateManger->MatchValue["userdata"]
-							if (!pStateManger->MatchValue["userdata"].isNull())
+							int count = pStateManger->MatchValue["userdata"].size();
+							for (int i = 0; i < count; i++)
 							{
-								int count = pStateManger->MatchValue["userdata"].size();
-								for (int i = 0; i < count; i++)
+								wstring currkey = String2WString(string(U2G(pStateManger->MatchValue["userdata"][i]["key"].asCString())));
+								if (currkey == wstring(m_CurrentReplaceStr))
 								{
-									wstring currkey = String2WString(string(U2G(pStateManger->MatchValue["userdata"][i]["key"].asCString())));
-									if (currkey == wstring(m_CurrentReplaceStr))
+									if (!pStateManger->MatchValue["userdata"][i]["value"].isNull())
 									{
-										if (!pStateManger->MatchValue["userdata"][i]["value"].isNull())
+										int vcount = pStateManger->MatchValue["userdata"][i]["value"].size();
+										for (int j = 0; j < vcount; j++)
 										{
-											int vcount = pStateManger->MatchValue["userdata"][i]["value"].size();
-											for (int j = 0; j < vcount; j++)
-											{
-												templist.push_back(String2WString(string(U2G(pStateManger->MatchValue["userdata"][i]["value"][j].asCString()))));
-											}
+											templist.push_back(String2WString(string(U2G(pStateManger->MatchValue["userdata"][i]["value"][j].asCString()))));
 										}
 									}
 								}
@@ -188,65 +167,55 @@ void SpeakerWindow::SelectItem()
 						}
 					}
 				}
+			}
 
-				if (templist.size() == 1)
+			if (templist.size() == 1)
+			{
+				list<wstring>::iterator item = templist.begin();
+				m_CurrentMsgStr = ReplaceOneItem(m_CurrentMsgStr, m_CurrentFindPos - 2, 2, (*item).c_str());
+				//m_CurrentMsgStr.Replace(m_CurrentReplaceStr, (*item).c_str());
+				pRControl->SetText(m_CurrentMsgStr);
+				int pos = m_CurrentMsgStr.Find('#');
+				if (pos >= 0)
 				{
-					list<wstring>::iterator item = templist.begin();
-					m_CurrentMsgStr = ReplaceOneItem(m_CurrentMsgStr, m_CurrentFindPos - 2, 2, (*item).c_str());
-					//m_CurrentMsgStr.Replace(m_CurrentReplaceStr, (*item).c_str());
-					pRControl->SetText(m_CurrentMsgStr);
-					int pos = m_CurrentMsgStr.Find('#');
-					if (pos >= 0)
-					{
-						SetTimer(m_hWnd, 2, 1, NULL);
-
-					}
+					SelectItem();
 				}
-				else if(templist.size()>1)
-				{
+			}
+			else if(templist.size()>1)
+			{
 
-					CDuiString key;
-					list<wstring>::iterator item = templist.begin();
-					int nSize = templist.size();
-					for (int i = 1; item != templist.end(); item++, i++)
-					{
-						CMenuElementUI* pNew = new CMenuElementUI;
-						pNew->SetName((*item).c_str());
-						CDuiString text;
-						if (bPerson)
-						{
-							i = std::stoi(WString2String((*item)));
-						}
-						if (nSize > 9|| bPerson)
-						{
-							key.Format(_T("%02d"), i);
-							text.Format(_T("%s  (%02d)"), (*item).c_str(), i);
-						}
-						else
-						{
-							key.Format(_T("%d"), i);
-							text.Format(_T("%s  (%d)"), (*item).c_str(), i);
-						}
-						pNew->SetText(text);
-						pNew->SetUserData(key);
-						
-						rootMenu->Add(pNew);
-					}
-					pMenu->bMutilKey = bPerson;
-					pMenu->ResizeMenu();
-					RECT rc;
-					GetWindowRect(pMenu->GetHWND(), &rc);
-					MoveWindow(pMenu->GetHWND(), rc.left, rc.top - (rc.bottom - rc.top), rc.right - rc.left, rc.bottom - rc.top, true);
+				CListUI *pControl = static_cast<CListUI*>(m_PaintManager.FindControl(_T("msgitem")));
+				pControl->RemoveAll();
+				pControl->SetAttribute(L"enabled", L"false");
+				CDuiString key;
+				list<wstring>::iterator item = templist.begin();
+				int nSize = templist.size();
+				for (int i = 1; item != templist.end(); item++, i++)
+				{
+					CDuiString text;
+					CListContainerElementUI *msgitem = new CListContainerElementUI();
+					msgitem->SetFixedWidth(120);
+					msgitem->SetFixedHeight(30);
+					msgitem->SetBorderSize(1);
+					msgitem->SetBorderColor(0xFFAAAAAA);
+					text.Format(_T("%s"), (*item).c_str());
+					CTextUI * TextItem = new CTextUI();
+					TextItem->SetText(text);
+					msgitem->SetUserData(text);
+					TextItem->SetFont(1);
+					msgitem->Add(TextItem);
+					pControl->Add(msgitem);
 				}
 			}
 		}
 		else
 		{
-			KillTimer(m_hWnd, 2);
+			CListUI *pControl = static_cast<CListUI*>(m_PaintManager.FindControl(_T("msgitem")));
+			pControl->RemoveAll();
 		}
 	}
 }
-CDuiString SpeakerWindow::ReplaceOneItem(CDuiString Dst, int Pos, int len, CDuiString src)
+CDuiString SpeakerWindowSample::ReplaceOneItem(CDuiString Dst, int Pos, int len, CDuiString src)
 {
 	if (m_CurrentReplaceStr != L"")
 	{
@@ -261,7 +230,7 @@ CDuiString SpeakerWindow::ReplaceOneItem(CDuiString Dst, int Pos, int len, CDuiS
 	return Dst;
 
 }
-LRESULT SpeakerWindow::HandleCustomMessage(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+LRESULT SpeakerWindowSample::HandleCustomMessage(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
 	if (uMsg == WM_MENUCLICK)
 	{
@@ -319,7 +288,7 @@ LRESULT SpeakerWindow::HandleCustomMessage(UINT uMsg, WPARAM wParam, LPARAM lPar
 	bHandled = false;
 	return 0;
 }
-LRESULT SpeakerWindow::MessageHandler(UINT uMsg, WPARAM wParam, LPARAM lParam, bool& bHandled)
+LRESULT SpeakerWindowSample::MessageHandler(UINT uMsg, WPARAM wParam, LPARAM lParam, bool& bHandled)
 {
 	if (uMsg == WM_KEYDOWN)
 	{
@@ -442,34 +411,28 @@ LRESULT SpeakerWindow::MessageHandler(UINT uMsg, WPARAM wParam, LPARAM lParam, b
 	//}
 	return __super::MessageHandler(uMsg, wParam, lParam, bHandled);
 }
-LRESULT SpeakerWindow::OnSize(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+LRESULT SpeakerWindowSample::OnSize(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
 	LRESULT ret = __super::OnSize(uMsg, wParam, lParam, bHandled);
 	if (m_bInit)
 	{
-		CListUI* pControl = static_cast<CListUI*>(m_PaintManager.FindControl(_T("msglist")));
-		if (!pControl)
-			return -1;
-		wchar_t insetstr[64] = { 0 };
-		int width = LOWORD(lParam);
-		int height = HIWORD(lParam);
-		int nCount = pControl->GetCount();
-		for (int i = 0; i < nCount; i++)
+
+
+		CTileLayoutUI *pFlowControl = static_cast<CTileLayoutUI*>(m_PaintManager.FindControl(_T("flowitem")));
+		if (pFlowControl)
 		{
-			if (pControl->GetItemAt(i)->GetUserData() == L"msga")
-			{
-				ReSizeMsgaNode(width-426, static_cast<CListContainerElementUI*>(pControl->GetItemAt(i)));
-			}
-			else if (pControl->GetItemAt(i)->GetUserData() == L"mmsg")
-			{
-				ReSizeMaxMsgNode(width - 426, static_cast<CListContainerElementUI*>(pControl->GetItemAt(i)));
-			}
+			int width = LOWORD(lParam);
+			int height = HIWORD(lParam);
+			int realwidth = width - 546;
+			int realheight = height - 224;
+			ReSizeItem(realwidth, realheight);
 		}
+
 	}
 	return ret;
 }
 
-void SpeakerWindow::Notify(TNotifyUI& msg)
+void SpeakerWindowSample::Notify(TNotifyUI& msg)
 {
 	if (msg.sType == L"click")
 	{
@@ -491,18 +454,22 @@ void SpeakerWindow::Notify(TNotifyUI& msg)
 		}
 		else if (_tcsicmp(msg.pSender->GetName(), L"addp1") == 0)
 		{
+			LOGI("准备添加主队队员");
 			AddP1(L"",true);
 		}
 		else if (_tcsicmp(msg.pSender->GetName(), L"addp2") == 0)
 		{
+			LOGI("准备添加客队队员");
 			AddP2(L"", true);
 		}
 		else if (_tcsicmp(msg.pSender->GetName(), L"addmatchevent") == 0)
 		{
+			LOGI("添加事件类型");
 			AddEvent(L"",true);
 		}
 		else if (_tcsicmp(msg.pSender->GetName(), L"addmsg") == 0)
 		{
+			LOGI("添加消息");
 			AddMsg(L"",wstring(msg.pSender->GetUserData()),true);
 		}
 		else if (_tcsicmp(msg.pSender->GetName(), L"send") == 0)
@@ -510,19 +477,54 @@ void SpeakerWindow::Notify(TNotifyUI& msg)
 			CRichEditUI* pControl = static_cast<CRichEditUI*>(m_PaintManager.FindControl(_T("editmsg")));
 			wstring sendmsg = wstring(pControl->GetText());
 			SendNewMessage(sendmsg);
+			LOGI("发送消息 %s",WString2String(sendmsg).c_str());
 			pControl->SetText(L"");
 		}
 		else if (_tcsicmp(msg.pSender->GetName(), L"import") == 0)
 		{
+			LOGI("导入比赛信息");
 			ImportMatchInfo();
 		}
 		else if (_tcsicmp(msg.pSender->GetName(), L"reset") == 0)
 		{
+			LOGI("重置比赛信息");
 			CComboUI *pComboControl = static_cast<CComboUI*>(m_PaintManager.FindControl(_T("team1combo")));
 			SelectTeam1(wstring(pComboControl->GetText()));
 			pComboControl = static_cast<CComboUI*>(m_PaintManager.FindControl(_T("team2combo")));
 			SelectTeam2(wstring(pComboControl->GetText()));
 		}
+		else if (_tcsicmp(msg.pSender->GetName(), L"auto") == 0)
+		{
+			
+			COptionUI* pControl = static_cast<COptionUI*>(msg.pSender);
+			m_bAuto = !pControl->IsSelected();
+			if (m_bAuto)
+			{
+				LOGI("自动发送消息");
+			}
+			else
+			{
+				LOGI("手动发送消息");
+			}
+		}
+		else if (_tcsicmp(msg.pSender->GetName(), L"item") == 0)
+		{
+			CRichEditUI* pControl = static_cast<CRichEditUI*>(m_PaintManager.FindControl(_T("editmsg")));
+			pControl->SetText(msg.pSender->GetUserData());
+			ClickItem(msg.pSender->GetText());
+			wstring itemmsg = wstring(msg.pSender->GetText());
+			LOGI("按键信息 %s", WString2String(itemmsg).c_str());
+			m_CurrentTeam = 0;
+			if (m_bAuto)
+			{
+				SendNewMessage(wstring(msg.pSender->GetUserData()));
+			}
+			SelectItem();
+			pControl->SetFocus();
+		}
+
+
+		
 		
 	}
 	else if (msg.sType == _T("selectchanged"))
@@ -539,7 +541,7 @@ void SpeakerWindow::Notify(TNotifyUI& msg)
 
 			pControl->SelectItem(0);
 			m_CurrentCanShotKey = true;
-		
+			LOGI("当前选择了信息发布");
 		}
 		else if (name == _T("match"))
 		{
@@ -550,6 +552,7 @@ void SpeakerWindow::Notify(TNotifyUI& msg)
 
 			pControl->SelectItem(1);
 			m_CurrentCanShotKey = false;
+			LOGI("当前选择了比赛信息");
 			
 		}
 		else if (name == _T("messages"))
@@ -561,6 +564,7 @@ void SpeakerWindow::Notify(TNotifyUI& msg)
 
 			pControl->SelectItem(2);
 			m_CurrentCanShotKey = false;
+			LOGI("当前选择了比赛信息");
 		}
 		else if (name == _T("settting"))
 		{
@@ -571,24 +575,7 @@ void SpeakerWindow::Notify(TNotifyUI& msg)
 
 			pControl->SelectItem(3);
 			m_CurrentCanShotKey = false;
-		}
-		else if (name == _T("eventshow"))
-		{
-			CVerticalLayoutUI* pControl = static_cast<CVerticalLayoutUI*>(m_PaintManager.FindControl(_T("eventtip")));
-			if (pControl->GetWidth() < 100)
-			{
-				pControl->SetFixedWidth(180);
-				CTreeViewUI* pControl = static_cast<CTreeViewUI*>(m_PaintManager.FindControl(_T("eventtree")));
-				pControl->SetVisible(true);
-				pControl->SetEnabled(false);
-			}
-			else
-			{
-				pControl->SetFixedWidth(30);
-				CTreeViewUI* pControl = static_cast<CTreeViewUI*>(m_PaintManager.FindControl(_T("eventtree")));
-				pControl->SetVisible(false);
-				pControl->SetEnabled(false);
-			}
+			LOGI("当前选择了配置信息");
 		}
 	}
 	else if (msg.sType == _T("return"))
@@ -598,7 +585,7 @@ void SpeakerWindow::Notify(TNotifyUI& msg)
 		wstring sendmsg = wstring(pControl->GetText());
 		SendNewMessage(sendmsg);
 		pControl->SetText(L"");
-
+		LOGI("手动发送消息 %s",WString2String(sendmsg).c_str());
 	}
 	else if (msg.sType == L"setfocus")
 	{
@@ -616,19 +603,21 @@ void SpeakerWindow::Notify(TNotifyUI& msg)
 		{
 			pStateManger->SetSpeakerNickName(wstring(msg.pSender->GetText()));
 			UpdateMainUI();
+			LOGI("更新昵称%s",WString2String(wstring(msg.pSender->GetText()).c_str()));
 			return;
 		}
 		if (classname == L"Edit")
 		{
 			msg.pSender->SetAttribute(L"bkcolor", L"#FFF3F3F3");
 			//设置名称
-
 			//更新比赛信息
 			UpdateMatchInfo();
 			//更新常用消息
 			UpdateMsgInfo();
 			//更新主界面上信息
 			UpdateMainUI();
+
+			LOGI("更新信息发送者为 %s ", WString2String(wstring(sendername).c_str()));
 		}
 		
 	}
@@ -650,6 +639,7 @@ void SpeakerWindow::Notify(TNotifyUI& msg)
 					{
 						pStateManger->SetOFont(fontid);
 						pStateManger->SaveCasterSetting();
+						LOGI("更新历史消息字体 %s", WString2String(wstring(fontid)).c_str());
 					}
 				}
 			}
@@ -669,6 +659,7 @@ void SpeakerWindow::Notify(TNotifyUI& msg)
 					{
 						pStateManger->SetNFont(fontid);
 						pStateManger->SaveCasterSetting();
+						LOGI("更新最新消息字体 %s", WString2String(wstring(fontid)).c_str());
 					}
 				}
 			}
@@ -680,6 +671,7 @@ void SpeakerWindow::Notify(TNotifyUI& msg)
 			CComboUI* pControl = static_cast<CComboUI*>(msg.pSender);
 			pStateManger->SetTeam1(pControl->GetCurSel());
 			pStateManger->SaveCasterSetting();
+			LOGI("选择主队 %s", WString2String(wstring(msg.pSender->GetText())).c_str());
 		}
 		if (name == L"team2combo")
 		{
@@ -687,60 +679,37 @@ void SpeakerWindow::Notify(TNotifyUI& msg)
 			CComboUI* pControl = static_cast<CComboUI*>(msg.pSender);
 			pStateManger->SetTeam2(pControl->GetCurSel());
 			pStateManger->SaveCasterSetting();
+			LOGI("选择客队 %s", WString2String(wstring(msg.pSender->GetText())).c_str());
 		}
-		if (name == L"eventtree")
+		if (name == L"msgitem")
 		{
-			CTreeViewUI* pControl = static_cast<CTreeViewUI*>(msg.pSender);
+			CListUI* pControl = static_cast<CListUI*>(msg.pSender);
 			CDuiString key = pControl->GetItemAt(pControl->GetCurSel())->GetUserData();
-			map<wstring, EventMsg>::iterator item = EMmap.find(wstring(key));
-			if (item != EMmap.end())
+			LOGI("选择通配信息 %s", WString2String(wstring(key)).c_str());
+			//文本替换
+			if (m_bStartSelectTeam)
 			{
-				CRichEditUI* pControl = static_cast<CRichEditUI*>(m_PaintManager.FindControl(_T("editmsg")));
-				pControl->GetPos();
-				CDuiPoint point(pControl->GetX(), pControl->GetY());
-				//GetCursorPos(&point);
-				ClientToScreen(m_hWnd, &point);
-
-
-				CMenuWnd* pMenu = CMenuWnd::CreateMenu(NULL, _T("menu.xml"), point, &m_PaintManager, NULL);
-				CMenuUI* rootMenu = pMenu->GetMenuUI();
-				if (rootMenu != NULL)
+				CComboUI *pComboControl = static_cast<CComboUI*>(m_PaintManager.FindControl(_T("team1combo")));
+				if (key == pComboControl->GetText())
 				{
-					rootMenu->SetAttribute(L"itemfont", L"2");
-					int nSize = item->second.MsgList.size();
-					list<wstring>::iterator childitem = item->second.MsgList.begin();
-					for (int i = 1; childitem != item->second.MsgList.end(); childitem++, i++)
-					{
-						CMenuElementUI* pNew = new CMenuElementUI;
-						pNew->SetName((*childitem).c_str());
-						CDuiString text;
-						if (nSize > 9)
-						{
-							key.Format(_T("%02d"), i);
-							text.Format(_T("%s  (%02d)"), (*childitem).c_str(), i);
-						}
-						else
-						{
-							key.Format(_T("%d"), i);
-							text.Format(_T("%s  (%d)"), (*childitem).c_str(), i);
-						}
-						pNew->SetText(text);
-						pNew->SetUserData(key);
-
-						rootMenu->Add(pNew);
-					}
-					pMenu->ResizeMenu();
-					RECT rc;
-
-					GetWindowRect(pMenu->GetHWND(), &rc);
-					MoveWindow(pMenu->GetHWND(), rc.left, rc.top - (rc.bottom - rc.top), rc.right - rc.left, rc.bottom - rc.top, true);
-					m_CurrentMsgStr = L"";
+					m_CurrentTeam = 1;
 				}
+				pComboControl = static_cast<CComboUI*>(m_PaintManager.FindControl(_T("team2combo")));
+				if (key == pComboControl->GetText())
+				{
+					m_CurrentTeam = 2;
+				}
+				m_bStartSelectTeam = false;
 			}
+			m_CurrentMsgStr = ReplaceOneItem(m_CurrentMsgStr, m_CurrentFindPos - 2, 2, key);
+			CRichEditUI *pRControl = static_cast<CRichEditUI*>(m_PaintManager.FindControl(_T("editmsg")));
+			pRControl->SetText(m_CurrentMsgStr);
+			SelectItem();
+			pControl->SetFocus();
 		}
 	}
 }
-void SpeakerWindow::OnListenerOnLine(usermap map)
+void SpeakerWindowSample::OnListenerOnLine(usermap map)
 {
 	CListUI *pControl = static_cast<CListUI*>(m_PaintManager.FindControl(_T("memberlist")));
 	pControl->SetAttribute(L"enabled", L"false");
@@ -776,16 +745,17 @@ void SpeakerWindow::OnListenerOnLine(usermap map)
 			p1->Add(p2);
 			Listener->Add(p1);
 			pControl->Add(Listener);
+			LOGI("刷新listener %s %s", item->second.name.c_str(),item->second.ip.c_str());
 		}
 	}
 
 
 }
-void SpeakerWindow::SetStateManger(StateManger *pSm)
+void SpeakerWindowSample::SetStateManger(StateManger *pSm)
 {
 	pStateManger = pSm;
 }
-int SpeakerWindow::SendNewMessage(wstring str)
+int SpeakerWindowSample::SendNewMessage(wstring str)
 {
 	if (str.length())
 	{
@@ -793,95 +763,131 @@ int SpeakerWindow::SendNewMessage(wstring str)
 	}
 	return -1;
 }
-
-void SpeakerWindow::ReSizeMsgaNode(int max_width, CListContainerElementUI *new_node)
+void SpeakerWindowSample::ReSizeItem(int max_width, int max_height)
 {
-	SIZE px;
-	int linecount = 1;
-	TFontInfo *tfi = m_PaintManager.GetFontInfo(_wtoi(pStateManger->GetOFont()));
-	TFontInfo *dtfi = m_PaintManager.GetDefaultFontInfo();
-	HDC hdc = m_PaintManager.GetPaintDC();
-	CDuiString msg = new_node->GetItemAt(0)->GetText();
-	int dis_num = 0, line_width = 0;//区域内可显示的字符个数，及区域大小（像素点的范围）
-	BOOL c_back = TRUE;
-	c_back = ::GetTextExtentExPoint(hdc, msg, lstrlen(msg), line_width, &dis_num, NULL, &px);
-	int str_width = px.cx;
-	int str_height = px.cy;
-	str_width = str_width*tfi->tm.tmHeight / dtfi->tm.tmHeight;
-	str_height = str_height*tfi->tm.tmHeight / dtfi->tm.tmHeight;
-	//int max_width = pList->GetWidth();
-	if (c_back)
+	m_lastwidth = max_width;
+	m_lastheight = max_height;
+	CTileLayoutUI *pFlowControl = static_cast<CTileLayoutUI*>(m_PaintManager.FindControl(_T("flowitem")));
+	pFlowControl->SetAttribute(L"inset", L"30,30,30,30");
+	if (pFlowControl)
 	{
-		linecount = str_width / (max_width - 140) + 1;
-	}
-	int height = 30 + linecount * (str_height *1.5);
-	new_node->SetMinHeight(height);
-	new_node->SetMaxHeight(height);
-
-	if (linecount == 1)
-	{
-		wchar_t insetstr[64] = { 0 };
-		int inset_x = (max_width - 20 - str_width*1.2) / 2;
-		wsprintf(insetstr, L"%d,5,%d,5", inset_x, inset_x);
-		OutputDebugString(insetstr);
-		new_node->SetAttribute(L"inset", insetstr);
-	}
-	else
-	{
-		wchar_t insetstr[64] = { 0 };
-		wsprintf(insetstr, L"%d,5,%d,5", 0, 0);
-		OutputDebugString(insetstr);
-		new_node->SetAttribute(L"inset", insetstr);
-	}
-}
-
-void SpeakerWindow::ReSizeMaxMsgNode(int max_width, CListContainerElementUI *max_node)
-{
-	CLabelUI *max_item = static_cast<CLabelUI*>(max_node->GetItemAt(0));
-	if (max_item)
-	{
-		SIZE px;
-		int linecount = 1;
-		HDC hdc = m_PaintManager.GetPaintDC();
-		CDuiString msg = max_node->GetItemAt(0)->GetText();
-		int dis_num = 0, line_width = 0;//区域内可显示的字符个数，及区域大小（像素点的范围）
-		BOOL c_back = TRUE;
-		c_back = ::GetTextExtentExPoint(hdc, msg, lstrlen(msg), line_width, &dis_num, NULL, &px);
-		TFontInfo *tfi = m_PaintManager.GetFontInfo(_wtoi(pStateManger->GetNFont()));
-		TFontInfo *dtfi = m_PaintManager.GetDefaultFontInfo();
-		int str_width = px.cx;
-		int str_height = px.cy;
-		str_width = str_width*tfi->tm.tmHeight / dtfi->tm.tmHeight;
-		str_height = str_height*tfi->tm.tmHeight / dtfi->tm.tmHeight;
-		//int max_width = pList->GetWidth();
-		if (c_back)
+		
+		int m = pFlowControl->GetCount();
+		if (m > 3)
 		{
-			linecount = str_width / max_width + 1;
+			int nc = m % 2;
+			pFlowControl->SetFixedColumns(nc ? m / 2 + 1 : m / 2);
 		}
-		int height = 30 + linecount * (str_height + 8);
-		int labheight = height + 100;
-		if (linecount < 4)
+		else
 		{
-			labheight = str_height * 3 + 100;
+			pFlowControl->SetFixedColumns(m);
 		}
-		wchar_t insetstr[64] = { 0 };
-		int inset_y = (labheight - height) / 2;
-		wsprintf(insetstr, L"0,%d,0,5", inset_y);
-		max_item->SetAttribute(L"textpadding", insetstr);
-		max_item->SetAttribute(L"font", pStateManger->GetNFont());
-		max_node->SetMinHeight(labheight);
-		max_node->SetMaxHeight(labheight);
+		int c = pFlowControl->GetFixedColumns();
+		if (m != 0 && c != 0)
+		{
+			int Rows = 1;
+			
+			if (m >= c)
+			{
+				Rows = m / c;
+				if (Rows*c < m)
+				{
+					Rows += 1;
+				}
+			}
+			SIZE sz;
+			sz.cx = (max_width-60) / c;
+			sz.cy = (max_height - 60) / Rows - 20;
+			if (Rows == 1)
+			{
+				sz.cy = (max_height - 60) / 2 - 20;
+				CDuiString insetstr;
+				insetstr.Format(L"%d,%d,%d,%d", 30, sz.cy/2+30, 30, sz.cy / 2 + 30);
+				pFlowControl->SetAttribute(L"inset", insetstr);
+			}
+			
+			pFlowControl->SetItemSize(sz);
+		}
+
 
 	}
 }
-int SpeakerWindow::AddNewMessage(wstring str)
+void SpeakerWindowSample::ClickItem(CDuiString ItemName, bool bSecond)
 {
-	CListUI* pControl = static_cast<CListUI*>(m_PaintManager.FindControl(_T("msglist")));
-	if (!pControl)
-		return -1;
+	CTileLayoutUI *pFlowControl = static_cast<CTileLayoutUI*>(m_PaintManager.FindControl(_T("flowitem")));
+	if (pFlowControl)
+	{
+		pFlowControl->RemoveAll();
+		if (ItemName == L"")  //最初状态
+		{
+			m_CurrentTypeMsg = L"";
+			pStateManger->CurrentFlowValue.copy(pStateManger->FlowValue["main"]);
+			vector<string> itemlist = pStateManger->CurrentFlowValue.getMemberNames();
+			vector<string>::iterator item = itemlist.begin();
+			//string tur = pStateManger->FlowValue["main"].asString();
+			for (; item != itemlist.end(); item++)
+			{
+				CButtonUI *pButton = new CButtonUI();
+				pButton->SetFont(11);
+				wstring str = String2WString(string(U2G((*item).c_str())).c_str());
+				pButton->SetText(str.c_str());
+				pButton->SetNormalImage(L"file = 'button.png' corner = '10,10,10,10'");
+				pButton->SetPushedImage(L"file = 'button_selected.png' corner = '10,10,10,10'");
+				pButton->SetHotImage(L"file = 'button_selected.png' corner = '10,10,10,10'");
+				pButton->SetName(L"item");
+				str = String2WString(string(U2G(pStateManger->CurrentFlowValue[(*item)]["itemmsg"].asString().c_str())).c_str());
+				pButton->SetUserData(str.c_str());
+				pFlowControl->Add(pButton);
+			}
+		}
+		else //每一步状态
+		{
+			string itemname = string(G2U(WString2String(wstring(ItemName)).c_str()));
+			if (m_CurrentTypeMsg.IsEmpty())
+			{
+				m_CurrentTypeMsg = ItemName;
+			}
+			if (!pStateManger->CurrentFlowValue[itemname]["itemchild"].isNull())
+			{
+				Json::Value temp;
+				temp.copyPayload(pStateManger->CurrentFlowValue[itemname]["itemchild"]);
+				pStateManger->CurrentFlowValue.copyPayload(temp);
+				vector<string> itemlist = temp.getMemberNames();
+				vector<string>::iterator item = itemlist.begin();
+				//string tur = pStateManger->FlowValue["main"].asString();
+				for (; item != itemlist.end(); item++)
+				{
+					CButtonUI *pButton = new CButtonUI();
+					pButton->SetFont(9);
+					wstring str = String2WString(string(U2G((*item).c_str())).c_str());
+					pButton->SetText(str.c_str());
+					pButton->SetNormalImage(L"file = 'button.png' corner = '10,10,10,10'");
+					pButton->SetPushedImage(L"file = 'button_selected.png' corner = '10,10,10,10'");
+					pButton->SetHotImage(L"file = 'button_selected.png' corner = '10,10,10,10'");
+					pButton->SetName(L"item");
+					str = String2WString(string(U2G(pStateManger->CurrentFlowValue[(*item)]["itemmsg"].asString().c_str())).c_str());
+					pButton->SetUserData(str.c_str());
+					pFlowControl->Add(pButton);
+				}
+			}
+			else //消息链结束
+			{
+				ClickItem(L"");
+			}
+		}
+		ReSizeItem(m_lastwidth, m_lastheight);
+	}
+}
+int SpeakerWindowSample::AddNewMessage(wstring str)
+{
 	SYSTEMTIME st;
 	GetSystemTime(&st);
 	wchar_t timestr[1024] = { 0 };
+	/*
+	CListUI* pControl = static_cast<CListUI*>(m_PaintManager.FindControl(_T("msglist")));
+	if (!pControl)
+		return -1;
+
 
 	int itemcount = pControl->GetCount();
 	wsprintf(timestr, L"%02d:%02d:%02d", (st.wHour + 8) % 24, st.wMinute, st.wSecond);
@@ -1045,15 +1051,15 @@ int SpeakerWindow::AddNewMessage(wstring str)
 		pControl->Add(max_node);
 	}
 
+	
+	SetTimer(m_hWnd, 3, 50, NULL);
+	*/
 	wsprintf(timestr, L"%04d-%02d-%02d %02d:%02d:%02d:%04d", st.wYear, st.wMonth, st.wDay, (st.wHour + 8) % 24, st.wMinute, st.wSecond, st.wMilliseconds);
 	pStateManger->AddChatlog(wstring(timestr), str);
-	SetTimer(m_hWnd, 3, 50, NULL);
 	return 0;
 
 }
-
-
-wstring SpeakerWindow::GetFreeKey(wstring key)
+wstring SpeakerWindowSample::GetFreeKey(wstring key)
 {
 	map<wstring, bool>::iterator item = CacheKeyMap.begin();
 	if (key == L"")
@@ -1083,7 +1089,7 @@ wstring SpeakerWindow::GetFreeKey(wstring key)
 	return L"";
 
 }
-void SpeakerWindow::FreeKey(wstring key)
+void SpeakerWindowSample::FreeKey(wstring key)
 {
 	map<wstring, bool>::iterator item = CacheKeyMap.find(key);
 	if (item != CacheKeyMap.end())
@@ -1091,8 +1097,7 @@ void SpeakerWindow::FreeKey(wstring key)
 		item->second = false;
 	}
 }
-
-int SpeakerWindow::AddR1(wstring str)
+int SpeakerWindowSample::AddR1(wstring str)
 {
 	CTreeNodeUI *pR1Control = static_cast<CTreeNodeUI*>(m_PaintManager.FindControl(_T("wildcardR1")));
 	if (pR1Control)
@@ -1115,7 +1120,7 @@ int SpeakerWindow::AddR1(wstring str)
 	}
 	return -1;
 }
-int SpeakerWindow::AddR2(wstring str)
+int SpeakerWindowSample::AddR2(wstring str)
 {
 	CTreeNodeUI *pR1Control = static_cast<CTreeNodeUI*>(m_PaintManager.FindControl(_T("wildcardR2")));
 	if (pR1Control)
@@ -1138,7 +1143,7 @@ int SpeakerWindow::AddR2(wstring str)
 	}
 	return -1;
 }
-int SpeakerWindow::AddR3(wstring str)
+int SpeakerWindowSample::AddR3(wstring str)
 {
 	CTreeNodeUI *pR1Control = static_cast<CTreeNodeUI*>(m_PaintManager.FindControl(_T("wildcardR3")));
 	if (pR1Control)
@@ -1164,8 +1169,7 @@ int SpeakerWindow::AddR3(wstring str)
 	}
 	return -1;
 }
-
-int SpeakerWindow::AddP1(wstring str, bool bfocus)
+int SpeakerWindowSample::AddP1(wstring str, bool bfocus)
 {
 	CTreeViewUI *pTControl = static_cast<CTreeViewUI*>(m_PaintManager.FindControl(_T("team1tree")));
 	if (pTControl)
@@ -1195,7 +1199,7 @@ int SpeakerWindow::AddP1(wstring str, bool bfocus)
 	}
 	return -1;
 }
-int SpeakerWindow::AddC1(wstring str)
+int SpeakerWindowSample::AddC1(wstring str)
 {
 	CTreeViewUI *pTControl = static_cast<CTreeViewUI*>(m_PaintManager.FindControl(_T("team1tree")));
 	if (pTControl)
@@ -1219,7 +1223,7 @@ int SpeakerWindow::AddC1(wstring str)
 	}
 	return -1;
 }
-int SpeakerWindow::AddT1(wstring str)
+int SpeakerWindowSample::AddT1(wstring str)
 {
 	CTreeViewUI *pTControl = static_cast<CTreeViewUI*>(m_PaintManager.FindControl(_T("team1tree")));
 	if (pTControl)
@@ -1245,7 +1249,7 @@ int SpeakerWindow::AddT1(wstring str)
 	}
 	return -1;
 }
-int SpeakerWindow::AddP2(wstring str, bool bfocus)
+int SpeakerWindowSample::AddP2(wstring str, bool bfocus)
 {
 
 	CTreeViewUI *pTControl = static_cast<CTreeViewUI*>(m_PaintManager.FindControl(_T("team2tree")));
@@ -1271,7 +1275,7 @@ int SpeakerWindow::AddP2(wstring str, bool bfocus)
 	}
 	return -1;
 }
-int SpeakerWindow::AddC2(wstring str)
+int SpeakerWindowSample::AddC2(wstring str)
 {
 	CTreeViewUI *pTControl = static_cast<CTreeViewUI*>(m_PaintManager.FindControl(_T("team2tree")));
 	if (pTControl)
@@ -1295,7 +1299,7 @@ int SpeakerWindow::AddC2(wstring str)
 	}
 	return -1;
 }
-int SpeakerWindow::AddT2(wstring str)
+int SpeakerWindowSample::AddT2(wstring str)
 {
 	CTreeViewUI *pTControl = static_cast<CTreeViewUI*>(m_PaintManager.FindControl(_T("team2tree")));
 	if (pTControl)
@@ -1319,7 +1323,7 @@ int SpeakerWindow::AddT2(wstring str)
 	}
 	return -1;
 }
-int SpeakerWindow::AddTeam(wstring str)
+int SpeakerWindowSample::AddTeam(wstring str)
 {
 	CComboUI *pComboControl = static_cast<CComboUI*>(m_PaintManager.FindControl(_T("team1combo")));
 	CListLabelElementUI *team1 = new CListLabelElementUI();
@@ -1331,7 +1335,7 @@ int SpeakerWindow::AddTeam(wstring str)
 	pComboControl->Add(team2);
 	return 0;
 }
-int SpeakerWindow::AddEvent(wstring str, bool bfocus)
+int SpeakerWindowSample::AddEvent(wstring str, bool bfocus)
 {
 	CTreeViewUI *pRControl = static_cast<CTreeViewUI*>(m_PaintManager.FindControl(_T("msgtree")));
 	if (pRControl)
@@ -1395,7 +1399,7 @@ int SpeakerWindow::AddEvent(wstring str, bool bfocus)
 	}
 	return -1;
 }
-int SpeakerWindow::AddMsg(wstring str, wstring type, bool bfocus)
+int SpeakerWindowSample::AddMsg(wstring str, wstring type, bool bfocus)
 {
 	CTreeNodeUI *pControl = static_cast<CTreeNodeUI*>(m_PaintManager.FindControl(type.c_str()));
 	if (pControl)
@@ -1418,7 +1422,7 @@ int SpeakerWindow::AddMsg(wstring str, wstring type, bool bfocus)
 	}
 	return -1;
 }
-void SpeakerWindow::SelectTeam1(wstring str)
+void SpeakerWindowSample::SelectTeam1(wstring str)
 {
 	ClearT1UIInfo();
 	if (!pStateManger->MatchValue["teams"].isNull())
@@ -1451,7 +1455,7 @@ void SpeakerWindow::SelectTeam1(wstring str)
 	UpdateMainUI();
 
 }
-void SpeakerWindow::SelectTeam2(wstring str)
+void SpeakerWindowSample::SelectTeam2(wstring str)
 {
 	ClearT2UIInfo();
 	if (!pStateManger->MatchValue["teams"].isNull())
@@ -1484,8 +1488,7 @@ void SpeakerWindow::SelectTeam2(wstring str)
 	UpdateMainUI();
 
 }
-
-void SpeakerWindow::UpdateMatchInfo()
+void SpeakerWindowSample::UpdateMatchInfo()
 {
 	Plist.clear();
 	P1list.clear();
@@ -1726,8 +1729,7 @@ void SpeakerWindow::UpdateMatchInfo()
 	matchinfo.Append(pComboControl->GetText());
 	pStateManger->SetMatchInfo(wstring(matchinfo));
 }
-
-void SpeakerWindow::UpdateMsgInfo()
+void SpeakerWindowSample::UpdateMsgInfo()
 {
 	EMmap.clear();
 	CTreeNodeUI *pControl = static_cast<CTreeNodeUI*>(m_PaintManager.FindControl(_T("eventnode")));
@@ -1806,8 +1808,7 @@ void SpeakerWindow::UpdateMsgInfo()
 	pStateManger->SetEventMap(EMmap);
 	pStateManger->SaveCasterSetting();
 }
-
-void SpeakerWindow::UpdateMainUI()
+void SpeakerWindowSample::UpdateMainUI()
 {
 	CTextUI* pControl = static_cast<CTextUI*>(m_PaintManager.FindControl(_T("ipaddr")));
 	wstring ip = pStateManger->GetLocalIP();
@@ -1822,38 +1823,8 @@ void SpeakerWindow::UpdateMainUI()
 		pNickNameControl->SetText(pStateManger->GetSpeakerNickName().c_str());
 
 	}
-	///事件信息
-	CTreeViewUI *pMainEventControl = static_cast<CTreeViewUI*>(m_PaintManager.FindControl(_T("eventtree")));
-	pMainEventControl->RemoveAll();
-	//while (pMainEventControl->GetCount())
-	//{
-	//	pMainEventControl->RemoveAt(0);
-	//}
-	//map<wstring, EventMsg >::reverse_iterator item = EMmap.rbegin();
-	//for (; item != EMmap.rend(); item++)
-	map<wstring, EventMsg >::iterator item = EMmap.begin();
-	for (; item != EMmap.end(); item++)
-	{
-		CTreeNodeUI *EditNode = new CTreeNodeUI();
-		EditNode->SetAttribute(L"height", L"20");
-		EditNode->SetAttribute(L"width", L"0");
-		EditNode->SetAttribute(L"padding", L"0,0,0,0");
-		EditNode->SetAttribute(L"bordersize", L"1");
-		EditNode->SetAttribute(L"bordercolor", L"#FFE5E5E5");
-		EditNode->SetUserData(item->first.c_str());
-		CDuiString str;
-		str.Append(L"(CTRL+");
-		str.Append(item->first.c_str());
-		str.Append(L")");
-		str.Append(L" ");
-		str.Append(item->second.EventName.c_str());
-		EditNode->SetItemText(str);
-		//pMainEventControl->AddAt(EditNode,pMainEventControl->GetCount());
-		pMainEventControl->Add(EditNode);
-	}
 }
-
-void SpeakerWindow::UpdateSettingUI()
+void SpeakerWindowSample::UpdateSettingUI()
 {
 	CComboUI *pComboControl = static_cast<CComboUI*>(m_PaintManager.FindControl(_T("nfontsize")));
 	pComboControl->SetInternVisible();
@@ -1869,8 +1840,26 @@ void SpeakerWindow::UpdateSettingUI()
 	pComboControl = static_cast<CComboUI*>(m_PaintManager.FindControl(_T("team2combo")));
 	pComboControl->SelectItem(pStateManger->GetTeam2());
 }
+void SpeakerWindowSample::UpdateFlowItem(int step)
+{
+	//流程信息
 
-void SpeakerWindow::ClearMatchUIInfo()
+	CTileLayoutUI *pFlowControl = static_cast<CTileLayoutUI*>(m_PaintManager.FindControl(_T("flowitem")));
+	if (pFlowControl)
+	{
+		pFlowControl->RemoveAll();
+		RECT rc = pFlowControl->GetPos();
+		pFlowControl->SetFixedColumns(2);
+		pFlowControl->SetChildVPadding(20);
+		pFlowControl->SetAttribute(L"inset", L"30,30,30,30");
+		ClickItem(L"");
+
+
+
+	}
+
+}
+void SpeakerWindowSample::ClearMatchUIInfo()
 {
 
 	CComboUI *pComboControl = static_cast<CComboUI*>(m_PaintManager.FindControl(_T("team1combo")));
@@ -1986,8 +1975,7 @@ void SpeakerWindow::ClearMatchUIInfo()
 		}
 	}
 }
-
-void SpeakerWindow::ClearT1UIInfo()
+void SpeakerWindowSample::ClearT1UIInfo()
 {
 	CTreeNodeUI *pControl = static_cast<CTreeNodeUI*>(m_PaintManager.FindControl(_T("wildcardP1")));
 	int count = pControl->GetCountChild();
@@ -2026,7 +2014,7 @@ void SpeakerWindow::ClearT1UIInfo()
 		}
 	}
 }
-void SpeakerWindow::ClearT2UIInfo()
+void SpeakerWindowSample::ClearT2UIInfo()
 {
 	CTreeNodeUI *pControl = static_cast<CTreeNodeUI*>(m_PaintManager.FindControl(_T("wildcardP2")));
 	int count = pControl->GetCountChild();
@@ -2066,7 +2054,7 @@ void SpeakerWindow::ClearT2UIInfo()
 	}
 }
 #include"Commdlg.h"
-bool SpeakerWindow::ImportMatchInfo(wstring path)
+bool SpeakerWindowSample::ImportMatchInfo(wstring path)
 {
 	if (path == L"")
 	{
@@ -2214,7 +2202,7 @@ bool SpeakerWindow::ImportMatchInfo(wstring path)
 	}
 	return true;
 }
-void SpeakerWindow::SaveMatchInfo()
+void SpeakerWindowSample::SaveMatchInfo()
 {
 	OPENFILENAME ofn;
 	TCHAR szFile[MAX_PATH] = _T("");
