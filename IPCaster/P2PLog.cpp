@@ -48,9 +48,11 @@ void logToFileLoop()
     time(&rawtime);
     localtime_s(&timeinfo,&rawtime);
     char filename[80];
+	char pathname[80];
     strftime(filename, 80, "%F-%H-%M-%S.log", &timeinfo);
     printf("create log file %s\n", filename);
-    logFileStream.open(filename);
+	sprintf(pathname, "log\\%s", filename);
+    logFileStream.open(pathname);
 
     while (!endOfLog)
     {

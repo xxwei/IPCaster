@@ -75,9 +75,9 @@ RESTART:
 	pLFrame->CenterWindow();
 	pLFrame->ShowModal();
 
-#ifndef SAMPLE
 
-	if (m_pStateManger->GetCurrentState() > 0)
+
+	if (m_pStateManger->GetCurrentState() == 1)
 	{
 		SpeakerWindow *pSFrame = new SpeakerWindow();
 		pSFrame->SetStateManger(m_pStateManger);
@@ -91,8 +91,8 @@ RESTART:
 			goto RESTART;
 		}
 	}
-#else
-	if (m_pStateManger->GetCurrentState() > 0)
+
+	if (m_pStateManger->GetCurrentState() ==2)
 	{
 		SpeakerWindowSample *pSFrame = new SpeakerWindowSample();
 		pSFrame->SetStateManger(m_pStateManger);
@@ -105,8 +105,7 @@ RESTART:
 		{
 			goto RESTART;
 		}
-	}
-#endif	
+	}	
 
 	m_pStateManger->SaveCasterSetting();
 	m_pStateManger->ExitState();

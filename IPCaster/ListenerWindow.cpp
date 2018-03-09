@@ -20,15 +20,39 @@ void ListenerWindow::OnSpeakerOnLine(wstring ip, wstring name)
 		info.Append(ip.c_str());
 		pControl->SetText(info);
 	}
-}
-void ListenerWindow::OnSpeakerOffLine()
-{
-	CLabelUI *pControl = static_cast<CLabelUI*>(m_PaintManager.FindControl(_T("loginfo")));
-	if (pControl)
+	if (m_bConnecting)
 	{
-		pControl->SetText(L"Speaker offline");
+		CLabelUI* pControl = static_cast<CLabelUI*>(m_PaintManager.FindControl(_T("ErrorInfo")));
+		if (pControl)
+		{
+			pControl->SetText(L"连接成功");
+			pControl->SetAttribute(L"textcolor", L"#FF00FF00");
+		}
+		m_bConnecting = false;
 	}
 }
+void ListenerWindow::OnSpeakerOffLine(int ntype)
+{
+	if (!ntype)
+	{
+		CLabelUI *pControl = static_cast<CLabelUI*>(m_PaintManager.FindControl(_T("loginfo")));
+		if (pControl)
+		{
+			pControl->SetText(L"Speaker offline");
+		}
+	}
+	if (m_bConnecting)
+	{
+		CLabelUI* pControl = static_cast<CLabelUI*>(m_PaintManager.FindControl(_T("ErrorInfo")));
+		if (pControl)
+		{
+			pControl->SetText(L"连接失败");
+			pControl->SetAttribute(L"textcolor", L"#FFFF0000");
+		}
+		m_bConnecting = false;
+	}
+}
+
 void ListenerWindow::OnRecvMessage(Message *msg)
 {
 	if (msg->GetType() == PUBMSG)
@@ -82,20 +106,15 @@ LRESULT ListenerWindow::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 			if (pListControl)
 			{
 				pListControl->EndDown();
-				HWND hwnd = m_PaintManager.GetPaintWindow();
-				KillTimer(hwnd, 2);
+				KillTimer(m_hWnd, 2);
 			}
 		}
 		if (wParam == 3)
 		{
 			AddNewMessage(m_newmsg);
 			KillTimer(m_hWnd, 3);
-			Sleep(50);
-			CListUI* pListControl = static_cast<CListUI*>(m_PaintManager.FindControl(_T("msglist")));
-			if (pListControl)
-			{
-				pListControl->EndDown();
-			}
+			SetTimer(m_hWnd, 2, 1,NULL);
+
 		}
 		if (wParam == 4)
 		{
@@ -112,43 +131,40 @@ LRESULT ListenerWindow::MessageHandler(UINT uMsg, WPARAM wParam, LPARAM lParam, 
 	{
 		switch (wParam)
 		{
-		case VK_ESCAPE:
-		{
-			int ret = ::GetKeyState(VK_SHIFT); //>0 up <0 down
-			if (pStateManger->CanChangeSpeaker() && ret < 0)
+			case VK_ESCAPE:
 			{
-				//切换到speaker
-				if (pStateManger->ChangeToSpeaker())
+				int ret = ::GetKeyState(VK_SHIFT); //>0 up <0 down
+				if (pStateManger->CanChangeSpeaker() && ret < 0)
 				{
-					break;
+					//切换到speaker
+					if (pStateManger->ChangeToSpeaker())
+					{
+						break;
+					}
+					//屏蔽ESC退出
+					return S_FALSE;
 				}
 				//屏蔽ESC退出
 				return S_FALSE;
 
 			}
-			else
+			case VK_F1:
 			{
-				//屏蔽ESC退出
-				return S_OK;
+				int ret = ::GetKeyState(VK_SHIFT); //>0 up <0 down
+				if (pStateManger->CanChangeSpeaker() && ret < 0)
+				{
+					//切换到speaker
+					if (pStateManger->ChangeToSpeakerSample())
+					{
+						Close();
+						break;
+					}
+					return S_FALSE;
+				}
 			}
-		}
-		case VK_CONTROL:
-		{
-			AddNewMessage(L"12312312312312312390909090007777777777777777777111111111111111111111111");
-			break;
-		}
-			
+
 		}
 	}
-	//else if (uMsg == WM_KEYUP)
-	//{
-	//	switch (wParam)
-	//	{
-	//	case VK_ESCAPE:
-	//		::GetKeyState(VK_SHIFT); //>0 up <0 down
-	//		return S_OK;
-	//	}
-	//}
 	return __super::MessageHandler(uMsg, wParam, lParam, bHandled);
 }
 LRESULT ListenerWindow::OnSize(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
@@ -343,7 +359,8 @@ void ListenerWindow::Notify(TNotifyUI& msg)
 
 					if (pStateManger->ConnectSpeaker(wstring(ip)))
 					{
-						retinfo = L"链接成功";
+						m_bConnecting = true;
+						retinfo = L"正在尝试连接";
 						bok = true;	
 					}
 					else
@@ -366,7 +383,7 @@ void ListenerWindow::Notify(TNotifyUI& msg)
 					
 					pControl->SetText(retinfo.c_str());
 
-			}
+				}
 			}
 		}
 	}
@@ -376,14 +393,14 @@ void ListenerWindow::Notify(TNotifyUI& msg)
 		CTabLayoutUI* pControl = static_cast<CTabLayoutUI*>(m_PaintManager.FindControl(_T("pageswitch")));
 		if (name == _T("page0"))
 		{
-			msg.pSender->SetAttribute(L"foreimage", L"file='info_selected.png' dest='76,30,110,64'");
-			m_PaintManager.FindControl(_T("page1"))->SetAttribute(L"foreimage", L"file='setting.png' dest='76,30,110,64'");
+			msg.pSender->SetAttribute(L"foreimage", L"file='info_selected.png' dest='61,30,95,64'");
+			m_PaintManager.FindControl(_T("page1"))->SetAttribute(L"foreimage", L"file='setting.png' dest='61,30,95,64'");
 			pControl->SelectItem(0);
 		}
 		else if (name == _T("page1"))
 		{
-			msg.pSender->SetAttribute(L"foreimage", L"file='setting_selected.png' dest='76,30,110,64'");
-			m_PaintManager.FindControl(_T("page0"))->SetAttribute(L"foreimage", L"file='info.png' dest='76,30,110,64'");
+			msg.pSender->SetAttribute(L"foreimage", L"file='setting_selected.png' dest='61,30,95,64'");
+			m_PaintManager.FindControl(_T("page0"))->SetAttribute(L"foreimage", L"file='info.png' dest='61,30,95,64'");
 
 			pControl->SelectItem(1);
 		}

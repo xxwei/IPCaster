@@ -29,8 +29,9 @@ private:
 
 	MessageMQ	*m_pMMQ = NULL;
 	MessageCallBack		*m_pMCB = NULL;
-	int		m_model = 0;
+	int		m_model = 0; //0 查找模式，1 订阅模式
 	string		m_listenername="listener";
+	string		m_speakerip = "";
 	string		m_speakeraddr = "";
 private:
 	bool InitFindSpeaker();
@@ -44,8 +45,10 @@ private:
 	
 public:
 	bool ConnectSpeaker(string ip, short port = MQPORT);
+	bool DisConnectSpeaker();
 	void SetMessageCallback(MessageCallBack *pmcb);
 	void AsyncFindSpeaker(char *self);
+	bool AsyncFindDestSpeaker(string ip, char *self=NULL);
 	void SetListenerNickName(string name);
 	bool isFindSpeaker();
 

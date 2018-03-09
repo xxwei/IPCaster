@@ -155,17 +155,57 @@ void FindSpeakerLoop::AsyncFindSpeaker(char *self)
 	}
 
 }
-
+bool FindSpeakerLoop::AsyncFindDestSpeaker(string ip, char *self)
+{
+	if (m_model == 1&&self==NULL) //手动连接speaker
+	{
+		return false;
+	}
+	//设置该套接字为广播类型，   
+	bool bOpt = true;
+	setsockopt(BroadCastSocket, SOL_SOCKET, SO_BROADCAST, (char*)&bOpt, sizeof(bOpt));
+	SOCKADDR_IN braddr;
+	braddr.sin_family = AF_INET;
+	braddr.sin_port = htons(BOARDPORT);
+	braddr.sin_addr.s_addr = inet_addr((ip).c_str());
+	int nLen = sizeof(braddr);
+	int ret = 0;
+	if (self)
+	{
+		ret = sendto(BroadCastSocket, self, strlen(self), 0, (sockaddr*)&(braddr), nLen);
+	}
+	else
+	{
+		ret = sendto(BroadCastSocket, m_listenername.c_str(), m_listenername.length(), 0, (sockaddr*)&(braddr), nLen);
+	}
+	if (ret != SOCKET_ERROR)
+	{
+		return true;
+	}
+	ret = GetLastError();
+	return false;
+	
+}
 void FindSpeakerLoop::FindThread()
 {
 	sockaddr_in clientAddr;
 	char buf[1024] = { 0 };
 	int fromlength = sizeof(SOCKADDR);
 	long error = 0;
+	int nRet = 0;
+	Sleep(1000);//等一下窗口显示
 	while (m_bFindRun)
 	{
-		AsyncFindSpeaker((char *)m_listenername.c_str());
-		int nRet = recvfrom(BroadCastSocket, buf, 1024, 0, (struct sockaddr FAR *)&clientAddr, (int FAR *)&fromlength);
+		if (m_speakerip == "")
+		{
+			AsyncFindSpeaker((char *)m_listenername.c_str());
+		}
+		else
+		{
+			AsyncFindDestSpeaker(m_speakerip, (char *)m_listenername.c_str());
+		}
+		
+		nRet = recvfrom(BroadCastSocket, buf, 1024, 0, (struct sockaddr FAR *)&clientAddr, (int FAR *)&fromlength);
 		if (SOCKET_ERROR != nRet)
 		{
 			char    *pIPAddr = inet_ntoa(clientAddr.sin_addr);
@@ -175,12 +215,15 @@ void FindSpeakerLoop::FindThread()
 				printf("receive command: %s\n", buf);
 				bFindSpeaker = true;
 				m_lastFindTick = GetTickCount();
-				if (m_pMCB)
-				{
-					m_pMCB->OnSpeakerOnLine(String2WString(string(pIPAddr)), String2WString(string(buf)));
-				}
+				
 
-				ConnectSpeaker(string(pIPAddr), MQPORT);
+				if (ConnectSpeaker(string(pIPAddr), MQPORT))
+				{
+					if (m_pMCB)
+					{
+						m_pMCB->OnSpeakerOnLine(String2WString(string(pIPAddr)), String2WString(string(buf)));
+					}
+				}
 				memset(buf, 0, 1024);
 			}
 		}
@@ -189,7 +232,7 @@ void FindSpeakerLoop::FindThread()
 			if (GetTickCount() - m_lastFindTick > 3000)
 			{
 				//speaker下线
-				if (ChangeModel(0))
+				if (DisConnectSpeaker())
 				{
 					if (m_pMCB)
 					{
@@ -197,8 +240,12 @@ void FindSpeakerLoop::FindThread()
 						bFindSpeaker = false;
 					}
 				}
-				
 			}
+			if (m_pMCB)
+			{
+				m_pMCB->OnSpeakerOffLine(1);
+			}
+
 		}
 		error = GetLastError();
 		Sleep(1000);
@@ -212,7 +259,7 @@ void FindSpeakerLoop::MQThread()
 		zmq_msg_t request;
 		zmq_msg_init(&request);
 		int nSize = zmq_msg_recv(&request, m_pSubSocket, 0);
-		if(nSize> 0)
+		if(nSize> 0&& m_bMQRun)
 		{
 			//int nSie = zmq_msg_size(&request);
 			//char *wmsg = new char[nSize];
@@ -226,9 +273,10 @@ void FindSpeakerLoop::MQThread()
 					m_pMCB->OnRecvMessage(pmsg);
 				}
 				m_lastFindTick = GetTickCount();
+				//OutputDebugStringA(pmsg->ToString().c_str());
+				//OutputDebugString(L"\n");
 			}
-			//OutputDebugStringA(wmsg);
-			//OutputDebugString(L"\n");
+			
 			zmq_msg_close(&request);
 		}
 		else
@@ -239,19 +287,20 @@ void FindSpeakerLoop::MQThread()
 }
 bool FindSpeakerLoop::ConnectSpeaker(string ip, short port)
 {
-	std::stringstream url;
-	url << "tcp://";
-	url << ip;
-	url << ":";
-	url << port;
-	m_speakeraddr = url.str();
-	if (!m_bMQRun)
+
+	if (m_model==0)
 	{
+		std::stringstream url;
+		url << "tcp://";
+		url << ip;
+		url << ":";
+		url << port;
+		m_speakeraddr = url.str();
 		OutputDebugStringA(m_speakeraddr.c_str());
 		m_pSubSocket = zmq_socket(m_pContext, ZMQ_SUB);
-		int iRcvTimeout = 2000;
+		int iRcvTimeout = 200;
 		int ret;
-		//ret = zmq_setsockopt(m_pSubSocket, ZMQ_RCVTIMEO, &iRcvTimeout, sizeof(iRcvTimeout));
+		ret = zmq_setsockopt(m_pSubSocket, ZMQ_RCVTIMEO, &iRcvTimeout, sizeof(iRcvTimeout));
 		ret = zmq_connect(m_pSubSocket, m_speakeraddr.c_str());
 		if (!ret)
 		{
@@ -260,12 +309,24 @@ bool FindSpeakerLoop::ConnectSpeaker(string ip, short port)
 			if (StartMQ())
 			{
 				ChangeModel(1);
+				m_speakerip = ip;
 			}
 			return true;
 		}
+		m_speakeraddr = "";
 	}
 	return false;
 
+}
+bool FindSpeakerLoop::DisConnectSpeaker()
+{
+	if (m_model == 1)
+	{
+		StopMQ();
+		m_speakerip = "";
+		return ChangeModel(0);
+	}
+	return false;
 }
 bool FindSpeakerLoop::ChangeModel(int model)
 {
@@ -273,11 +334,11 @@ bool FindSpeakerLoop::ChangeModel(int model)
 	{
 		if (m_model==0)  //转入订阅模式
 		{
-			//没啥要做的
+			LOGI("进入订阅模式");
 		}
 		if (m_model == 1) //由订阅模式转入查找模式
 		{
-			zmq_disconnect(m_pSubSocket, m_speakeraddr.c_str());
+			LOGI("由订阅模式转入查找模式");
 		}
 		m_model = model;
 		return true;
@@ -322,6 +383,8 @@ bool FindSpeakerLoop::StartMQ()
 bool FindSpeakerLoop::StopMQ()
 {
 	m_bMQRun = false;
+	Sleep(500);
+	zmq_disconnect(m_pSubSocket, m_speakeraddr.c_str());
 	zmq_close(m_pSubSocket);
 	return false;
 }
@@ -422,7 +485,7 @@ bool SpeakerEcho::InitSpeakEcho()
 		setsockopt(RecvBroadSocket, SOL_SOCKET, SO_REUSEADDR, (const char*)&optval, sizeof(BOOL));
 		optval = FALSE;
 		setsockopt(RecvBroadSocket, SOL_SOCKET, SO_DONTLINGER, (const char*)&optval, sizeof(BOOL));
-		int nNetTimeout = 1000;//1秒
+		int nNetTimeout = 2000;//1秒
 		//发送时限
 		setsockopt(RecvBroadSocket, SOL_SOCKET, SO_SNDTIMEO, (char *)&nNetTimeout, sizeof(int));
 		//接收时限
@@ -467,7 +530,7 @@ void SpeakerEcho::EchoThread()
 			else
 			{
 
-				UpdateUser("", lu);
+				//UpdateUser("", lu);
 			}
 		}
 	}
@@ -480,7 +543,7 @@ void SpeakerEcho::MatchInfoThread()
 	{
 		i++;
 		Sleep(100);
-		if (i > 30)
+		if (i > 20)
 		{
 			i = 0;
 			Message msg;

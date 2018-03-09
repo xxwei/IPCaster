@@ -46,7 +46,7 @@ public:
 
 	///// overlay MessageCallBack
 	virtual void OnSpeakerOnLine(wstring ip, wstring name);
-	virtual void OnSpeakerOffLine();
+	virtual void OnSpeakerOffLine(int ntype);
 	virtual void OnRecvMessage(Message *msg);
 
 
@@ -61,6 +61,7 @@ private:
 	void UpdateMainUI();
 	void UpdateSettingUI();
 	bool	m_bInit = false;
+	bool	m_bConnecting = false;
 public:
 	void SetStateManger(StateManger *pSm);
 	int AddNewMessage(wstring str);

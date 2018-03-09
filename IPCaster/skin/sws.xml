@@ -76,12 +76,15 @@
 								</Container>
 								<HorizontalLayout height="104" padding="1,1,1,10" bkcolor="#FFF0F0F0">
 									<VerticalLayout>
-										<RichEdit name="editmsg" font="2" height="68" bkcolor="#FFFAFAFA" enabled="true" rich="false" readonly="false" wantreturn="false" wantctrlreturn="false"/>
-										<HorizontalLayout height="36"  bkcolor="#FFFAFAFA" >
+										<RichEdit name="editmsg" font="2" height="48" bkcolor="#FFFAFAFA" enabled="true" rich="false" readonly="false" wantreturn="false" wantctrlreturn="false"/>
+										<HorizontalLayout height="56"  bkcolor="#FFFAFAFA" >
 											<Control />
-											<Option name="auto"  text="自动发送" padding = "10,0,10,0"  height = "26" width = "90" normalimage="button.png" pushedimage="button_selected.png" selectedimage="button_selected.png"/>
-											<Button  name="cancel"  text="取消" padding = "10,0,10,0"  height = "26" width = "90" normalimage="button.png" pushedimage="button_selected.png"/>
-											<Button padding = "10,0,10,0" name="send" height = "26" width = "90"  text="发送(Enter)"  normalimage="button.png" pushedimage="button_selected.png"/>
+											<Button padding = "10,0,10,0" name="send" height = "56" width = "90"  text="发送(Enter)"  normalimage="button.png" hotimage="button_hover.png" disabledimage="button_disabled.png" pushedimage="button_selected.png"/>
+											<VerticalLayout width="110" >
+											<Button name="back"  text="返回" padding = "10,0,10,2"  height = "26" width = "90" normalimage="button.png" hotimage="button_hover.png" disabledimage="button_disabled.png" pushedimage="button_selected.png"/>
+											<Option name="auto"  text="自动发送" padding = "10,2,10,0"  height = "26" width = "90" normalimage="button.png" hotimage="button_hover.png" selectedimage="button_selected.png" pushedimage="button_selected.png"/>
+											</VerticalLayout>	
+											
 										</HorizontalLayout>
 									</VerticalLayout>
 								</HorizontalLayout>
@@ -184,8 +187,8 @@
 						</HorizontalLayout>
 						<HorizontalLayout padding="30,0,100,0" height="50" >
 							<Control />
-							<Button name="reset" text="重置" padding = "10,0,10,0"  height = "26" width = "90" normalimage="button.png" pushedimage="button_selected.png"/>
-							<Button name="import" text="导入" padding = "10,0,10,0"  height = "26" width = "90" normalimage="button.png" pushedimage="button_selected.png"/>
+							<Button name="reset" text="重置" padding = "10,0,10,0"  height = "26" width = "90" normalimage="button.png" hotimage="button_hover.png" disabledimage="button_disabled.png" pushedimage="button_selected.png"/>
+							<Button name="import" text="导入" padding = "10,0,10,0"  height = "26" width = "90" normalimage="button.png" hotimage="button_hover.png" disabledimage="button_disabled.png" pushedimage="button_selected.png"/>
 						</HorizontalLayout>
 						</VerticalLayout>
 					</VerticalLayout>

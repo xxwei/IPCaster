@@ -532,10 +532,10 @@ void SpeakerWindow::Notify(TNotifyUI& msg)
 
 		if (name == _T("infopub"))
 		{
-			msg.pSender->SetAttribute(L"foreimage", L"file='info_selected.png' dest='76,30,110,64'");
-			m_PaintManager.FindControl(_T("match"))->SetAttribute(L"foreimage", L"file='match.png' dest='76,30,110,64'");
-			m_PaintManager.FindControl(_T("messages"))->SetAttribute(L"foreimage", L"file='messages.png' dest='76,30,110,64'");
-			m_PaintManager.FindControl(_T("settting"))->SetAttribute(L"foreimage", L"file='setting.png' dest='76,30,110,64'");
+			msg.pSender->SetAttribute(L"foreimage", L"file='info_selected.png' dest='61,30,95,64'");
+			m_PaintManager.FindControl(_T("match"))->SetAttribute(L"foreimage", L"file='match.png' dest='61,30,95,64'");
+			m_PaintManager.FindControl(_T("messages"))->SetAttribute(L"foreimage", L"file='messages.png' dest='61,30,95,64'");
+			m_PaintManager.FindControl(_T("settting"))->SetAttribute(L"foreimage", L"file='setting.png' dest='61,30,95,64'");
 
 			pControl->SelectItem(0);
 			m_CurrentCanShotKey = true;
@@ -543,10 +543,10 @@ void SpeakerWindow::Notify(TNotifyUI& msg)
 		}
 		else if (name == _T("match"))
 		{
-			msg.pSender->SetAttribute(L"foreimage", L"file='match_selected.png' dest='76,30,110,64'");
-			m_PaintManager.FindControl(_T("infopub"))->SetAttribute(L"foreimage", L"file='info.png' dest='76,30,110,64'");
-			m_PaintManager.FindControl(_T("messages"))->SetAttribute(L"foreimage", L"file='messages.png' dest='76,30,110,64'");
-			m_PaintManager.FindControl(_T("settting"))->SetAttribute(L"foreimage", L"file='setting.png' dest='76,30,110,64'");
+			msg.pSender->SetAttribute(L"foreimage", L"file='match_selected.png' dest='61,30,95,64'");
+			m_PaintManager.FindControl(_T("infopub"))->SetAttribute(L"foreimage", L"file='info.png' dest='61,30,95,64'");
+			m_PaintManager.FindControl(_T("messages"))->SetAttribute(L"foreimage", L"file='messages.png' dest='61,30,95,64'");
+			m_PaintManager.FindControl(_T("settting"))->SetAttribute(L"foreimage", L"file='setting.png' dest='61,30,95,64'");
 
 			pControl->SelectItem(1);
 			m_CurrentCanShotKey = false;
@@ -554,20 +554,20 @@ void SpeakerWindow::Notify(TNotifyUI& msg)
 		}
 		else if (name == _T("messages"))
 		{
-			msg.pSender->SetAttribute(L"foreimage", L"file='messages_selected.png' dest='76,30,110,64'");
-			m_PaintManager.FindControl(_T("infopub"))->SetAttribute(L"foreimage", L"file='info.png' dest='76,30,110,64'");
-			m_PaintManager.FindControl(_T("match"))->SetAttribute(L"foreimage", L"file='match.png' dest='76,30,110,64'");
-			m_PaintManager.FindControl(_T("settting"))->SetAttribute(L"foreimage", L"file='setting.png' dest='76,30,110,64'");
+			msg.pSender->SetAttribute(L"foreimage", L"file='messages_selected.png' dest='61,30,95,64'");
+			m_PaintManager.FindControl(_T("infopub"))->SetAttribute(L"foreimage", L"file='info.png' dest='61,30,95,64'");
+			m_PaintManager.FindControl(_T("match"))->SetAttribute(L"foreimage", L"file='match.png' dest='61,30,95,64'");
+			m_PaintManager.FindControl(_T("settting"))->SetAttribute(L"foreimage", L"file='setting.png' dest='61,30,95,64'");
 
 			pControl->SelectItem(2);
 			m_CurrentCanShotKey = false;
 		}
 		else if (name == _T("settting"))
 		{
-			msg.pSender->SetAttribute(L"foreimage", L"file='setting_selected.png' dest='76,30,110,64'");
-			m_PaintManager.FindControl(_T("infopub"))->SetAttribute(L"foreimage", L"file='info.png' dest='76,30,110,64'");
-			m_PaintManager.FindControl(_T("match"))->SetAttribute(L"foreimage", L"file='match.png' dest='76,30,110,64'");
-			m_PaintManager.FindControl(_T("messages"))->SetAttribute(L"foreimage", L"file='messages.png' dest='76,30,110,64'");
+			msg.pSender->SetAttribute(L"foreimage", L"file='setting_selected.png' dest='61,30,95,64'");
+			m_PaintManager.FindControl(_T("infopub"))->SetAttribute(L"foreimage", L"file='info.png' dest='61,30,95,64'");
+			m_PaintManager.FindControl(_T("match"))->SetAttribute(L"foreimage", L"file='match.png' dest='61,30,95,64'");
+			m_PaintManager.FindControl(_T("messages"))->SetAttribute(L"foreimage", L"file='messages.png' dest='61,30,95,64'");
 
 			pControl->SelectItem(3);
 			m_CurrentCanShotKey = false;
@@ -1874,115 +1874,120 @@ void SpeakerWindow::ClearMatchUIInfo()
 {
 
 	CComboUI *pComboControl = static_cast<CComboUI*>(m_PaintManager.FindControl(_T("team1combo")));
-	pComboControl->RemoveAll();
+	if(pComboControl)
+		pComboControl->RemoveAll();
 	pComboControl = static_cast<CComboUI*>(m_PaintManager.FindControl(_T("team2combo")));
-	pComboControl->RemoveAll();
+	if (pComboControl)
+		pComboControl->RemoveAll();
 	CTreeNodeUI *pControl = static_cast<CTreeNodeUI*>(m_PaintManager.FindControl(_T("wildcardP1")));
-	int count = pControl->GetCountChild();
-	for (int i = 0; i < count; i++)
+	if (pControl)
 	{
-		CDuiString userdata = pControl->GetChildNode(i)->GetUserData();
-		if (userdata == L"P1")
+		int count = pControl->GetCountChild();
+		for (int i = 0; i < count; i++)
 		{
-			pControl->RemoveAt(pControl->GetChildNode(i));
-			i--;
-			count--;
+			CDuiString userdata = pControl->GetChildNode(i)->GetUserData();
+			if (userdata == L"P1")
+			{
+				pControl->RemoveAt(pControl->GetChildNode(i));
+				i--;
+				count--;
+			}
 		}
-	}
-	pControl = static_cast<CTreeNodeUI*>(m_PaintManager.FindControl(_T("wildcardP2")));
-	count = pControl->GetCountChild();
-	for (int i = 0; i < count; i++)
-	{
-		CDuiString userdata = pControl->GetChildNode(i)->GetUserData();
-		if (userdata == L"P2")
+		pControl = static_cast<CTreeNodeUI*>(m_PaintManager.FindControl(_T("wildcardP2")));
+		count = pControl->GetCountChild();
+		for (int i = 0; i < count; i++)
 		{
-			pControl->RemoveAt(pControl->GetChildNode(i));
-			i--;
-			count--;
+			CDuiString userdata = pControl->GetChildNode(i)->GetUserData();
+			if (userdata == L"P2")
+			{
+				pControl->RemoveAt(pControl->GetChildNode(i));
+				i--;
+				count--;
+			}
 		}
-	}
-	pControl = static_cast<CTreeNodeUI*>(m_PaintManager.FindControl(_T("wildcardT1")));
-	count = pControl->GetCountChild();
-	for (int i = 0; i < count; i++)
-	{
-		CDuiString userdata = pControl->GetChildNode(i)->GetUserData();
-		if (userdata == L"T1")
+		pControl = static_cast<CTreeNodeUI*>(m_PaintManager.FindControl(_T("wildcardT1")));
+		count = pControl->GetCountChild();
+		for (int i = 0; i < count; i++)
 		{
-			pControl->RemoveAt(pControl->GetChildNode(i));
-			i--;
-			count--;
+			CDuiString userdata = pControl->GetChildNode(i)->GetUserData();
+			if (userdata == L"T1")
+			{
+				pControl->RemoveAt(pControl->GetChildNode(i));
+				i--;
+				count--;
+			}
 		}
-	}
-	pControl = static_cast<CTreeNodeUI*>(m_PaintManager.FindControl(_T("wildcardT2")));
-	count = pControl->GetCountChild();
-	for (int i = 0; i < count; i++)
-	{
-		CDuiString userdata = pControl->GetChildNode(i)->GetUserData();
-		if (userdata == L"T2")
+		pControl = static_cast<CTreeNodeUI*>(m_PaintManager.FindControl(_T("wildcardT2")));
+		count = pControl->GetCountChild();
+		for (int i = 0; i < count; i++)
 		{
-			pControl->RemoveAt(pControl->GetChildNode(i));
-			i--;
-			count--;
+			CDuiString userdata = pControl->GetChildNode(i)->GetUserData();
+			if (userdata == L"T2")
+			{
+				pControl->RemoveAt(pControl->GetChildNode(i));
+				i--;
+				count--;
+			}
 		}
-	}
-	pControl = static_cast<CTreeNodeUI*>(m_PaintManager.FindControl(_T("wildcardC1")));
-	count = pControl->GetCountChild();
-	for (int i = 0; i < count; i++)
-	{
-		CDuiString userdata = pControl->GetChildNode(i)->GetUserData();
-		if (userdata == L"C1")
+		pControl = static_cast<CTreeNodeUI*>(m_PaintManager.FindControl(_T("wildcardC1")));
+		count = pControl->GetCountChild();
+		for (int i = 0; i < count; i++)
 		{
-			pControl->RemoveAt(pControl->GetChildNode(i));
-			i--;
-			count--;
+			CDuiString userdata = pControl->GetChildNode(i)->GetUserData();
+			if (userdata == L"C1")
+			{
+				pControl->RemoveAt(pControl->GetChildNode(i));
+				i--;
+				count--;
+			}
 		}
-	}
-	pControl = static_cast<CTreeNodeUI*>(m_PaintManager.FindControl(_T("wildcardC2")));
-	count = pControl->GetCountChild();
-	for (int i = 0; i < count; i++)
-	{
-		CDuiString userdata = pControl->GetChildNode(i)->GetUserData();
-		if (userdata == L"C2")
+		pControl = static_cast<CTreeNodeUI*>(m_PaintManager.FindControl(_T("wildcardC2")));
+		count = pControl->GetCountChild();
+		for (int i = 0; i < count; i++)
 		{
-			pControl->RemoveAt(pControl->GetChildNode(i));
-			i--;
-			count--;
+			CDuiString userdata = pControl->GetChildNode(i)->GetUserData();
+			if (userdata == L"C2")
+			{
+				pControl->RemoveAt(pControl->GetChildNode(i));
+				i--;
+				count--;
+			}
 		}
-	}
-	pControl = static_cast<CTreeNodeUI*>(m_PaintManager.FindControl(_T("wildcardR1")));
-	count = pControl->GetCountChild();
-	for (int i = 0; i < count; i++)
-	{
-		CDuiString userdata = pControl->GetChildNode(i)->GetUserData();
-		if (userdata == L"R1")
+		pControl = static_cast<CTreeNodeUI*>(m_PaintManager.FindControl(_T("wildcardR1")));
+		count = pControl->GetCountChild();
+		for (int i = 0; i < count; i++)
 		{
-			pControl->RemoveAt(pControl->GetChildNode(i));
-			i--;
-			count--;
+			CDuiString userdata = pControl->GetChildNode(i)->GetUserData();
+			if (userdata == L"R1")
+			{
+				pControl->RemoveAt(pControl->GetChildNode(i));
+				i--;
+				count--;
+			}
 		}
-	}
-	pControl = static_cast<CTreeNodeUI*>(m_PaintManager.FindControl(_T("wildcardR2")));
-	count = pControl->GetCountChild();
-	for (int i = 0; i < count; i++)
-	{
-		CDuiString userdata = pControl->GetChildNode(i)->GetUserData();
-		if (userdata == L"R2")
+		pControl = static_cast<CTreeNodeUI*>(m_PaintManager.FindControl(_T("wildcardR2")));
+		count = pControl->GetCountChild();
+		for (int i = 0; i < count; i++)
 		{
-			pControl->RemoveAt(pControl->GetChildNode(i));
-			i--;
-			count--;
+			CDuiString userdata = pControl->GetChildNode(i)->GetUserData();
+			if (userdata == L"R2")
+			{
+				pControl->RemoveAt(pControl->GetChildNode(i));
+				i--;
+				count--;
+			}
 		}
-	}
-	pControl = static_cast<CTreeNodeUI*>(m_PaintManager.FindControl(_T("wildcardR3")));
-	count = pControl->GetCountChild();
-	for (int i = 0; i < count; i++)
-	{
-		CDuiString userdata = pControl->GetChildNode(i)->GetUserData();
-		if (userdata == L"R3")
+		pControl = static_cast<CTreeNodeUI*>(m_PaintManager.FindControl(_T("wildcardR3")));
+		count = pControl->GetCountChild();
+		for (int i = 0; i < count; i++)
 		{
-			pControl->RemoveAt(pControl->GetChildNode(i));
-			i--;
-			count--;
+			CDuiString userdata = pControl->GetChildNode(i)->GetUserData();
+			if (userdata == L"R3")
+			{
+				pControl->RemoveAt(pControl->GetChildNode(i));
+				i--;
+				count--;
+			}
 		}
 	}
 }

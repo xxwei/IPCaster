@@ -70,6 +70,9 @@ void  SpeakerWindowSample::InitWindow()
 	UpdateSettingUI();
 	UpdateFlowItem(0);
 	m_bInit = true;
+	COptionUI* pAutoControl = static_cast<COptionUI*>(m_PaintManager.FindControl(_T("auto")));
+	pAutoControl->Selected(true);
+	m_bAuto = true;
 	LOGI("简版电子公告栏启动");
 }
 CControlUI* SpeakerWindowSample::CreateControl(LPCTSTR pstrClassName)
@@ -195,14 +198,16 @@ void SpeakerWindowSample::SelectItem()
 					CDuiString text;
 					CListContainerElementUI *msgitem = new CListContainerElementUI();
 					msgitem->SetFixedWidth(120);
-					msgitem->SetFixedHeight(30);
+					msgitem->SetFixedHeight(50);
 					msgitem->SetBorderSize(1);
 					msgitem->SetBorderColor(0xFFAAAAAA);
 					text.Format(_T("%s"), (*item).c_str());
 					CTextUI * TextItem = new CTextUI();
+					TextItem->SetAttribute(L"endellipsis", L"true");
+					TextItem->SetAttribute(L"textpadding", L"10,13,3,13");
 					TextItem->SetText(text);
 					msgitem->SetUserData(text);
-					TextItem->SetFont(1);
+					TextItem->SetFont(2);
 					msgitem->Add(TextItem);
 					pControl->Add(msgitem);
 				}
@@ -294,28 +299,23 @@ LRESULT SpeakerWindowSample::MessageHandler(UINT uMsg, WPARAM wParam, LPARAM lPa
 	{
 		switch (wParam)
 		{
-		case VK_ESCAPE:
-		{
-			int ret = ::GetKeyState(VK_SHIFT); //>0 up <0 down
-			if (ret < 0)
+			case VK_ESCAPE:
 			{
-				//切换到Listener
-				pStateManger->ChangeToListener();
-				break;
+				int ret = ::GetKeyState(VK_SHIFT); //>0 up <0 down
+				if (ret < 0)
+				{
+					//切换到Listener
+					pStateManger->ChangeToListener();
+					break;
 
-			}
-			else
-			{
-				//屏蔽ESC退出
+				}
+				else
+				{
+					//屏蔽ESC退出
+					return S_OK;
+				}
 				return S_OK;
 			}
-			return S_OK;
-		}
-		case VK_CONTROL:
-		{
-			//AddNewMessage(L"12312312312312312390909090007777777777777777777111111111111111111111111");
-			break;
-		}
 		}
 		if ((wParam >= '1'&&wParam <= '9')|| wParam == 'q'|| wParam == 'Q'|| wParam == 'w'|| wParam == 'W'|| wParam == 'e'|| wParam == 'E')
 		{
@@ -480,6 +480,18 @@ void SpeakerWindowSample::Notify(TNotifyUI& msg)
 			LOGI("发送消息 %s",WString2String(sendmsg).c_str());
 			pControl->SetText(L"");
 		}
+		else if (_tcsicmp(msg.pSender->GetName(), L"back") == 0)
+		{
+			
+			ClickItem(L"");
+			SelectItem();
+			
+			CRichEditUI* pControl = static_cast<CRichEditUI*>(m_PaintManager.FindControl(_T("editmsg")));
+			pControl->SetText(L"");
+			pControl->SetFocus();
+			LOGI("手动返回");
+			
+		}
 		else if (_tcsicmp(msg.pSender->GetName(), L"import") == 0)
 		{
 			LOGI("导入比赛信息");
@@ -501,10 +513,14 @@ void SpeakerWindowSample::Notify(TNotifyUI& msg)
 			if (m_bAuto)
 			{
 				LOGI("自动发送消息");
+				CButtonUI  *pBtnControl = static_cast<CButtonUI*>(m_PaintManager.FindControl(_T("send")));
+				pBtnControl->SetEnabled(false);
 			}
 			else
 			{
 				LOGI("手动发送消息");
+				CButtonUI  *pBtnControl = static_cast<CButtonUI*>(m_PaintManager.FindControl(_T("send")));
+				pBtnControl->SetEnabled();
 			}
 		}
 		else if (_tcsicmp(msg.pSender->GetName(), L"item") == 0)
@@ -522,10 +538,7 @@ void SpeakerWindowSample::Notify(TNotifyUI& msg)
 			SelectItem();
 			pControl->SetFocus();
 		}
-
-
-		
-		
+	
 	}
 	else if (msg.sType == _T("selectchanged"))
 	{
@@ -534,10 +547,10 @@ void SpeakerWindowSample::Notify(TNotifyUI& msg)
 
 		if (name == _T("infopub"))
 		{
-			msg.pSender->SetAttribute(L"foreimage", L"file='info_selected.png' dest='76,30,110,64'");
-			m_PaintManager.FindControl(_T("match"))->SetAttribute(L"foreimage", L"file='match.png' dest='76,30,110,64'");
-			m_PaintManager.FindControl(_T("messages"))->SetAttribute(L"foreimage", L"file='messages.png' dest='76,30,110,64'");
-			m_PaintManager.FindControl(_T("settting"))->SetAttribute(L"foreimage", L"file='setting.png' dest='76,30,110,64'");
+			msg.pSender->SetAttribute(L"foreimage", L"file='info_selected.png' dest='61,30,95,64'");
+			m_PaintManager.FindControl(_T("match"))->SetAttribute(L"foreimage", L"file='match.png' dest='61,30,95,64'");
+			m_PaintManager.FindControl(_T("messages"))->SetAttribute(L"foreimage", L"file='messages.png' dest='61,30,95,64'");
+			m_PaintManager.FindControl(_T("settting"))->SetAttribute(L"foreimage", L"file='setting.png' dest='61,30,95,64'");
 
 			pControl->SelectItem(0);
 			m_CurrentCanShotKey = true;
@@ -545,10 +558,10 @@ void SpeakerWindowSample::Notify(TNotifyUI& msg)
 		}
 		else if (name == _T("match"))
 		{
-			msg.pSender->SetAttribute(L"foreimage", L"file='match_selected.png' dest='76,30,110,64'");
-			m_PaintManager.FindControl(_T("infopub"))->SetAttribute(L"foreimage", L"file='info.png' dest='76,30,110,64'");
-			m_PaintManager.FindControl(_T("messages"))->SetAttribute(L"foreimage", L"file='messages.png' dest='76,30,110,64'");
-			m_PaintManager.FindControl(_T("settting"))->SetAttribute(L"foreimage", L"file='setting.png' dest='76,30,110,64'");
+			msg.pSender->SetAttribute(L"foreimage", L"file='match_selected.png' dest='61,30,95,64'");
+			m_PaintManager.FindControl(_T("infopub"))->SetAttribute(L"foreimage", L"file='info.png' dest='61,30,95,64'");
+			m_PaintManager.FindControl(_T("messages"))->SetAttribute(L"foreimage", L"file='messages.png' dest='61,30,95,64'");
+			m_PaintManager.FindControl(_T("settting"))->SetAttribute(L"foreimage", L"file='setting.png' dest='61,30,95,64'");
 
 			pControl->SelectItem(1);
 			m_CurrentCanShotKey = false;
@@ -557,10 +570,10 @@ void SpeakerWindowSample::Notify(TNotifyUI& msg)
 		}
 		else if (name == _T("messages"))
 		{
-			msg.pSender->SetAttribute(L"foreimage", L"file='messages_selected.png' dest='76,30,110,64'");
-			m_PaintManager.FindControl(_T("infopub"))->SetAttribute(L"foreimage", L"file='info.png' dest='76,30,110,64'");
-			m_PaintManager.FindControl(_T("match"))->SetAttribute(L"foreimage", L"file='match.png' dest='76,30,110,64'");
-			m_PaintManager.FindControl(_T("settting"))->SetAttribute(L"foreimage", L"file='setting.png' dest='76,30,110,64'");
+			msg.pSender->SetAttribute(L"foreimage", L"file='messages_selected.png' dest='61,30,95,64'");
+			m_PaintManager.FindControl(_T("infopub"))->SetAttribute(L"foreimage", L"file='info.png' dest='61,30,95,64'");
+			m_PaintManager.FindControl(_T("match"))->SetAttribute(L"foreimage", L"file='match.png' dest='61,30,95,64'");
+			m_PaintManager.FindControl(_T("settting"))->SetAttribute(L"foreimage", L"file='setting.png' dest='61,30,95,64'");
 
 			pControl->SelectItem(2);
 			m_CurrentCanShotKey = false;
@@ -568,10 +581,10 @@ void SpeakerWindowSample::Notify(TNotifyUI& msg)
 		}
 		else if (name == _T("settting"))
 		{
-			msg.pSender->SetAttribute(L"foreimage", L"file='setting_selected.png' dest='76,30,110,64'");
-			m_PaintManager.FindControl(_T("infopub"))->SetAttribute(L"foreimage", L"file='info.png' dest='76,30,110,64'");
-			m_PaintManager.FindControl(_T("match"))->SetAttribute(L"foreimage", L"file='match.png' dest='76,30,110,64'");
-			m_PaintManager.FindControl(_T("messages"))->SetAttribute(L"foreimage", L"file='messages.png' dest='76,30,110,64'");
+			msg.pSender->SetAttribute(L"foreimage", L"file='setting_selected.png' dest='61,30,95,64'");
+			m_PaintManager.FindControl(_T("infopub"))->SetAttribute(L"foreimage", L"file='info.png' dest='61,30,95,64'");
+			m_PaintManager.FindControl(_T("match"))->SetAttribute(L"foreimage", L"file='match.png' dest='61,30,95,64'");
+			m_PaintManager.FindControl(_T("messages"))->SetAttribute(L"foreimage", L"file='messages.png' dest='61,30,95,64'");
 
 			pControl->SelectItem(3);
 			m_CurrentCanShotKey = false;
@@ -705,7 +718,7 @@ void SpeakerWindowSample::Notify(TNotifyUI& msg)
 			CRichEditUI *pRControl = static_cast<CRichEditUI*>(m_PaintManager.FindControl(_T("editmsg")));
 			pRControl->SetText(m_CurrentMsgStr);
 			SelectItem();
-			pControl->SetFocus();
+			pRControl->SetFocus();
 		}
 	}
 }
@@ -759,6 +772,19 @@ int SpeakerWindowSample::SendNewMessage(wstring str)
 {
 	if (str.length())
 	{
+		int pos = str.find(L"。", 0);
+		if (pos != wstring::npos)
+		{
+			int pos1 = str.find(L"#", 0);
+			if (pos1 != wstring::npos)
+			{
+				if (pos1 > pos)
+				{
+					str = str.substr(0, pos+1);
+				}
+			}
+			
+		}
 		return AddNewMessage(str);
 	}
 	return -1;
@@ -798,11 +824,12 @@ void SpeakerWindowSample::ReSizeItem(int max_width, int max_height)
 			SIZE sz;
 			sz.cx = (max_width-60) / c;
 			sz.cy = (max_height - 60) / Rows - 20;
-			if (Rows == 1)
+			if (Rows < 3) //行数
 			{
-				sz.cy = (max_height - 60) / 2 - 20;
+				sz.cy = (max_height - 60) / 3 - 20;
 				CDuiString insetstr;
-				insetstr.Format(L"%d,%d,%d,%d", 30, sz.cy/2+30, 30, sz.cy / 2 + 30);
+				int tl = ((max_height - 60) - (sz.cy + 20)*Rows) / 2;
+				insetstr.Format(L"%d,%d,%d,%d", 30, tl, 30, tl);
 				pFlowControl->SetAttribute(L"inset", insetstr);
 			}
 			
@@ -828,17 +855,21 @@ void SpeakerWindowSample::ClickItem(CDuiString ItemName, bool bSecond)
 			for (; item != itemlist.end(); item++)
 			{
 				CButtonUI *pButton = new CButtonUI();
-				pButton->SetFont(11);
+				pButton->SetFont(10);
+				pButton->SetTextColor(0xFFEEEEEE);
 				wstring str = String2WString(string(U2G((*item).c_str())).c_str());
 				pButton->SetText(str.c_str());
-				pButton->SetNormalImage(L"file = 'button.png' corner = '10,10,10,10'");
-				pButton->SetPushedImage(L"file = 'button_selected.png' corner = '10,10,10,10'");
-				pButton->SetHotImage(L"file = 'button_selected.png' corner = '10,10,10,10'");
+				pButton->SetNormalImage(L"file = 'buttons.png' corner = '10,10,10,10'");
+				pButton->SetPushedImage(L"file = 'buttons_selected.png' corner = '10,10,10,10'");
+				pButton->SetHotImage(L"file = 'buttons_hover.png' corner = '10,10,10,10'");
 				pButton->SetName(L"item");
+				pButton->SetAttribute(L"endellipsis", L"true");
 				str = String2WString(string(U2G(pStateManger->CurrentFlowValue[(*item)]["itemmsg"].asString().c_str())).c_str());
 				pButton->SetUserData(str.c_str());
 				pFlowControl->Add(pButton);
 			}
+			CRichEditUI* pControl = static_cast<CRichEditUI*>(m_PaintManager.FindControl(_T("editmsg")));
+			pControl->SetText(L"");
 		}
 		else //每一步状态
 		{
@@ -858,13 +889,15 @@ void SpeakerWindowSample::ClickItem(CDuiString ItemName, bool bSecond)
 				for (; item != itemlist.end(); item++)
 				{
 					CButtonUI *pButton = new CButtonUI();
-					pButton->SetFont(9);
+					pButton->SetFont(8);
+					pButton->SetTextColor(0xFFEEEEEE);
 					wstring str = String2WString(string(U2G((*item).c_str())).c_str());
 					pButton->SetText(str.c_str());
-					pButton->SetNormalImage(L"file = 'button.png' corner = '10,10,10,10'");
-					pButton->SetPushedImage(L"file = 'button_selected.png' corner = '10,10,10,10'");
-					pButton->SetHotImage(L"file = 'button_selected.png' corner = '10,10,10,10'");
+					pButton->SetNormalImage(L"file = 'buttons.png' corner = '10,10,10,10'");
+					pButton->SetPushedImage(L"file = 'buttons_selected.png' corner = '10,10,10,10'");
+					pButton->SetHotImage(L"file = 'buttons_hover.png' corner = '10,10,10,10'");
 					pButton->SetName(L"item");
+					pButton->SetAttribute(L"endellipsis", L"true");
 					str = String2WString(string(U2G(pStateManger->CurrentFlowValue[(*item)]["itemmsg"].asString().c_str())).c_str());
 					pButton->SetUserData(str.c_str());
 					pFlowControl->Add(pButton);

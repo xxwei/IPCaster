@@ -10,7 +10,7 @@
 	<Font id="7" name="微软雅黑" size="26" bold="true"/>
 	<Font id="8" name="微软雅黑" size="28" bold="true"/>
 	<Font id="9" name="微软雅黑" size="30" bold="true"/>
-		<Font id="10" name="微软雅黑" size="36" bold="true"/>
+	<Font id="10" name="微软雅黑" size="36" bold="true"/>
 	<Font id="11" name="微软雅黑" size="72" bold="true"/>
 	<Default name="VScrollBar" value="thumbnormalimage=&quot;file='scrollbar_n.png' source='0,0,12,500' corner='0,2,0,2'&quot;thumbhotimage=&quot;file='scrollbar_n.png' source='0,0,12,500' corner='0,2,0,2'&quot; thumbpushedimage=&quot;file='scrollbar_n.png' source='0,0,12,500' corner='0,2,0,2'&quot;showbutton1=&quot;false&quot;showbutton2=&quot;false&quot;bknormalimage=&quot;file='scrollbar_n.png' source='0,0,14,20'&quot;" />
 	<VerticalLayout  bkcolor="#FFAEAEAE" vscrollbar="false"> 
@@ -71,8 +71,8 @@
 										<RichEdit name="editmsg" font="2" height="148" bkcolor="#FFFAFAFA" enabled="true" rich="false" readonly="false" wantreturn="false" wantctrlreturn="false"/>
 										<HorizontalLayout height="36"  bkcolor="#FFFAFAFA" >
 											<Control />
-											<Button  name="cancel"  text="取消" padding = "10,0,10,0"  height = "26" width = "90" normalimage="button.png" pushedimage="button_selected.png"/>
-											<Button padding = "10,0,10,0" name="send" height = "26" width = "90"  text="发送(Enter)"  normalimage="button.png" pushedimage="button_selected.png"/>
+											<Button  name="cancel"  text="取消" padding = "10,0,10,0"  height = "26" width = "90" normalimage="button.png" hotimage="button_hover.png" disabledimage="button_disabled.png" pushedimage="button_selected.png"/>
+											<Button padding = "10,0,10,0" name="send" height = "26" width = "90"  text="发送(Enter)"  normalimage="button.png" hotimage="button_hover.png" disabledimage="button_disabled.png" pushedimage="button_selected.png"/>
 										</HorizontalLayout>
 									</VerticalLayout>
 									<VerticalLayout name="eventtip" width="30" bkcolor = "#FFF0F0F0">
@@ -97,14 +97,12 @@
 										<VerticalLayout>
 											<HorizontalLayout padding="30,30,30,0" >
 												<Label text="主队:" font="1"  width="40"/>
-												<Combo name="team1" bordersize="1" borderround="2,2" maxheight="25"  bordercolor="#FFCECECE" textpadding="9,3,9,5">
-													<ListLabelElement name="team1text" text="主队名称" selected="true"  />
+												<Combo name="team1combo" bordersize="1" borderround="2,2" maxheight="25"  bordercolor="#FFCECECE" textpadding="9,3,9,5">
 												</Combo>
 											</HorizontalLayout>
 											<HorizontalLayout padding="30,0,30,10" >
 												<Label text="客队:" font="1" width="40" />
-												<Combo name="team2" bordersize="1" borderround="2,2" maxheight="25"  bordercolor="#FFCECECE" textpadding="9,3,9,5">
-													<ListLabelElement name="team2text" text="客队名称" selected="true"  />
+												<Combo name="team2combo" bordersize="1" borderround="2,2" maxheight="25"  bordercolor="#FFCECECE" textpadding="9,3,9,5">
 												</Combo>
 											</HorizontalLayout>
 										</VerticalLayout>
@@ -186,15 +184,15 @@
 						</HorizontalLayout>
 						<HorizontalLayout padding="30,0,100,0" height="50" >
 							<Control />
-							<Button name="save" text="保存" padding = "10,0,10,0"  height = "26" width = "90" normalimage="button.png" pushedimage="button_selected.png"/>
-							<Button name="import" text="导入" padding = "10,0,10,0"  height = "26" width = "90" normalimage="button.png" pushedimage="button_selected.png"/>
+							<Button name="reset" text="重置" padding = "10,0,10,0"  height = "26" width = "90" normalimage="button.png" hotimage="button_hover.png" disabledimage="button_disabled.png" pushedimage="button_selected.png"/>
+							<Button name="import" text="导入" padding = "10,0,10,0"  height = "26" width = "90" normalimage="button.png" hotimage="button_hover.png" disabledimage="button_disabled.png" pushedimage="button_selected.png"/>
 						</HorizontalLayout>
 						</VerticalLayout>
 					</VerticalLayout>
 					<VerticalLayout childpadding="8,0,0,0" inset="124,50,0,0" bkcolor="#FFF3F3F3"><!-- 消息设置 -->
 						<Label text="消息设置" font="3" />
-						<Control height="1" bkcolor="#FFC8C8C8" width="500"/>
-						<TreeView name="msgtree" padding="10,30,10,10" height="0" width="500" itemtextcolor="#FF000000"  vscrollbar="true" >											
+						<Control height="1" bkcolor="#FFC8C8C8" padding="0,0,10,0"/>
+						<TreeView name="msgtree" padding="10,30,10,10" height="0"  itemtextcolor="#FF000000"  vscrollbar="true" hscrollbar="true">											
 							<TreeNode name="eventnode"text="常用消息" height="33" width="0" bordersize="1"  bordercolor="#FFE5E5E5">
 								<Label text="代码" width="60"/>
 								<!--
@@ -239,6 +237,8 @@
 											<ListLabelElement text="26" userdata="7"/>
 											<ListLabelElement text="28" userdata="8"/>
 											<ListLabelElement text="30" userdata="9"/>
+											<ListLabelElement text="36" userdata="10"/>
+											<ListLabelElement text="72" userdata="11"/>
 										</Combo>
 								</HorizontalLayout>
 							</VerticalLayout>

@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include <json.h>
 using namespace Json;
 
@@ -39,7 +39,7 @@ class MessageCallBack
 {
 public:
 	virtual void OnSpeakerOnLine(wstring ip,wstring name) {};
-	virtual void OnSpeakerOffLine() {};
+	virtual void OnSpeakerOffLine(int ntype=0) {};
 	virtual void OnRecvMessage(Message *msg) {};
 	virtual void OnListenerOnLine(usermap map) {};
 	virtual void OnListenerOffLine() {};
@@ -59,11 +59,11 @@ public:
 	void	InMsgMQ(Message *msg);
 };
 
-//½á¹¹Ìå¼ÇÂ¼ipĞÅÏ¢
+//ç»“æ„ä½“è®°å½•ipä¿¡æ¯
 typedef struct tagIPInfo
 {
 	char ip[30];
 }IPInfo;
 
-//»ñÈ¡¶à¸öipµØÖ·ĞÅÏ¢ÁĞ±í
+//è·å–å¤šä¸ªipåœ°å€ä¿¡æ¯åˆ—è¡¨
 bool GetLocalIPs(IPInfo* ips, int maxCnt, int* cnt);

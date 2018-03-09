@@ -23,6 +23,11 @@ void StateManger::InitCasterState()
 	m_nState = 0;
 	m_findSpeaker = new FindSpeakerLoop();
 	m_findSpeaker->Start();
+
+	//创建目录
+	CreateDirectory(L"log", NULL);
+	CreateDirectory(L"chat", NULL);
+
 }
 bool StateManger::ChangeToSpeaker()
 {
@@ -42,6 +47,27 @@ bool StateManger::ChangeToSpeaker()
 				return true;
 			}
 			
+		}
+	}
+	return false;
+}
+bool StateManger::ChangeToSpeakerSample()
+{
+	if (CanChangeSpeaker() && m_nState == 0)
+	{
+		if (m_findSpeaker)
+		{
+			m_findSpeaker->Stop();
+		}
+		if (m_speakEcho == NULL)
+		{
+			m_speakEcho = new SpeakerEcho();
+			if (m_speakEcho->Start())
+			{
+				m_nState = 2;
+				return true;
+			}
+
 		}
 	}
 	return false;
@@ -223,7 +249,7 @@ void StateManger::AddChatlog(wstring time, wstring text)
 	mapMutex.lock();
 	m_chatlog_map.insert(pair<wstring, wstring>(time, text));
 	mapMutex.unlock();
-	if (m_nState == 1) //speaker
+	if (m_nState >0) //speaker
 	{
 		Message msg;
 		msg.SetType(PUBMSG);
@@ -417,7 +443,7 @@ bool	StateManger::ConnectSpeaker(wstring ip)
 {
 	if (m_findSpeaker)
 	{
-		return m_findSpeaker->ConnectSpeaker(WString2String(ip));
+		return m_findSpeaker->AsyncFindDestSpeaker(WString2String(ip));
 	}
 	return false;
 }
@@ -451,7 +477,7 @@ void StateManger::ChatToFileThread()
 				localtime_s(&timeinfo, &rawtime);
 				char filename[80];
 				strftime(filename, 80, "%F-%H-%M-%S.txt",&timeinfo);
-				string filestr = WString2String(m_matchinfo) + string(filename);
+				string filestr = "chat\\"+WString2String(m_matchinfo) + string(filename);
 				ChatFileStream.open(filestr.c_str());
 			}
 			if (mapMutex.try_lock())

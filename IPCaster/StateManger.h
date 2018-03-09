@@ -23,6 +23,7 @@ public:
 public:
 	void InitCasterState();
 	bool ChangeToSpeaker();
+	bool ChangeToSpeakerSample();
 	bool ChangeToListener();
 	bool CanChangeSpeaker();
 	void ChangeToExit();
