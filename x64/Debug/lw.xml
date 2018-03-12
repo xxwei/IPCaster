@@ -65,19 +65,40 @@
 				<TabLayout name="pageswitch" selectedid="0" inset="0,0,0,0" ><!-- 主体界面 -->
 						<VerticalLayout childpadding="8,0,0,0" bkcolor="#FF900090" ><!-- 信息页 -->
 						<List name="msglist" vscrollbar="true" bkcolor="#FFFFFFFF" itemalign="center"  itemshowhtml="true" header="hidden" inset="0,0,0,0"    itemalign="center" hscrollbar="false" menu="true">
-
+								<!--
+								<ListContainerElement height="50" font="3" text="{h1}11111111111{/h1}"/>
+								<ListContainerElement  width="200" height="30" font="3" enabled="false" text=""/>
+								<ListContainerElement  height="50" font="3" text="{h1}11111111111{/h1}"/>
+								-->
 						</List>
 						</VerticalLayout>
 						
 						<VerticalLayout childpadding="0,0,0,0" inset="124,50,0,0" bkcolor="#FFF3F3F3" ><!-- 设置页面 -->
-							<Label text="代号设置" font="3" />
+							<Label text="本机设置" font="3" />
 							<Control height="1" bkcolor="#FFC8C8C8" width="500"/>
-							<VerticalLayout padding="10,10,0,0">
-								<HorizontalLayout inset="0,5,0,0" height ="30" width="300" > 
+							<VerticalLayout padding="10,10,0,0" height="140">
+								<HorizontalLayout inset="0,5,0,0" height ="30" width="500" > 
 									<Label text="本机代号:" font="1" width="80" />
-									<RichEdit name="localnickname" bkcolor="#FFF3F3F3" width="200" bordersize="1" borderround="2,2" bordercolor="#FFCECECE" maxheight="30" textpadding="9,3,9,5" multiline="false" enabled="true" rich="false" readonly="false" wantreturn="false" wantctrlreturn="false"/>
+									<RichEdit name="localnickname" bkcolor="#FFF3F3F3" width="300" bordersize="1" borderround="2,2" bordercolor="#FFCECECE" maxheight="30" textpadding="9,3,9,5" multiline="false" enabled="true" rich="false" readonly="false" wantreturn="false" wantctrlreturn="false"/>
 
 								</HorizontalLayout>
+								<HorizontalLayout inset="0,5,0,0" height ="30" width="500" > 
+									<Label text="机器编号:" font="1" width="80" />
+									<RichEdit name="memcode" bkcolor="#FFF3F3F3" width="300" bordersize="1" borderround="2,2" bordercolor="#FFCECECE" maxheight="30" textpadding="9,3,9,5" multiline="false" enabled="true" rich="false" readonly="false" wantreturn="false" wantctrlreturn="false"/>
+								</HorizontalLayout>
+								<HorizontalLayout inset="0,5,0,0" height ="30" width="500" > 
+									<Label text="本机注册码:" font="1" width="80" />
+									<RichEdit name="regcode" bkcolor="#FFF3F3F3" width="300" bordersize="1" borderround="2,2" bordercolor="#FFCECECE" maxheight="30" textpadding="9,3,9,5" multiline="false" enabled="true" rich="false" readonly="false" wantreturn="false" wantctrlreturn="false"/>
+									<Button name="reg" width="33" height="27" text="注册" padding="10,0,0,0" bkcolor="#FF4F9FEB" bordersize="1" borderround="3,3"/>
+								</HorizontalLayout>
+								<HorizontalLayout inset="0,5,0,0" height ="35" width="500"  > 
+									<Label name="RegErrorInfo" text="" font="0" width="180" textcolor="#FFFF0000" />
+								</HorizontalLayout>
+								
+							</VerticalLayout>
+							<Label text="手动连接" font="3" />
+							<Control height="1" bkcolor="#FFC8C8C8" width="500"/>
+							<VerticalLayout padding="10,10,0,0" height="70">
 								<HorizontalLayout inset="0,5,0,0" height ="30" width="343"  > 
 									<Label text="Speaker IP:" font="1" width="80" />
 									<RichEdit name="speakerip" bkcolor="#FFFFFFFF" maxheight="30" width="200" bordersize="1" borderround="2,2" bordercolor="#FFCECECE" textpadding="9,3,9,5" multiline="false" enabled="true" rich="false" readonly="false" wantreturn="false" wantctrlreturn="false"/>

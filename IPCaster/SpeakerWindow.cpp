@@ -325,28 +325,38 @@ LRESULT SpeakerWindow::MessageHandler(UINT uMsg, WPARAM wParam, LPARAM lParam, b
 	{
 		switch (wParam)
 		{
-		case VK_ESCAPE:
-		{
-			int ret = ::GetKeyState(VK_SHIFT); //>0 up <0 down
-			if (ret < 0)
+			case VK_ESCAPE:
 			{
-				//切换到Listener
-				pStateManger->ChangeToListener();
-				break;
+				int ret = ::GetKeyState(VK_SHIFT); //>0 up <0 down
+				if (ret < 0)
+				{
+					//切换到Listener
+					pStateManger->ChangeToListener();
+					break;
 
-			}
-			else
-			{
-				//屏蔽ESC退出
+				}
+				else
+				{
+					//屏蔽ESC退出
+					return S_OK;
+				}
 				return S_OK;
 			}
-			return S_OK;
-		}
-		case VK_CONTROL:
-		{
-			//AddNewMessage(L"12312312312312312390909090007777777777777777777111111111111111111111111");
-			break;
-		}
+			case VK_F1:
+			{
+				int ret = ::GetKeyState(VK_SHIFT); //>0 up <0 down
+				if (pStateManger->CanChangeSpeaker() && ret < 0)
+				{
+					//切换到speaker
+					if (pStateManger->ChangeToSpeakerSample())
+					{
+						Close();
+						break;
+					}
+					return S_FALSE;
+				}
+				break;
+			}
 		}
 		if ((wParam >= '1'&&wParam <= '9')|| wParam == 'q'|| wParam == 'Q'|| wParam == 'w'|| wParam == 'W'|| wParam == 'e'|| wParam == 'E')
 		{

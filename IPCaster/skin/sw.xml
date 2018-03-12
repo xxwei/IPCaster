@@ -31,7 +31,7 @@
 		<HorizontalLayout bkcolor="#FFF8F8F8" padding="0,0,0,0" height="80" bordersize="1" bordercolor="#FFE2E2E2">
 			<Button name="headlogo" width="56" height="56" maxheight="56" maxwidth="56" bkimage="file='speaker.png' corner='5,5,5,5'" padding="66,10,0,0"/>
 			<VerticalLayout  padding="10,20,0,0"  width="120" > 				
-				<Text name="nickname" textcolor="#FF000000" font="5" text="Speaker" width="120" height="25" />
+				<Text name="nickname" textcolor="#FF000000" font="5" text="Speaker" width="120" height="30" />
 				<Text name="ipaddr" textcolor="#FF000000" font="0" text="IP:192.168.3.102" width="120" height="16" />
 			</VerticalLayout>
 			<VerticalLayout />

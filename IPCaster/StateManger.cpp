@@ -24,10 +24,30 @@ void StateManger::InitCasterState()
 	m_findSpeaker = new FindSpeakerLoop();
 	m_findSpeaker->Start();
 
+
 	//创建目录
 	CreateDirectory(L"log", NULL);
 	CreateDirectory(L"chat", NULL);
 
+	m_pLicense = new License();
+
+}
+bool	StateManger::IsRegOK()
+{
+	return m_pLicense->isOk();
+}
+wstring StateManger::GetMCode()
+{
+	return String2WString(m_pLicense->GetMCode());
+}
+wstring StateManger::GetRegCode()
+{
+	return String2WString(m_pLicense->ReadRegCode());
+}
+bool	StateManger::SetRegCode(wstring regcode)
+{
+	string regc = WString2String(regcode);
+	return m_pLicense->WriteRegCode(regc);
 }
 bool StateManger::ChangeToSpeaker()
 {
@@ -48,6 +68,11 @@ bool StateManger::ChangeToSpeaker()
 			}
 			
 		}
+	}
+	if (m_nState == 2)
+	{
+		m_nState = 1;
+		return true;
 	}
 	return false;
 }
@@ -70,6 +95,11 @@ bool StateManger::ChangeToSpeakerSample()
 
 		}
 	}
+	if (m_nState == 1)
+	{
+		m_nState = 2;
+		return true;
+	}
 	return false;
 }
 bool StateManger::ChangeToListener()
@@ -81,6 +111,10 @@ bool StateManger::ChangeToListener()
 			m_nState = 0;
 			delete m_speakEcho;
 			m_speakEcho = NULL;
+			if (m_findSpeaker)
+			{
+				m_findSpeaker->Start();
+			}
 			return true;
 		}
 
@@ -89,7 +123,8 @@ bool StateManger::ChangeToListener()
 }
 bool StateManger::CanChangeSpeaker()
 {
-	if (m_findSpeaker)
+
+	if (m_findSpeaker&&m_pLicense->isOk())
 	{
 		bool ret =  m_findSpeaker->isFindSpeaker();
 		return !ret;
@@ -453,6 +488,10 @@ void	StateManger::ExitState()
 }
 void StateManger::ChatToFileThread()
 {
+	if (!m_pLicense->isOk())
+	{
+		return;
+	}
 	int nOldState = m_nState;
 	m_bStartSaveChat = true;
 	while (m_nState >= 0)

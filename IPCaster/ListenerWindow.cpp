@@ -7,7 +7,7 @@ const TCHAR* const kMinButtonControlName = _T("minbtn");
 const TCHAR* const kMaxButtonControlName = _T("maxbtn");
 const TCHAR* const kRestoreButtonControlName = _T("restorebtn");
 const TCHAR* const kConnectSpeakerName = _T("Connect");
-
+const TCHAR* const kRegAppName = _T("reg");
 
 void ListenerWindow::OnSpeakerOnLine(wstring ip, wstring name)
 {
@@ -82,6 +82,27 @@ void  ListenerWindow::InitWindow()
 	CTextUI* pControl = static_cast<CTextUI*>(m_PaintManager.FindControl(_T("ipaddr")));
 	wstring ip = pStateManger->GetLocalIP();
 	pControl->SetText(ip.c_str());
+
+	CRichEditUI* pRControl = static_cast<CRichEditUI*>(m_PaintManager.FindControl(_T("memcode")));
+	wstring mcode = pStateManger->GetMCode();
+	pRControl->SetText(mcode.c_str());
+	
+	CLabelUI* pLControl = static_cast<CLabelUI*>(m_PaintManager.FindControl(_T("RegErrorInfo")));
+	if (!pStateManger->IsRegOK())
+	{
+		
+		pLControl->SetText(L"未注册");
+		pLControl->SetTextColor(0xFFFF0000);
+		
+	}
+	else
+	{
+		pLControl->SetText(L"已注册");
+		pLControl->SetTextColor(0xFF00FF00);
+		pRControl = static_cast<CRichEditUI*>(m_PaintManager.FindControl(_T("regcode")));
+		wstring regcode = pStateManger->GetRegCode();
+		pRControl->SetText(regcode.c_str());
+	}
 	//读取配置
 	UpdateSettingUI();
 	UpdateMainUI();
@@ -133,20 +154,21 @@ LRESULT ListenerWindow::MessageHandler(UINT uMsg, WPARAM wParam, LPARAM lParam, 
 		{
 			case VK_ESCAPE:
 			{
+				return S_FALSE;
+			}
+			case VK_F2:
+			{
 				int ret = ::GetKeyState(VK_SHIFT); //>0 up <0 down
 				if (pStateManger->CanChangeSpeaker() && ret < 0)
 				{
 					//切换到speaker
 					if (pStateManger->ChangeToSpeaker())
 					{
+						Close();
 						break;
 					}
-					//屏蔽ESC退出
-					return S_FALSE;
-				}
-				//屏蔽ESC退出
-				return S_FALSE;
 
+				}
 			}
 			case VK_F1:
 			{
@@ -339,6 +361,29 @@ void ListenerWindow::Notify(TNotifyUI& msg)
 		{
 			SendMessage(WM_SYSCOMMAND, SC_RESTORE, 0);
 		}
+		else if (_tcsicmp(msg.pSender->GetName(), kRegAppName) == 0)
+		{
+			CRichEditUI* pIPControl = static_cast<CRichEditUI*>(m_PaintManager.FindControl(_T("regcode")));
+			if (pIPControl)
+			{
+				CDuiString  regcode = pIPControl->GetText();
+				bool ret = pStateManger->SetRegCode(wstring(regcode));
+				CLabelUI* pControl = static_cast<CLabelUI*>(m_PaintManager.FindControl(_T("RegErrorInfo")));
+				if (pControl)
+				{
+					if (ret)
+					{
+						pControl->SetAttribute(L"textcolor", L"#FF00FF00");
+						pControl->SetText(L"注册成功");
+					}
+					else
+					{
+						pControl->SetAttribute(L"textcolor", L"#FFFF0000");
+						pControl->SetText(L"注册失败");
+					}
+				}
+			}
+		}
 		else if (_tcsicmp(msg.pSender->GetName(), kConnectSpeakerName) == 0)
 		{
 			
@@ -491,6 +536,10 @@ void ListenerWindow::SetStateManger(StateManger *pSm)
 }
 int ListenerWindow::AddNewMessage(wstring str)
 {
+	if (!pStateManger->IsRegOK())
+	{
+		str = L"未注册，无法收到消息";
+	}
 	CListUI* pControl = static_cast<CListUI*>(m_PaintManager.FindControl(_T("msglist")));
 	if (!pControl)
 		return -1;

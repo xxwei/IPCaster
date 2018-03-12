@@ -530,7 +530,7 @@ void SpeakerEcho::EchoThread()
 			else
 			{
 
-				//UpdateUser("", lu);
+				UpdateUser("", lu);
 			}
 		}
 	}

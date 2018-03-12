@@ -7,6 +7,7 @@
 #include "SpeakerWindow.h"
 #include "SpeakerWindowSample.h"
 
+
 //#ifdef _DEBUG
 //#pragma comment(lib, "DuiLib_d.lib")
 //#pragma comment(lib, "libzmq_d.lib")
@@ -27,11 +28,30 @@
 #pragma comment(lib, "jsoncpp.lib")
 #endif
 
+void InitConsoleWindow()
+{
+	AllocConsole();
+
+	freopen("CONIN$", "r", stdin);
+	freopen("CONOUT$", "w", stdout);
+	freopen("CONOUT$", "w", stderr);
+	std::wcout.clear();
+	std::cout.clear();
+	std::wcerr.clear();
+	std::cerr.clear();
+	std::wcin.clear();
+	std::cin.clear();
+}
+
+
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                      _In_opt_ HINSTANCE hPrevInstance,
                      _In_ LPWSTR    lpCmdLine,
                      _In_ int       nCmdShow)
 {
+	//InitConsoleWindow();
+
+
 	HRESULT Hr = ::CoInitialize(NULL);
 	if (FAILED(Hr))
 	{
@@ -66,7 +86,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 	StateManger * m_pStateManger = new StateManger();
 	m_pStateManger->InitCasterState();
-RESTART:
+LPAGE:
 	ListenerWindow *pLFrame = new ListenerWindow();
 	pLFrame->SetStateManger(m_pStateManger);
 	m_pStateManger->SetListenerCB(pLFrame);
@@ -75,7 +95,7 @@ RESTART:
 	pLFrame->CenterWindow();
 	pLFrame->ShowModal();
 
-
+SPAGE:
 
 	if (m_pStateManger->GetCurrentState() == 1)
 	{
@@ -88,7 +108,7 @@ RESTART:
 		pSFrame->ShowModal();
 		if (m_pStateManger->GetCurrentState() == 0)
 		{
-			goto RESTART;
+			goto LPAGE;
 		}
 	}
 
@@ -103,7 +123,11 @@ RESTART:
 		pSFrame->ShowModal();
 		if (m_pStateManger->GetCurrentState() == 0)
 		{
-			goto RESTART;
+			goto LPAGE;
+		}
+		if (m_pStateManger->GetCurrentState() == 1)
+		{
+			goto SPAGE;
 		}
 	}	
 

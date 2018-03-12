@@ -130,7 +130,7 @@ public:
 	CDuiString ReplaceOneItem(CDuiString Dst, int Pos, int len, CDuiString src);
 
 	void ReSizeItem(int max_width,int max_height);
-	void ClickItem(CDuiString ItemName,bool bSecond = false);
+	void ClickItem(CDuiString ItemName,bool bOver = false);
 
 
 	

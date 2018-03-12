@@ -52,42 +52,42 @@
 			</VerticalLayout> 
 		</HorizontalLayout>
 		<HorizontalLayout bkcolor="#FFBBBBBB" padding="0,0,0,0" >
-			<VerticalLayout   name="allfunction" bkcolor="#FF313949" padding="0,0,0,0"  width="156"> 
+			<VerticalLayout width="156">
+			<Option font="5" name="showfunc" float="false" text="︾" textpadding="0,0,0,2" bkcolor="#FF313949" width="156" height="30"  textcolor="#FF999999"  align="center"  bordersize="1" bordercolor="#FF515969"/>
+			<VerticalLayout   name="allfunction" bkcolor="#FF313949" padding="0,0,0,0"  width="156" maxheight="0" bordersize="1" bordercolor="#FF515969"> 
 				<Option font="3" name="infopub" float="false" text="信息发布" textpadding="0,40,0,2" foreimage="file='info_selected.png' dest='61,30,95,64'" width="156" height="136"  group="switch"  selected="true"  textcolor="#FF999999"  align="center" selectedtextcolor="#ffFFAF8C" />
 				<Option font="3" name="match" float="false" text="比赛信息" textpadding="0,40,0,2" foreimage="file='match.png' dest='61,30,95,64'" width="156" height="136"  group="switch"  textcolor="#FF999999"  align="center" selectedtextcolor="#ffFFAF8C" />
 				<Option font="3" name="messages" float="false" text="消息设置" textpadding="0,40,0,2" foreimage="file='messages.png' dest='61,30,95,64'" width="156" height="136"  group="switch"  textcolor="#FF999999"  align="center" selectedtextcolor="#ffFFAF8C" />
 				<Option font="3" name="settting" float="false" text="系统设置" textpadding="0,40,0,2" foreimage="file='setting.png' dest='61,30,95,64'" width="156" height="136"  group="switch"  textcolor="#FF999999"  align="center" selectedtextcolor="#ffFFAF8C" />
-
 			</VerticalLayout>
-			<VerticalLayout  padding="0,0,0,0"> 
-				<TabLayout name="pageswitch" selectedid="0" inset="0,0,0,0"><!-- 主体界面 -->
+			<List name="memberlist" width="156" vscrollbar="true" bkcolor="#FF313949" itemalign="center"  itemshowhtml="true" header="hidden" inset="0,0,0,0"    itemalign="center" hscrollbar="false" menu="true" />							
+			</VerticalLayout>
+			<VerticalLayout  padding="0,0,1,1" bordersize="1" bordercolor="#FF0000FF" > 
+				<TabLayout name="pageswitch" selectedid="0" inset="0,0,0,0" ><!-- 主体界面 -->
 					<VerticalLayout childpadding="8,0,0,0" bkcolor="#FFFFFFFF"><!-- 信息发布 -->
 						<HorizontalLayout>
-							<List name="memberlist" width="140" vscrollbar="true" bkcolor="#FFBBBBBB" itemalign="center"  itemshowhtml="true" header="hidden" inset="0,0,0,0"    itemalign="center" hscrollbar="false" menu="true">							
-							</List>
-							<VerticalLayout>
-								<HorizontalLayout>
-									<TileLayout name="flowitem" bkcolor="#FFFFFFFF">
-										
-									</TileLayout>
-									<list name="msgitem" width = "120" vscrollbar="true" bkcolor="#FFBBBBBB" itemalign="center"  itemshowhtml="true" header="hidden" inset="0,0,0,0"    itemalign="center" hscrollbar="false" menu="true" ></list>
-								</HorizontalLayout>
-								<Container name="midtool" height="2" bkcolor="#FFEEEEEE">
-								</Container>
-								<HorizontalLayout height="104" padding="1,1,1,10" bkcolor="#FFF0F0F0">
-									<VerticalLayout>
-										<RichEdit name="editmsg" font="2" height="68" bkcolor="#FFFAFAFA" enabled="true" rich="false" readonly="false" wantreturn="false" wantctrlreturn="false"/>
-										<HorizontalLayout height="36"  bkcolor="#FFFAFAFA" >
-											<Control />
-											<Option name="auto"  text="自动发送" padding = "10,0,10,0"  height = "26" width = "90" normalimage="button.png" pushedimage="button_selected.png" selectedimage="button_selected.png"/>
-											<Button  name="cancel"  text="取消" padding = "10,0,10,0"  height = "26" width = "90" normalimage="button.png" pushedimage="button_selected.png"/>
-											<Button padding = "10,0,10,0" name="send" height = "26" width = "90"  text="发送(Enter)"  normalimage="button.png" pushedimage="button_selected.png"/>
-										</HorizontalLayout>
-									</VerticalLayout>
-								</HorizontalLayout>
+							<TileLayout name="flowitem" bkcolor="#FFFFFFFF">
 								
+							</TileLayout>
+							<list name="msgitem" width = "200" vscrollbar="true" bkcolor="#FFBBBBBB" itemalign="center"  itemshowhtml="true" header="hidden" inset="0,0,0,0"    itemalign="center" hscrollbar="false" menu="true" ></list>
+						</HorizontalLayout>
+						<Container name="midtool" height="2" bkcolor="#FFEEEEEE">
+						</Container>
+						<HorizontalLayout height="104" padding="1,1,1,10" bkcolor="#FFF0F0F0">
+							<VerticalLayout>
+								<RichEdit name="editmsg" font="2" height="48" bkcolor="#FFFAFAFA" enabled="true" rich="false" readonly="false" wantreturn="false" wantctrlreturn="false"/>
+								<HorizontalLayout height="56"  bkcolor="#FFFAFAFA" >
+									<Control />
+									<Button padding = "10,0,10,0" name="send" height = "56" width = "90"  text="发送(Enter)"  normalimage="button.png" hotimage="button_hover.png" disabledimage="button_disabled.png" pushedimage="button_selected.png"/>
+									<VerticalLayout width="110" >
+									<Button name="back"  text="返回" padding = "10,0,10,2"  height = "26" width = "90" normalimage="button.png" hotimage="button_hover.png" disabledimage="button_disabled.png" pushedimage="button_selected.png"/>
+									<Option name="auto"  text="自动发送" padding = "10,2,10,0"  height = "26" width = "90" normalimage="button.png" hotimage="button_hover.png" selectedimage="button_selected.png" pushedimage="button_selected.png"/>
+									</VerticalLayout>	
+									
+								</HorizontalLayout>
 							</VerticalLayout>
 						</HorizontalLayout>
+
 					</VerticalLayout>
 					<VerticalLayout childpadding="8,0,0,0" bkcolor="#FFF3F3F3"><!-- 比赛信息 -->
 						<VerticalLayout childpadding="8,0,0,0" bkcolor="#FFF3F3F3">
@@ -184,8 +184,8 @@
 						</HorizontalLayout>
 						<HorizontalLayout padding="30,0,100,0" height="50" >
 							<Control />
-							<Button name="reset" text="重置" padding = "10,0,10,0"  height = "26" width = "90" normalimage="button.png" pushedimage="button_selected.png"/>
-							<Button name="import" text="导入" padding = "10,0,10,0"  height = "26" width = "90" normalimage="button.png" pushedimage="button_selected.png"/>
+							<Button name="reset" text="重置" padding = "10,0,10,0"  height = "26" width = "90" normalimage="button.png" hotimage="button_hover.png" disabledimage="button_disabled.png" pushedimage="button_selected.png"/>
+							<Button name="import" text="导入" padding = "10,0,10,0"  height = "26" width = "90" normalimage="button.png" hotimage="button_hover.png" disabledimage="button_disabled.png" pushedimage="button_selected.png"/>
 						</HorizontalLayout>
 						</VerticalLayout>
 					</VerticalLayout>
@@ -210,11 +210,11 @@
 						</TreeView>
 					</VerticalLayout>
 
-					<VerticalLayout childpadding="0,0,0,0" inset="124,50,0,0" bkcolor="#FFF3F3F3" ><!-- 设置页面 -->
+					<VerticalLayout childpadding="0,0,0,0" inset="124,30,0,0" bkcolor="#FFF3F3F3" ><!-- 设置页面 -->
 						<Label text="代号设置" font="3" />
 						<Control height="1" bkcolor="#FFC8C8C8" width="500"/>
 						<VerticalLayout padding="10,10,0,0">
-							<HorizontalLayout inset="0,5,0,0" height ="30" width="300" > 
+							<HorizontalLayout inset="0,5,0,0" height ="30" width="500" > 
 								<Label text="本机代号:" font="1" width="80" />
 								<RichEdit name="localnickname" bkcolor="#FFFFFFFF" width="200" bordersize="1" borderround="2,2" bordercolor="#FFCECECE" maxheight="30" textpadding="9,3,9,5" multiline="false" enabled="true" rich="false" readonly="false" wantreturn="false" wantctrlreturn="false"/>
 							</HorizontalLayout>

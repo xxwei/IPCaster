@@ -60,6 +60,12 @@
     <ClInclude Include="P2PLog.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="AES.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="License.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -93,6 +99,12 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="P2PLog.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="AES.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="License.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

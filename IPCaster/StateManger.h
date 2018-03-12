@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include "MessageMQ.h"
 #include "FindSpeakerLoop.h"
+#include "License.h"
 //#include <bson.h>
 //#include <bcon.h>
 
@@ -78,13 +79,19 @@ public:
 	bool SendMsg(Message msg);
 
 	void	ExitState();
+
+
+	bool	IsRegOK();
+	wstring GetMCode();
+	bool	SetRegCode(wstring regcode);
+	wstring GetRegCode();
 public:
 	Value			SettingValue;
 	Value			MatchValue;
 	Value			FlowValue;
 	Value			CurrentFlowValue;
 private:
-	int				m_nState = 0;
+	int				m_nState = 0;  //0 listener 1 speaker 2 samplespeaker
 	FindSpeakerLoop *m_findSpeaker = NULL;
 	SpeakerEcho		*m_speakEcho = NULL;
 	CDuiString		m_nfontid = L"5";
@@ -100,7 +107,7 @@ private:
 
 	void			ChatToFileThread();
 
-
+	License			*m_pLicense = NULL;
 
 
 };

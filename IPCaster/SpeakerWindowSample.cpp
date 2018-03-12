@@ -197,7 +197,7 @@ void SpeakerWindowSample::SelectItem()
 				{
 					CDuiString text;
 					CListContainerElementUI *msgitem = new CListContainerElementUI();
-					msgitem->SetFixedWidth(120);
+					msgitem->SetFixedWidth(200);
 					msgitem->SetFixedHeight(50);
 					msgitem->SetBorderSize(1);
 					msgitem->SetBorderColor(0xFFAAAAAA);
@@ -316,6 +316,21 @@ LRESULT SpeakerWindowSample::MessageHandler(UINT uMsg, WPARAM wParam, LPARAM lPa
 				}
 				return S_OK;
 			}
+			case VK_F2:
+			{
+				int ret = ::GetKeyState(VK_SHIFT); //>0 up <0 down
+				if (pStateManger->CanChangeSpeaker() && ret < 0)
+				{
+					//切换到speaker
+					if (pStateManger->ChangeToSpeaker())
+					{
+						Close();
+						break;
+					}
+					return S_FALSE;
+				}
+				break;
+			}
 		}
 		if ((wParam >= '1'&&wParam <= '9')|| wParam == 'q'|| wParam == 'Q'|| wParam == 'w'|| wParam == 'W'|| wParam == 'e'|| wParam == 'E')
 		{
@@ -423,7 +438,7 @@ LRESULT SpeakerWindowSample::OnSize(UINT uMsg, WPARAM wParam, LPARAM lParam, BOO
 		{
 			int width = LOWORD(lParam);
 			int height = HIWORD(lParam);
-			int realwidth = width - 546;
+			int realwidth = width - 356;
 			int realheight = height - 224;
 			ReSizeItem(realwidth, realheight);
 		}
@@ -537,6 +552,7 @@ void SpeakerWindowSample::Notify(TNotifyUI& msg)
 			}
 			SelectItem();
 			pControl->SetFocus();
+			Sleep(200);
 		}
 	
 	}
@@ -589,6 +605,34 @@ void SpeakerWindowSample::Notify(TNotifyUI& msg)
 			pControl->SelectItem(3);
 			m_CurrentCanShotKey = false;
 			LOGI("当前选择了配置信息");
+		}
+		else if (name == _T("showfunc"))
+		{
+			COptionUI* pControl = static_cast<COptionUI*>(msg.pSender);
+			CVerticalLayoutUI *pRControl = static_cast<CVerticalLayoutUI*>(m_PaintManager.FindControl(_T("allfunction")));
+			CListUI *pLControl = static_cast<CListUI*>(m_PaintManager.FindControl(_T("memberlist")));
+			if (!pControl->IsSelected())
+			{
+				if (pRControl)
+				{
+					pControl->SetText(L"︾");
+					pRControl->SetMaxHeight(0);
+					pLControl->SetMaxHeight(9999);
+					pLControl->SetFixedHeight(9999);
+				}
+			}
+			else
+			{
+				if (pRControl)
+				{
+					
+					
+					pControl->SetText(L"︽");
+					pRControl->SetMaxHeight(9999);
+					pRControl->SetFixedHeight(9999);
+					pLControl->SetMaxHeight(0);
+				}
+			}
 		}
 	}
 	else if (msg.sType == _T("return"))
@@ -733,10 +777,10 @@ void SpeakerWindowSample::OnListenerOnLine(usermap map)
 		for (; item != map.end(); item++)
 		{
 			CListContainerElementUI *Listener = new CListContainerElementUI();
-			Listener->SetFixedWidth(140);
+			Listener->SetFixedWidth(156);
 			Listener->SetFixedHeight(50);
 			Listener->SetBorderSize(1);
-			Listener->SetBorderColor(0xFFAAAAAA);
+			Listener->SetBorderColor(0xFF313949);
 			CHorizontalLayoutUI * p1 = new CHorizontalLayoutUI();
 
 			CButtonUI  *head = new CButtonUI();
@@ -751,8 +795,10 @@ void SpeakerWindowSample::OnListenerOnLine(usermap map)
 			CTextUI * nickname = new CTextUI();
 			nickname->SetText(String2WString(item->second.name).c_str());
 			nickname->SetFont(1);
+			nickname->SetTextColor(0xFF999999);
 			CTextUI * iptext = new CTextUI();
 			iptext->SetText(String2WString(item->second.ip).c_str());
+			iptext->SetTextColor(0xFF999999);
 			p2->Add(nickname);
 			p2->Add(iptext);
 			p1->Add(p2);
@@ -785,6 +831,8 @@ int SpeakerWindowSample::SendNewMessage(wstring str)
 			}
 			
 		}
+		OutputDebugString(str.c_str());
+		OutputDebugString(L"\n");
 		return AddNewMessage(str);
 	}
 	return -1;
@@ -822,7 +870,7 @@ void SpeakerWindowSample::ReSizeItem(int max_width, int max_height)
 				}
 			}
 			SIZE sz;
-			sz.cx = (max_width-60) / c;
+			sz.cx = (max_width-60) / c - 20;
 			sz.cy = (max_height - 60) / Rows - 20;
 			if (Rows < 3) //行数
 			{
@@ -831,15 +879,14 @@ void SpeakerWindowSample::ReSizeItem(int max_width, int max_height)
 				int tl = ((max_height - 60) - (sz.cy + 20)*Rows) / 2;
 				insetstr.Format(L"%d,%d,%d,%d", 30, tl, 30, tl);
 				pFlowControl->SetAttribute(L"inset", insetstr);
-			}
-			
+			}		
 			pFlowControl->SetItemSize(sz);
 		}
 
 
 	}
 }
-void SpeakerWindowSample::ClickItem(CDuiString ItemName, bool bSecond)
+void SpeakerWindowSample::ClickItem(CDuiString ItemName, bool bOver)
 {
 	CTileLayoutUI *pFlowControl = static_cast<CTileLayoutUI*>(m_PaintManager.FindControl(_T("flowitem")));
 	if (pFlowControl)
@@ -868,8 +915,11 @@ void SpeakerWindowSample::ClickItem(CDuiString ItemName, bool bSecond)
 				pButton->SetUserData(str.c_str());
 				pFlowControl->Add(pButton);
 			}
-			CRichEditUI* pControl = static_cast<CRichEditUI*>(m_PaintManager.FindControl(_T("editmsg")));
-			pControl->SetText(L"");
+			if (!bOver)
+			{
+				CRichEditUI* pControl = static_cast<CRichEditUI*>(m_PaintManager.FindControl(_T("editmsg")));
+				pControl->SetText(L"");
+			}
 		}
 		else //每一步状态
 		{
@@ -905,7 +955,8 @@ void SpeakerWindowSample::ClickItem(CDuiString ItemName, bool bSecond)
 			}
 			else //消息链结束
 			{
-				ClickItem(L"");
+
+				ClickItem(L"", true);
 			}
 		}
 		ReSizeItem(m_lastwidth, m_lastheight);

@@ -95,13 +95,13 @@
 										<VerticalLayout>
 											<HorizontalLayout padding="30,30,30,0" >
 												<Label text="主队:" font="1"  width="40"/>
-												<Combo name="team1" bordersize="1" borderround="2,2" maxheight="25"  bordercolor="#FFCECECE" textpadding="9,3,9,5">
+												<Combo name="team1combo" bordersize="1" borderround="2,2" maxheight="25"  bordercolor="#FFCECECE" textpadding="9,3,9,5">
 													<ListLabelElement name="team1text" text="主队名称" selected="true"  />
 												</Combo>
 											</HorizontalLayout>
 											<HorizontalLayout padding="30,0,30,10" >
 												<Label text="客队:" font="1" width="40" />
-												<Combo name="team2" bordersize="1" borderround="2,2" maxheight="25"  bordercolor="#FFCECECE" textpadding="9,3,9,5">
+												<Combo name="team1combo" bordersize="1" borderround="2,2" maxheight="25"  bordercolor="#FFCECECE" textpadding="9,3,9,5">
 													<ListLabelElement name="team2text" text="客队名称" selected="true"  />
 												</Combo>
 											</HorizontalLayout>
