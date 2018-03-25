@@ -11,6 +11,7 @@ License::License()
 {
 	m_paesL = new CAES((unsigned char *)"柴晓伟0211691561");
 	m_paesS = new CAES((unsigned char *)"柴晓伟0211691562");
+	m_paesD = new CAES((unsigned char *)"柴晓伟0211691563");
 	char ps[128] = { 1 };
 	GetCpuByCmd(ps);
 	string mcode = GetMCode();
@@ -55,6 +56,18 @@ string License::GetRegCode(string mcode)
 		reg2code.append(str);
 	}
 	return reg2code;
+}
+string License::GetLimitCode(string datecode)
+{
+	m_ndestD = m_paesD->Encrypt((void *)datecode.c_str(), datecode.length(), m_pdestD, 0);
+	string limitcode;
+	for (UINT i = 0; i < m_ndestD; i++)
+	{
+		char str[128] = { 0 };
+		sprintf(str, "%02X", reinterpret_cast<BYTE*>(m_pdestD)[i]);
+		limitcode.append(str);
+	}
+	return limitcode;
 }
 bool License::isOk()
 {
@@ -122,7 +135,61 @@ string License::ReadRegCode()
 	return  string(dwValue);
 	
 }
+bool License::WriteTimeLimit(string timelimit)
+{
+	BOOL isWOW64;
+	REGSAM p;
+	IsWow64Process(GetCurrentProcess(), &isWOW64);
+	if (isWOW64) {
+		p = KEY_WRITE | KEY_WOW64_64KEY;
+	}
+	else {
+		p = KEY_WRITE;
+	}
+	//if (m_localshouldregcode.compare(regcode) == 0)
+	{
+		HKEY hcuKey;
+		if (RegCreateKeyEx(HKEY_CURRENT_USER, TEXT("Software\\Microsoft\\Windows\\CurrentVersion\\IPCaster"), 0, NULL, 0, p, NULL, &hcuKey, NULL) != ERROR_SUCCESS) {
+			//失败  
+			return false;
+		}
+		if (RegSetValueEx(hcuKey, TEXT("timelimit"), 0, REG_SZ, (BYTE*)timelimit.c_str(), timelimit.length()) != ERROR_SUCCESS) {
+			//失败  
+			return false;
+		}
+		RegCloseKey(hcuKey);
+		return true;
+	}
+	return false;
+}
+string License::ReadTimeLimit()
+{
+	BOOL isWOW64;
+	REGSAM p;
+	IsWow64Process(GetCurrentProcess(), &isWOW64);
+	if (isWOW64) {
+		p = KEY_READ | KEY_WOW64_64KEY;
+	}
+	else {
+		p = KEY_READ;
+	}
+	HKEY hcuKey;
+	if (RegOpenKeyEx(HKEY_CURRENT_USER, TEXT("Software\\Microsoft\\Windows\\CurrentVersion\\IPCaster"), 0, p, &hcuKey) != ERROR_SUCCESS) {
+		//失败  
+		return "";
+	}
+	CHAR  dwValue[128] = { 0 };//长整型数据，如果是字符串数据用char数组  
+	DWORD dwSize = 128;
+	DWORD dwType = REG_SZ;
 
+	if (::RegQueryValueEx(hcuKey, _T("timelimit"), 0, &dwType, (LPBYTE)&dwValue, &dwSize) != ERROR_SUCCESS)
+	{
+		RegCloseKey(hcuKey);
+		return "";
+	}
+	RegCloseKey(hcuKey);
+	return  string(dwValue);
+}
 //--------------------------------------------------------------  
 //                      CPU序列号  
 //--------------------------------------------------------------  

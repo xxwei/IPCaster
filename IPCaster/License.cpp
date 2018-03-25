@@ -7,14 +7,33 @@
 
 
 
+//字符转换成整形  
+int hex2int(char c)
+{
+	if ((c >= 'A') && (c <= 'Z'))
+	{
+		return c - 'A' + 10;
+	}
+	else if ((c >= 'a') && (c <= 'z'))
+	{
+		return c - 'a' + 10;
+	}
+	else if ((c >= '0') && (c <= '9'))
+	{
+		return c - '0';
+	}
+}
+
 License::License()
 {
 	m_paesL = new CAES((unsigned char *)"柴晓伟0211691561");
 	m_paesS = new CAES((unsigned char *)"柴晓伟0211691562");
+	m_paesD = new CAES((unsigned char *)"柴晓伟0211691563");
 	char ps[128] = { 1 };
 	GetCpuByCmd(ps);
 	string mcode = GetMCode();
 	m_localshouldregcode = GetRegCode(mcode);
+	m_currentlimitcode = ReadTimeLimit();
 }
 
 
@@ -51,15 +70,77 @@ string License::GetRegCode(string mcode)
 	for (UINT i = 0; i < m_ndestS&&i<16; i++)
 	{
 		char str[128] = { 0 };
-		sprintf(str, "%02X", reinterpret_cast<BYTE*>(m_pdestS)[i]+ reinterpret_cast<BYTE*>(m_pdestS)[m_ndestS-i-1]);
+		sprintf(str, "%02X", reinterpret_cast<BYTE*>(m_pdestS)[i] + reinterpret_cast<BYTE*>(m_pdestS)[m_ndestS - i - 1]);
 		reg2code.append(str);
 	}
 	return reg2code;
+}
+string License::GetLimitCode(string datecode)
+{
+	m_ndestD = m_paesD->Encrypt((void *)datecode.c_str(), datecode.length(), m_pdestD, 0);
+	string limitcode;
+	for (UINT i = 0; i < m_ndestD; i++)
+	{
+		char str[128] = { 0 };
+		sprintf(str, "%02X", reinterpret_cast<BYTE*>(m_pdestD)[i]);
+		limitcode.append(str);
+	}
+	return limitcode;
 }
 bool License::isOk()
 {
 	string regcode = ReadRegCode();
 	if (m_localshouldregcode.compare(regcode) == 0)
+	{
+		return true;
+	}
+	return false;
+}
+bool License::isOutDate(string limitcodestr)
+{
+	if (limitcodestr.length() == 0)
+	{
+		m_currentlimitcode = ReadTimeLimit();
+	}
+	else
+	{
+		m_currentlimitcode = limitcodestr;
+	}
+
+	char    encryptdata[128] = { 0 };
+	int count = 0;
+	for (int i = 0; i<m_currentlimitcode.length(); i += 2)
+	{
+		int high = hex2int(m_currentlimitcode[i]);   //高四位  
+		int low = hex2int(m_currentlimitcode[i + 1]); //低四位  
+		encryptdata[count++] = (high << 4) + low;
+	}
+
+
+	m_paesD->Decrypt(encryptdata, count);
+	string limitcode = string(encryptdata);
+	m_ntime = atoi(limitcode.substr(0, 4).c_str());
+	m_ntimes = atoi(limitcode.substr(4, 4).c_str());
+	m_nyear = atoi(limitcode.substr(8, 4).c_str());
+	m_nmonth = atoi(limitcode.substr(12, 2).c_str());
+	m_nday = atoi(limitcode.substr(14, 2).c_str());
+
+	bool ret = false;
+	if (m_ntime < 1)
+	{
+		return true;
+	}
+	if (m_ntimes < 1)
+	{
+		return true;
+	}
+	SYSTEMTIME current; //windows.h中  
+	GetLocalTime(&current);
+	if (m_nyear>=current.wYear&&m_nmonth>=current.wMonth&&m_nday>=current.wDay)
+	{
+		//没有超出日期
+	}
+	else
 	{
 		return true;
 	}
@@ -122,7 +203,96 @@ string License::ReadRegCode()
 	return  string(dwValue);
 	
 }
+bool License::WriteTimeLimitCode(string limitcode,bool bupdate)
+{
+	BOOL isWOW64;
+	REGSAM p;
+	IsWow64Process(GetCurrentProcess(), &isWOW64);
+	if (isWOW64) {
+		p = KEY_WRITE | KEY_WOW64_64KEY;
+	}
+	else {
+		p = KEY_WRITE;
+	}
+	if (!isOutDate(limitcode)||bupdate)
+	{
+		HKEY hcuKey;
+		if (RegCreateKeyEx(HKEY_CURRENT_USER, TEXT("Software\\Microsoft\\Windows\\CurrentVersion\\IPCaster"), 0, NULL, 0, p, NULL, &hcuKey, NULL) != ERROR_SUCCESS) {
+			//失败  
+			return false;
+		}
+		if (RegSetValueEx(hcuKey, TEXT("timelimit"), 0, REG_SZ, (BYTE*)limitcode.c_str(), limitcode.length()) != ERROR_SUCCESS) {
+			//失败  
+			return false;
+		}
+		RegCloseKey(hcuKey);
+		return true;
+	}
+	return false;
+}
+bool License::WriteTimeLimit(unsigned int time, unsigned int times, unsigned int year, unsigned int month, unsigned int day)
+{
+	char str[128] = { 0 };
+	sprintf(str, "%04d%04d%04d%02d%02d", time, times, year, month, day);
+	string timelimit = string(str);
+	string timelimitcode  = GetLimitCode(timelimit);
+	return WriteTimeLimitCode(timelimitcode,true);
+}
 
+
+
+string License::ReadTimeLimit()
+{
+	BOOL isWOW64;
+	REGSAM p;
+	IsWow64Process(GetCurrentProcess(), &isWOW64);
+	if (isWOW64) {
+		p = KEY_READ | KEY_WOW64_64KEY;
+	}
+	else {
+		p = KEY_READ;
+	}
+	HKEY hcuKey;
+	if (RegOpenKeyEx(HKEY_CURRENT_USER, TEXT("Software\\Microsoft\\Windows\\CurrentVersion\\IPCaster"), 0, p, &hcuKey) != ERROR_SUCCESS) {
+		//失败  
+		return "";
+	}
+	CHAR  dwValue[128] = { 0 };//长整型数据，如果是字符串数据用char数组  
+	DWORD dwSize = 128;
+	DWORD dwType = REG_SZ;
+
+	if (::RegQueryValueEx(hcuKey, _T("timelimit"), 0, &dwType, (LPBYTE)&dwValue, &dwSize) != ERROR_SUCCESS)
+	{
+		RegCloseKey(hcuKey);
+		return "";
+	}
+	RegCloseKey(hcuKey);
+	
+
+
+	return  string(dwValue);
+}
+unsigned int License::GetTimes()
+{
+	return m_ntimes;
+}
+unsigned int License::GetTime()
+{
+	return m_ntime;
+}
+void License::UpdateTimesLimit()
+{
+	 //次数减一
+	m_ntimes--;
+	WriteTimeLimit(m_ntime, m_ntimes, m_nyear, m_nmonth, m_nday);
+
+}
+void License::UpdateTimeLimit()
+{
+	//更新使用时间
+	m_ntime--;
+	WriteTimeLimit(m_ntime, m_ntimes, m_nyear, m_nmonth, m_nday);
+}
 //--------------------------------------------------------------  
 //                      CPU序列号  
 //--------------------------------------------------------------  

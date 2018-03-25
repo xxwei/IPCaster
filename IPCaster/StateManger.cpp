@@ -7,6 +7,7 @@
 
 StateManger::StateManger()
 {
+	m_bFirstToSpeaker = true;
 }
 
 
@@ -36,18 +37,33 @@ bool	StateManger::IsRegOK()
 {
 	return m_pLicense->isOk();
 }
+bool  StateManger::IsOutDate()
+{
+	return m_pLicense->isOutDate();
+	
+}
+
+
+
 wstring StateManger::GetMCode()
 {
 	return String2WString(m_pLicense->GetMCode());
 }
 wstring StateManger::GetRegCode()
 {
-	return String2WString(m_pLicense->ReadRegCode());
+	return String2WString(m_pLicense->ReadTimeLimit()+ m_pLicense->ReadRegCode() );
 }
 bool	StateManger::SetRegCode(wstring regcode)
 {
 	string regc = WString2String(regcode);
-	return m_pLicense->WriteRegCode(regc);
+	string limitcode = regc.substr(0, 32);
+	string regicode = regc.substr(32, regc.length());
+	bool ret =  m_pLicense->WriteRegCode(regicode);
+	if (ret)
+	{
+		return m_pLicense->WriteTimeLimitCode(limitcode);
+	}
+	return ret;
 }
 bool StateManger::ChangeToSpeaker()
 {
@@ -64,6 +80,11 @@ bool StateManger::ChangeToSpeaker()
 			if (m_speakEcho->Start())
 			{
 				m_nState = 1;
+				if (m_bFirstToSpeaker)
+				{
+					m_bFirstToSpeaker = false;
+					m_pLicense->UpdateTimesLimit();
+				}
 				return true;
 			}
 			
@@ -89,6 +110,11 @@ bool StateManger::ChangeToSpeakerSample()
 			m_speakEcho = new SpeakerEcho();
 			if (m_speakEcho->Start())
 			{
+				if (m_bFirstToSpeaker)
+				{
+					m_bFirstToSpeaker = false;
+					m_pLicense->UpdateTimesLimit();
+				}
 				m_nState = 2;
 				return true;
 			}
@@ -124,7 +150,7 @@ bool StateManger::ChangeToListener()
 bool StateManger::CanChangeSpeaker()
 {
 
-	if (m_findSpeaker&&m_pLicense->isOk())
+	if (m_findSpeaker&&m_pLicense->isOk()&&!m_pLicense->isOutDate())
 	{
 		bool ret =  m_findSpeaker->isFindSpeaker();
 		return !ret;

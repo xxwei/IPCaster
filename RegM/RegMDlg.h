@@ -33,4 +33,10 @@ protected:
 	DECLARE_MESSAGE_MAP()
 public:
 	afx_msg void OnBnClickedButtonCalc();
+	// 使用时长
+	unsigned int m_nusetime;
+	// 使用次数
+	unsigned int m_usetimes;
+	// 最后截止日期
+	CDateTimeCtrl  m_lasttime;
 };

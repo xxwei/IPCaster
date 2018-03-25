@@ -97,11 +97,19 @@ void  ListenerWindow::InitWindow()
 	}
 	else
 	{
-		pLControl->SetText(L"已注册");
-		pLControl->SetTextColor(0xFF00FF00);
-		pRControl = static_cast<CRichEditUI*>(m_PaintManager.FindControl(_T("regcode")));
-		wstring regcode = pStateManger->GetRegCode();
-		pRControl->SetText(regcode.c_str());
+		if (pStateManger->IsOutDate())
+		{
+			pLControl->SetText(L"已过期");
+			pLControl->SetTextColor(0xFFFF0000);
+		}
+		else
+		{
+			pLControl->SetText(L"已注册");
+			pLControl->SetTextColor(0xFF00FF00);
+			pRControl = static_cast<CRichEditUI*>(m_PaintManager.FindControl(_T("regcode")));
+			wstring regcode = pStateManger->GetRegCode();
+			pRControl->SetText(regcode.c_str());
+		}
 	}
 	//读取配置
 	UpdateSettingUI();
@@ -536,10 +544,10 @@ void ListenerWindow::SetStateManger(StateManger *pSm)
 }
 int ListenerWindow::AddNewMessage(wstring str)
 {
-	if (!pStateManger->IsRegOK())
-	{
-		str = L"未注册，无法收到消息";
-	}
+	//if (!pStateManger->IsRegOK())
+	//{
+	//	str = L"未注册，无法收到消息";
+	//}
 	CListUI* pControl = static_cast<CListUI*>(m_PaintManager.FindControl(_T("msglist")));
 	if (!pControl)
 		return -1;

@@ -82,6 +82,8 @@ public:
 
 
 	bool	IsRegOK();
+
+	bool  IsOutDate();
 	wstring GetMCode();
 	bool	SetRegCode(wstring regcode);
 	wstring GetRegCode();
@@ -109,7 +111,7 @@ private:
 
 	License			*m_pLicense = NULL;
 
-
+	bool			 m_bFirstToSpeaker = true;
 };
 
 

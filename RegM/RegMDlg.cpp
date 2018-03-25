@@ -42,6 +42,7 @@ void CAboutDlg::DoDataExchange(CDataExchange* pDX)
 }
 
 BEGIN_MESSAGE_MAP(CAboutDlg, CDialogEx)
+
 END_MESSAGE_MAP()
 
 
@@ -58,6 +59,11 @@ CRegMDlg::CRegMDlg(CWnd* pParent /*=NULL*/)
 void CRegMDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
+	DDX_Control(pDX, IDC_DATETIMEPICKER_USE, m_lasttime);
+	DDX_Text(pDX, IDC_EDIT_USETIMIE, m_nusetime);
+	DDV_MinMaxUInt(pDX, m_nusetime, 0, 9999);
+	DDX_Text(pDX, IDC_EDIT_USENUM, m_usetimes);
+	DDV_MinMaxUInt(pDX, m_usetimes, 0, 9999);
 }
 
 BEGIN_MESSAGE_MAP(CRegMDlg, CDialogEx)
@@ -99,6 +105,9 @@ BOOL CRegMDlg::OnInitDialog()
 	SetIcon(m_hIcon, TRUE);			// 设置大图标
 	SetIcon(m_hIcon, FALSE);		// 设置小图标
 
+	SetDlgItemText(IDC_EDIT_USETIMIE, L"9999");
+	SetDlgItemText(IDC_EDIT_USENUM, L"9999");
+	
 	// TODO: 在此添加额外的初始化代码
 	m_pLicense = new License();
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
@@ -159,8 +168,25 @@ void CRegMDlg::OnBnClickedButtonCalc()
 {
 
 	// TODO: 在此添加控件通知处理程序代码
-	CString m_code;
-	GetDlgItemText(IDC_EDIT_MCODE, m_code);
-	string regcode = m_pLicense->GetRegCode(WString2String(wstring(m_code.GetBuffer())));
-	SetDlgItemTextA(m_hWnd,IDC_EDIT_RCODE, regcode.c_str());
+	if (UpdateData())
+	{
+		CString m_code;
+		GetDlgItemText(IDC_EDIT_MCODE, m_code);
+		CTime m_time;
+		m_lasttime.GetTime(m_time);
+		wchar_t str[128] = { 0 };
+		wsprintf(str, L"%04d%04d%04d%02d%02d", m_nusetime, m_usetimes, m_time.GetYear(), m_time.GetMonth(), m_time.GetDay());
+		string limitcode = m_pLicense->GetLimitCode(WString2String(wstring(str)));
+		string regcode = m_pLicense->GetRegCode(WString2String(wstring(m_code.GetBuffer())));
+		string totalcode = limitcode + regcode;
+		//int len = limitcode.length();
+		//limitcode = WString2String(wstring(str));
+		//int m_ntime = atoi(limitcode.substr(0, 4).c_str());
+		//int m_ntimes = atoi(limitcode.substr(4, 4).c_str());
+		//int m_nyear = atoi(limitcode.substr(8, 4).c_str());
+		//int m_nmonth = atoi(limitcode.substr(12, 2).c_str());
+		//int m_nday = atoi(limitcode.substr(14, 2).c_str());
+
+		SetDlgItemTextA(m_hWnd, IDC_EDIT_RCODE, totalcode.c_str());
+	}
 }
