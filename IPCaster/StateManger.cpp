@@ -56,6 +56,10 @@ wstring StateManger::GetRegCode()
 bool	StateManger::SetRegCode(wstring regcode)
 {
 	string regc = WString2String(regcode);
+	if (regc.length() <= 32)
+	{
+		return false;
+	}
 	string limitcode = regc.substr(0, 32);
 	string regicode = regc.substr(32, regc.length());
 	bool ret =  m_pLicense->WriteRegCode(regicode);

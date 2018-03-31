@@ -75,7 +75,7 @@
 						</Container>
 						<HorizontalLayout height="104" padding="1,1,1,10" bkcolor="#FFF0F0F0">
 							<VerticalLayout>
-								<RichEdit name="editmsg" font="2" height="48" bkcolor="#FFFAFAFA" enabled="true" rich="false" readonly="false" wantreturn="false" wantctrlreturn="false"/>
+								<RichEdit name="editmsg" font="4" height="48" bkcolor="#FFFAFAFA" enabled="true" rich="false" readonly="false" wantreturn="false" wantctrlreturn="false"/>
 								<HorizontalLayout height="56"  bkcolor="#FFFAFAFA" >
 									<Control />
 									<Button padding = "10,0,10,0" name="send" height = "56" width = "90"  text="发送(Enter)"  normalimage="button.png" hotimage="button_hover.png" disabledimage="button_disabled.png" pushedimage="button_selected.png"/>

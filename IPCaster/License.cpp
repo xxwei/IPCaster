@@ -22,6 +22,7 @@ int hex2int(char c)
 	{
 		return c - '0';
 	}
+	return 0;
 }
 
 License::License()
