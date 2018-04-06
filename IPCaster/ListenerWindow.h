@@ -65,6 +65,8 @@ private:
 public:
 	void SetStateManger(StateManger *pSm);
 	int AddNewMessage(wstring str);
+    //最新消息变灰
+    void NewMessageOld();
 	void SaveSetting();
 };
 

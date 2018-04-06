@@ -59,6 +59,7 @@ void ListenerWindow::OnRecvMessage(Message *msg)
 	{
 		m_newmsg = msg->GetMsgValue(L"text");
 		SetTimer(m_hWnd, 3, 1, NULL);
+        //SetTimer(m_hWnd, 5, 10, NULL);
 		//AddNewMessage(msg->GetMsgValue(L"text"));
 	}
 	if (msg->GetType() == MATCHMSG)
@@ -142,8 +143,9 @@ LRESULT ListenerWindow::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 		{
 			AddNewMessage(m_newmsg);
 			KillTimer(m_hWnd, 3);
-			SetTimer(m_hWnd, 2, 1,NULL);
-
+            KillTimer(m_hWnd, 5);
+			SetTimer(m_hWnd, 2, 500,NULL);
+            SetTimer(m_hWnd, 5, 10000, NULL);
 		}
 		if (wParam == 4)
 		{
@@ -151,6 +153,12 @@ LRESULT ListenerWindow::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 			pControl->SetText(pStateManger->GetMatchInfo().c_str());
 			KillTimer(m_hWnd, 4);
 		}
+        if (wParam == 5)
+        {
+            //最新消息变灰
+            NewMessageOld();
+            KillTimer(m_hWnd, 5);
+        }
 	}
 	return __super::HandleMessage(uMsg,wParam,lParam);
 }
@@ -542,6 +550,25 @@ void ListenerWindow::SetStateManger(StateManger *pSm)
 {
 	pStateManger = pSm;
 }
+void ListenerWindow::NewMessageOld()
+{
+    CListUI* pControl = static_cast<CListUI*>(m_PaintManager.FindControl(_T("msglist")));
+    if (!pControl)
+        return ;
+    int itemcount = pControl->GetCount();
+    if (itemcount)
+    {
+        CListContainerElementUI *max_node = static_cast<CListContainerElementUI*>(pControl->GetItemAt(itemcount-1));
+        if (max_node)
+        {
+            CLabelUI *max_item = static_cast<CLabelUI*>(max_node->GetItemAt(0));
+            if (max_item)
+            {
+                max_item->SetAttribute(L"bkcolor", L"0xFFEEEEEE");
+            }
+        }
+    }
+}
 int ListenerWindow::AddNewMessage(wstring str)
 {
 	//if (!pStateManger->IsRegOK())
@@ -660,6 +687,7 @@ int ListenerWindow::AddNewMessage(wstring str)
 			wsprintf(insetstr, L"0,%d,0,5", inset_y);
 			max_item->SetAttribute(L"textpadding", insetstr);
 			max_item->SetAttribute(L"font", pStateManger->GetNFont());
+            max_item->SetAttribute(L"bkcolor", L"0xFFD4F3FC");
 			max_item->SetText(str.c_str());
 		}
 	}

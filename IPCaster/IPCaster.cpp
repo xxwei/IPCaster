@@ -49,7 +49,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                      _In_ LPWSTR    lpCmdLine,
                      _In_ int       nCmdShow)
 {
-	InitConsoleWindow();
+	//InitConsoleWindow();
 
 
 	HRESULT Hr = ::CoInitialize(NULL);
@@ -88,9 +88,15 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	m_pStateManger->InitCasterState();
 	if (m_pStateManger->IsRegOK() && !m_pStateManger->IsOutDate())
 	{
-		Sleep(500);
-		m_pStateManger->ChangeToSpeakerSample();
-		goto SPAGE;
+		Sleep(300);
+		if (m_pStateManger->CanChangeSpeaker())
+		{
+			if (m_pStateManger->ChangeToSpeakerSample())
+			{
+				goto SPAGE;
+			}
+			
+		}
 	}
 
 LPAGE:

@@ -125,7 +125,7 @@ bool License::isOutDate(string limitcodestr)
 	m_nyear = atoi(limitcode.substr(8, 4).c_str());
 	m_nmonth = atoi(limitcode.substr(12, 2).c_str());
 	m_nday = atoi(limitcode.substr(14, 2).c_str());
-
+	//LOGI("注册码期限 %04d 年%02d月 %02d日 %d 次 %d小时", m_nyear, m_nmonth, m_nday, m_ntimes,m_ntime);
 	bool ret = false;
 	if (m_ntime < 1)
 	{
@@ -137,14 +137,16 @@ bool License::isOutDate(string limitcodestr)
 	}
 	SYSTEMTIME current; //windows.h中  
 	GetLocalTime(&current);
-	if (m_nyear>=current.wYear&&m_nmonth>=current.wMonth&&m_nday>=current.wDay)
+	if (m_nyear <= current.wYear)
 	{
-		//没有超出日期
-	}
-	else
-	{
-		return true;
-	}
+		if (m_nmonth <= current.wMonth)
+		{
+			if (m_nday <= current.wDay)
+			{
+				return true;
+			}
+		}
+	}	
 	return false;
 }
 bool License::WriteRegCode(string regcode)
@@ -229,6 +231,10 @@ bool License::WriteTimeLimitCode(string limitcode,bool bupdate)
 		RegCloseKey(hcuKey);
 		return true;
 	}
+	else
+	{
+		LOGE("注册码已过期，不能用于注册");
+	}
 	return false;
 }
 bool License::WriteTimeLimit(unsigned int time, unsigned int times, unsigned int year, unsigned int month, unsigned int day)
@@ -273,6 +279,94 @@ string License::ReadTimeLimit()
 
 	return  string(dwValue);
 }
+
+bool License::WriteSession(string flag, int times)
+{
+    BOOL isWOW64;
+    REGSAM p;
+    IsWow64Process(GetCurrentProcess(), &isWOW64);
+    if (isWOW64) {
+        p = KEY_WRITE | KEY_WOW64_64KEY;
+    }
+    else {
+        p = KEY_WRITE;
+    }
+    HKEY hcuKey;
+    if (RegCreateKeyEx(HKEY_CURRENT_USER, TEXT("Software\\Microsoft\\Windows\\CurrentVersion\\IPCaster"), 0, NULL, 0, p, NULL, &hcuKey, NULL) != ERROR_SUCCESS) {
+        //失败  
+        return false;
+    }
+    if (RegSetValueEx(hcuKey, TEXT("flag"), 0, REG_SZ, (BYTE*)flag.c_str(), flag.length()+1) != ERROR_SUCCESS) {
+        //失败  
+        return false;
+    }
+    if (RegSetValueEx(hcuKey, TEXT("times"), 0, REG_DWORD, (BYTE*)&times, 4) != ERROR_SUCCESS) {
+        //失败  
+        return false;
+    }
+    
+    RegCloseKey(hcuKey);
+    return true;
+}
+string License::GetCurrentSessionFlag()
+{
+    BOOL isWOW64;
+    REGSAM p;
+    IsWow64Process(GetCurrentProcess(), &isWOW64);
+    if (isWOW64) {
+        p = KEY_READ | KEY_WOW64_64KEY;
+    }
+    else {
+        p = KEY_READ;
+    }
+    HKEY hcuKey;
+    if (RegOpenKeyEx(HKEY_CURRENT_USER, TEXT("Software\\Microsoft\\Windows\\CurrentVersion\\IPCaster"), 0, p, &hcuKey) != ERROR_SUCCESS) {
+        //失败  
+        return "";
+    }
+    CHAR  dwValue[1024] = { 0 };//长整型数据，如果是字符串数据用char数组  
+    DWORD dwSize = 1024;
+    DWORD dwType = REG_SZ;
+
+    if (::RegQueryValueEx(hcuKey, _T("flag"), 0, &dwType, (LPBYTE)&dwValue, &dwSize) != ERROR_SUCCESS)
+    {
+        RegCloseKey(hcuKey);
+        return "";
+    }
+    RegCloseKey(hcuKey);
+    return  string(dwValue);
+}
+int License::GetCurrentSessionTimes()
+{
+    BOOL isWOW64;
+    REGSAM p;
+    IsWow64Process(GetCurrentProcess(), &isWOW64);
+    if (isWOW64) {
+        p = KEY_READ | KEY_WOW64_64KEY;
+    }
+    else {
+        p = KEY_READ;
+    }
+    HKEY hcuKey;
+    if (RegOpenKeyEx(HKEY_CURRENT_USER, TEXT("Software\\Microsoft\\Windows\\CurrentVersion\\IPCaster"), 0, p, &hcuKey) != ERROR_SUCCESS) {
+        //失败  
+        return 0;
+    }
+
+    DWORD dwSize = sizeof(DWORD);
+    DWORD dwType = REG_DWORD;
+    DWORD dwInsTime = 0;
+    if (::RegQueryValueEx(hcuKey, _T("times"), 0, &dwType, (LPBYTE)&dwInsTime, &dwSize) != ERROR_SUCCESS)
+    {
+        RegCloseKey(hcuKey);
+        return 0;
+    }
+    _tprintf(_T("%s %s:0x%08x\n"), _T("Software\\Microsoft\\Windows\\CurrentVersion\\IPCaster"), _T("times"), dwInsTime);
+    RegCloseKey(hcuKey);
+   
+    return  dwInsTime;
+}
+
 unsigned int License::GetTimes()
 {
 	return m_ntimes;
@@ -290,7 +384,7 @@ void License::UpdateTimesLimit()
 }
 void License::UpdateTimeLimit()
 {
-	//更新使用时间
+	//场次减一
 	m_ntime--;
 	WriteTimeLimit(m_ntime, m_ntimes, m_nyear, m_nmonth, m_nday);
 }

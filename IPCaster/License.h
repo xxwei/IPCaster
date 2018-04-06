@@ -20,6 +20,10 @@ public:
 	bool WriteTimeLimit(unsigned int time,unsigned int times,unsigned int year,unsigned int month,unsigned int day);
 	string ReadTimeLimit();
 
+    bool WriteSession(string flag, int times);
+    string GetCurrentSessionFlag();
+    int GetCurrentSessionTimes();
+
 	unsigned int GetTimes();
 	unsigned int GetTime();
 

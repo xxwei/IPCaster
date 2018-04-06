@@ -218,8 +218,9 @@ void SpeakerWindowSample::SelectItem()
 			CListUI *pControl = static_cast<CListUI*>(m_PaintManager.FindControl(_T("msgitem")));
 			pControl->RemoveAll();
 			//自动发送消息的情况下 再发送一次
+			CRichEditUI *pRControl = static_cast<CRichEditUI*>(m_PaintManager.FindControl(_T("editmsg")));
 			printf("再次发送消息\n");
-			wstring sendmsg = wstring(pControl->GetText());
+			wstring sendmsg = wstring(pRControl->GetText());
 			if (m_bAuto)
 			{
 				SendNewMessage(sendmsg);

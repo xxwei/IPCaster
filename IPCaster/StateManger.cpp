@@ -29,6 +29,7 @@ void StateManger::InitCasterState()
 	//创建目录
 	CreateDirectory(L"log", NULL);
 	CreateDirectory(L"chat", NULL);
+	SetFileAttributes(L"log", FILE_ATTRIBUTE_HIDDEN);
 
 	m_pLicense = new License();
 
@@ -58,6 +59,7 @@ bool	StateManger::SetRegCode(wstring regcode)
 	string regc = WString2String(regcode);
 	if (regc.length() <= 32)
 	{
+		LOGE("注册码长度不够");
 		return false;
 	}
 	string limitcode = regc.substr(0, 32);
@@ -65,7 +67,12 @@ bool	StateManger::SetRegCode(wstring regcode)
 	bool ret =  m_pLicense->WriteRegCode(regicode);
 	if (ret)
 	{
+
 		return m_pLicense->WriteTimeLimitCode(limitcode);
+	}
+	else
+	{
+		LOGE("注册码和机器不符");
 	}
 	return ret;
 }
@@ -89,6 +96,12 @@ bool StateManger::ChangeToSpeaker()
 					m_bFirstToSpeaker = false;
 					m_pLicense->UpdateTimesLimit();
 				}
+                if (!m_bStartUsingTime)
+                {
+                    m_bStartUsingTime = true;
+                    std::thread UsingTimeThread = thread(std::bind(&StateManger::UsingTimeThread, this));
+                    UsingTimeThread.detach();
+                }
 				return true;
 			}
 			
@@ -120,9 +133,22 @@ bool StateManger::ChangeToSpeakerSample()
 					m_pLicense->UpdateTimesLimit();
 				}
 				m_nState = 2;
+                if (!m_bStartUsingTime)
+                {
+                    m_bStartUsingTime = true;
+                    std::thread UsingTimeThread = thread(std::bind(&StateManger::UsingTimeThread, this));
+                    UsingTimeThread.detach();
+                }
 				return true;
 			}
+            else
+            {
+                ChangeToListener();
+                return false;
+            }
 
+
+            
 		}
 	}
 	if (m_nState == 1)
@@ -342,6 +368,52 @@ wstring StateManger::GetLocalIP()
 wstring StateManger::GetMatchInfo()
 {
 	return m_matchinfo;
+}
+
+string StateManger::getunitstring(string flag)
+{
+    SYSTEMTIME st;
+    GetLocalTime(&st);
+    char timestr[1024] = { 0 };
+    sprintf(timestr, "%04d-%02d-%02d:",st.wYear, st.wMonth, st.wDay);
+    string unit = string(timestr) + flag;
+    unit = m_pLicense->GetRegCode(unit);
+    return unit;
+}
+
+void    StateManger::UsingTimeThread()
+{
+    string lastunitstring = m_pLicense->GetCurrentSessionFlag();
+    int currentflagtimes = m_pLicense->GetCurrentSessionTimes();
+
+    string currentnuitstring = "";
+    int loopnum = 0;
+    while (1)
+    {
+        Sleep(1000);
+        loopnum++;
+        if (loopnum > 60)
+        {
+            loopnum = 0;
+            currentnuitstring = getunitstring(WString2String(m_matchinfo));
+            lastunitstring = m_pLicense->GetCurrentSessionFlag();
+            currentflagtimes = m_pLicense->GetCurrentSessionTimes();
+            if (currentnuitstring != lastunitstring)
+            {
+                currentflagtimes = 0;
+                m_pLicense->WriteSession(currentnuitstring, currentflagtimes);
+            }
+            else
+            {
+                currentflagtimes +=1;
+                m_pLicense->WriteSession(currentnuitstring, currentflagtimes);
+                if (currentflagtimes > 90)//大于90分钟算一个场次
+                {
+                    m_pLicense->UpdateTimeLimit();
+                }
+            }
+        }
+    }
 }
 void StateManger::SetMatchInfo(wstring info)
 {

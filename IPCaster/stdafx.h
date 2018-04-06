@@ -21,7 +21,8 @@
 
 // TODO:  在此处引用程序需要的其他头文件
 #include <WinSock2.h>  
-
+#include <iphlpapi.h>  
+#include <stdlib.h>  
 #include <zmq.h>
 
 
@@ -30,6 +31,7 @@
 
 using namespace DuiLib;
 #pragma comment(lib, "ws2_32.lib")  
+#pragma comment(lib, "IPHLPAPI.lib")  
 #include <thread>
 #include <mutex>
 #include <list>

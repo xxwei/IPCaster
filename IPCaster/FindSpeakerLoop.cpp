@@ -2,8 +2,42 @@
 #include "FindSpeakerLoop.h"
 
 
+//获取子网掩码
+std::string GetMaskFromIp(const std::string &ip)
+{
+    std::string ret;
+    PIP_ADAPTER_INFO pAdapterInfo;
+    PIP_ADAPTER_INFO pAdapter = NULL;
 
+    ULONG ulOutBufLen = sizeof(IP_ADAPTER_INFO);
+    pAdapterInfo = (IP_ADAPTER_INFO *)malloc(sizeof(IP_ADAPTER_INFO));
 
+    if (ERROR_BUFFER_OVERFLOW == GetAdaptersInfo(pAdapterInfo, &ulOutBufLen))
+    {
+        free(pAdapterInfo);
+        pAdapterInfo = (IP_ADAPTER_INFO *)malloc(ulOutBufLen);
+    }
+
+    if (NO_ERROR == GetAdaptersInfo(pAdapterInfo, &ulOutBufLen))
+    {
+        pAdapter = pAdapterInfo;
+        while (pAdapter)
+        {
+            if (ip == pAdapter->IpAddressList.IpAddress.String)
+            {
+                ret = pAdapter->IpAddressList.IpMask.String;
+                break;
+            } // 在这里循环可以获取所有网卡信息  
+            pAdapter = pAdapter->Next;
+        }
+    }
+
+    if (pAdapterInfo)
+    {
+        free(pAdapterInfo);
+    }
+    return ret;
+}
 
 //获取多个ip地址信息列表
 bool GetLocalIPs(IPInfo* ips, int maxCnt, int* cnt)
@@ -59,7 +93,27 @@ bool isLAN(string ipstring)
 	else return false;
 }
 
+string getbroadcast(string ip, string submask)
+{
+    int ip1 = atoi(strtok((char *)ip.c_str(), "."));
+    int ip2 = atoi(strtok(NULL, "."));
+    int ip3 = atoi(strtok(NULL, "."));
+    int ip4 = atoi(strtok(NULL, "."));
 
+    int submask1 = atoi(strtok((char *)submask.c_str(), "."));
+    int submask2 = atoi(strtok(NULL, "."));
+    int submask3 = atoi(strtok(NULL, "."));
+    int submask4 = atoi(strtok(NULL, "."));
+
+    int b1 = (255 - submask1) + (ip1 & submask1);
+    int b2 = (255 - submask2) + (ip2 & submask2);
+    int b3 = (255 - submask3) + (ip3 & submask3);
+    int b4 = (255 - submask4) + (ip4 & submask4);
+
+    char    bip[128] = { 0 };
+    sprintf(bip, "%d.%d.%d.%d", b1, b2, b3, b4);
+    return string(bip);
+}
 
 
 FindSpeakerLoop::FindSpeakerLoop()
@@ -122,11 +176,15 @@ void FindSpeakerLoop::AsyncFindSpeaker(char *self)
 	{
 		if (isLAN(string(ips[i].ip)))
 		{
+            string submask = GetMaskFromIp(string(ips[i].ip));
+
 			string ip = string(ips[i].ip);
-			int pos = ip.find_last_of(".");
-			ip = ip.substr(0, pos);
-			ip = ip + ".255";
-			brlist.push_back(ip);
+
+            string bip = getbroadcast(ip, submask);
+			//int pos = ip.find_last_of(".");
+			//ip = ip.substr(0, pos);
+			//ip = ip + ".255";
+			brlist.push_back(bip);
 		}
 	}
 	list<SOCKADDR_IN>		sockaddrlist;
@@ -193,7 +251,7 @@ void FindSpeakerLoop::FindThread()
 	int fromlength = sizeof(SOCKADDR);
 	long error = 0;
 	int nRet = 0;
-	Sleep(1000);//等一下窗口显示
+	//Sleep(1000);//等一下窗口显示
 	while (m_bFindRun)
 	{
 		if (m_speakerip == "")
@@ -211,7 +269,7 @@ void FindSpeakerLoop::FindThread()
 			char    *pIPAddr = inet_ntoa(clientAddr.sin_addr);
 			if (NULL != pIPAddr)
 			{
-				printf("SpeakerAddr: %s\n", pIPAddr);
+				
 				printf("receive command: %s\n", buf);
 				bFindSpeaker = true;
 				m_lastFindTick = GetTickCount();
@@ -219,11 +277,16 @@ void FindSpeakerLoop::FindThread()
 
 				if (ConnectSpeaker(string(pIPAddr), MQPORT))
 				{
-					if (m_pMCB)
-					{
-						m_pMCB->OnSpeakerOnLine(String2WString(string(pIPAddr)), String2WString(string(buf)));
-					}
+					//连接成功
+                    LOGI("连接成功 Speaker地址 %s", pIPAddr);
 				}
+                if (m_model == 1)
+                {
+                    if (m_pMCB)
+                    {
+                        m_pMCB->OnSpeakerOnLine(String2WString(string(pIPAddr)), String2WString(string(buf)));
+                    }
+                }
 				memset(buf, 0, 1024);
 			}
 		}
@@ -423,6 +486,7 @@ void SpeakerEcho::SetMatchInfo(string info)
 void SpeakerEcho::UpdateUser(string key, ListenUser lu)
 {
 	int nSize = m_usermap.size();
+    bool bChange = false;
 	if (key != "")
 	{
 		usermap::iterator item = m_usermap.find(key);
@@ -430,6 +494,11 @@ void SpeakerEcho::UpdateUser(string key, ListenUser lu)
 		if (item != m_usermap.end())
 		{
 			item->second.lasttick = lu.lasttick;
+            if (item->second.name != lu.name)
+            {
+                item->second.name = lu.name;
+                bChange = true;
+            }
 		}
 		else
 		{
@@ -456,7 +525,7 @@ void SpeakerEcho::UpdateUser(string key, ListenUser lu)
 			}
 		}
 	}
-	if (nSize != m_usermap.size())
+	if (nSize != m_usermap.size()||bChange)
 	{
 		if (m_pMCB)
 		{
@@ -505,14 +574,16 @@ void SpeakerEcho::EchoThread()
 		ListenUser lu;
 		while (m_bRun)
 		{
+            memset(buf, 0, 1024);
 			int nRet = recvfrom(RecvBroadSocket, buf, 1024, 0, (struct sockaddr FAR *)&clientAddr, (int FAR *)&fromlength);
 			if (SOCKET_ERROR != nRet)
 			{
 				char    *pIPAddr = inet_ntoa(clientAddr.sin_addr);
 				if (NULL != pIPAddr)
 				{
-					printf("ListenerAddr: %s\n", pIPAddr);
-					printf("ListenerName: %s\n", buf);
+					//printf("ListenerAddr: %s\n", pIPAddr);
+					//printf("ListenerName: %s\n", buf);
+                    LOGI("收到来自%s:%s的广播", pIPAddr, buf);
 					//char    szMsg[] = "Speaker Copy";
 					if (SOCKET_ERROR != sendto(RecvBroadSocket, m_speakername.c_str(), m_speakername.length(), 0, (sockaddr*)&clientAddr, fromlength))
 					{

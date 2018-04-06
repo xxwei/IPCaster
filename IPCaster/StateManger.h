@@ -87,11 +87,15 @@ public:
 	wstring GetMCode();
 	bool	SetRegCode(wstring regcode);
 	wstring GetRegCode();
+
+    void    UsingTimeThread(); // 计算场次线程
+    string getunitstring(string flag);
 public:
 	Value			SettingValue;
 	Value			MatchValue;
 	Value			FlowValue;
 	Value			CurrentFlowValue;
+
 private:
 	int				m_nState = 0;  //0 listener 1 speaker 2 samplespeaker
 	FindSpeakerLoop *m_findSpeaker = NULL;
@@ -102,6 +106,7 @@ private:
 	mutex			mapMutex;
 	std::ofstream	ChatFileStream;
 	bool			m_bStartSaveChat = false;
+    bool         m_bStartUsingTime = false;//计算场次线程开关
 	wstring			m_matchinfo = L" ";
 
 	Reader			m_JsonReader;
