@@ -82,6 +82,11 @@ private:
 	bool				m_bAuto = false;
 	CDuiString				m_CurrentTypeMsg = L"";
 
+
+    bool                 m_bresetmsg = false;
+    int                    m_resethour = 18;
+    int                    m_resetmin = 3;
+
 	
 public:
 

@@ -62,6 +62,11 @@ void ListenerWindow::OnRecvMessage(Message *msg)
         //SetTimer(m_hWnd, 5, 10, NULL);
 		//AddNewMessage(msg->GetMsgValue(L"text"));
 	}
+    if (msg->GetType() == CMDMSG)
+    {
+        m_newcmd = msg->GetMsgValue(L"cmd");
+        SetTimer(m_hWnd,6, 1, NULL);
+    }
 	if (msg->GetType() == MATCHMSG)
 	{
 		wstring matchinfo = msg->GetMsgValue(L"matchinfo");
@@ -158,6 +163,18 @@ LRESULT ListenerWindow::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
             //最新消息变灰
             NewMessageOld();
             KillTimer(m_hWnd, 5);
+        }
+        if (wParam == 6)
+        {
+            KillTimer(m_hWnd, 6);
+            if (m_newcmd == L"CLEAR")
+            {
+                CListUI* pControl = static_cast<CListUI*>(m_PaintManager.FindControl(_T("msglist")));
+                if (pControl)
+                {
+                    pControl->RemoveAll();
+                }
+            }
         }
 	}
 	return __super::HandleMessage(uMsg,wParam,lParam);
@@ -575,6 +592,14 @@ int ListenerWindow::AddNewMessage(wstring str)
 	//{
 	//	str = L"未注册，无法收到消息";
 	//}
+    wstring textcolor = L"#0xFF000000";
+    if (str.find('#') == 0)
+    {
+        textcolor = str.substr(1, 10);
+        str = str.substr(11, str.length());
+    }
+
+
 	CListUI* pControl = static_cast<CListUI*>(m_PaintManager.FindControl(_T("msglist")));
 	if (!pControl)
 		return -1;
@@ -688,6 +713,7 @@ int ListenerWindow::AddNewMessage(wstring str)
 			max_item->SetAttribute(L"textpadding", insetstr);
 			max_item->SetAttribute(L"font", pStateManger->GetNFont());
             max_item->SetAttribute(L"bkcolor", L"0xFFD4F3FC");
+            max_item->SetAttribute(L"textcolor", textcolor.c_str());
 			max_item->SetText(str.c_str());
 		}
 	}
@@ -722,6 +748,7 @@ int ListenerWindow::AddNewMessage(wstring str)
 		pMaxMsg->SetAttribute(L"valign", L"vcenter");
 		pMaxMsg->SetAttribute(L"borderround", L"10,10");
 		pMaxMsg->SetAttribute(L"multiline", L"true");
+        pMaxMsg->SetAttribute(L"textcolor", textcolor.c_str());
 		pMaxMsg->SetAttribute(L"font", pStateManger->GetNFont());
 
 		int labheight = height + 100;

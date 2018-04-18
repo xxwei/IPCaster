@@ -45,6 +45,9 @@ public:
 	wstring GetLocalIP();
 //speaker
 	
+
+    void SendCmdMsg(wstring cmd);
+
 	wstring GetMatchInfo();
 	void SetMatchInfo(wstring info);
 
@@ -62,6 +65,11 @@ public:
 	void GetEventMap(EventMap &em);
 
 
+    void SetResetMsgTimeHour(int hour);
+    int GetResetMsgTimeHour();
+
+    void SetResetMsgTimeMin(int min);
+    int GetResetMsgTimeMin();
 
 
 //listener
@@ -95,7 +103,7 @@ public:
 	Value			MatchValue;
 	Value			FlowValue;
 	Value			CurrentFlowValue;
-
+    wstring           m_keepalivemsg = L"";
 private:
 	int				m_nState = 0;  //0 listener 1 speaker 2 samplespeaker
 	FindSpeakerLoop *m_findSpeaker = NULL;
@@ -108,7 +116,7 @@ private:
 	bool			m_bStartSaveChat = false;
     bool         m_bStartUsingTime = false;//计算场次线程开关
 	wstring			m_matchinfo = L" ";
-
+   
 	Reader			m_JsonReader;
 	StyledWriter		m_JsonWriter;
 

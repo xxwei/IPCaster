@@ -101,7 +101,7 @@ void SpeakerWindow::SelectItem()
 	if (pRControl)
 	{
 
-		m_CurrentFindPos = m_CurrentMsgStr.Find('#');
+		m_CurrentFindPos = m_CurrentMsgStr.Find('$');
 		if (m_CurrentFindPos >= 0)
 		{
 			m_CurrentReplaceStr = m_CurrentMsgStr.Mid(m_CurrentFindPos, 2);
@@ -195,7 +195,7 @@ void SpeakerWindow::SelectItem()
 					m_CurrentMsgStr = ReplaceOneItem(m_CurrentMsgStr, m_CurrentFindPos - 2, 2, (*item).c_str());
 					//m_CurrentMsgStr.Replace(m_CurrentReplaceStr, (*item).c_str());
 					pRControl->SetText(m_CurrentMsgStr);
-					int pos = m_CurrentMsgStr.Find('#');
+					int pos = m_CurrentMsgStr.Find('$');
 					if (pos >= 0)
 					{
 						SetTimer(m_hWnd, 2, 1, NULL);
@@ -277,7 +277,7 @@ LRESULT SpeakerWindow::HandleCustomMessage(UINT uMsg, WPARAM wParam, LPARAM lPar
 		{
 			
 			pRControl->SetText(m_CurrentMsgStr);
-			int pos = strMenuName.Find('#');
+			int pos = strMenuName.Find('$');
 			if (pos >= 0)
 			{
 				m_CurrentTeam = 0;
@@ -304,7 +304,7 @@ LRESULT SpeakerWindow::HandleCustomMessage(UINT uMsg, WPARAM wParam, LPARAM lPar
 					}
 					m_bStartSelectTeam = false;
 				}
-				pos = m_CurrentMsgStr.Find('#');
+				pos = m_CurrentMsgStr.Find('$');
 				if (pos >= 0)
 				{
 					SetTimer(m_hWnd, 2, 1, NULL);

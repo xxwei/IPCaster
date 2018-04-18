@@ -250,7 +250,7 @@ void StateManger::ReadCasterSettting()
 	//SettingValue["SOfont"]
 	//SettingValue["EventMap"]
 	int m = 0;
-
+    m_keepalivemsg = String2WString(SettingValue["KeepAliveMsg"].asString());
 
 }
 
@@ -462,6 +462,44 @@ void StateManger::SetListenerNickName(wstring name)
 		m_findSpeaker->SetListenerNickName(newname);
 	}
 }
+void StateManger::SetResetMsgTimeHour(int hour)
+{
+    if (m_nState != 0)
+    {
+        SettingValue["ResetHour"] = hour;
+       
+    }
+}
+int StateManger::GetResetMsgTimeHour()
+{
+    if (m_nState != 0)
+    {
+        if (!SettingValue["ResetHour"].isNull())
+        {
+            return SettingValue["ResetHour"].asInt();
+        }
+    }
+    return 18;
+}
+
+void StateManger::SetResetMsgTimeMin(int min)
+{
+    if (m_nState != 0)
+    {
+        SettingValue["ResetMin"] = min;
+    }
+}
+int StateManger::GetResetMsgTimeMin()
+{
+    if (m_nState != 0)
+    {
+        if (!SettingValue["ResetMin"].isNull())
+        {
+            return SettingValue["ResetMin"].asInt();
+        }
+    }
+    return 2;
+}
 void StateManger::SetNFont(CDuiString fontid)
 {
 	if (m_nState == 0)
@@ -567,6 +605,13 @@ void StateManger::GetEventMap(EventMap &emap)
 			emap.insert(pair<wstring, EventMsg>(key, em));
 		}
 	}
+}
+void StateManger::SendCmdMsg(wstring cmd)
+{
+    Message msg;
+    msg.SetType(CMDMSG);
+    msg.AppendMsg(L"cmd", cmd);
+    SendMsg(msg);
 }
 bool StateManger::SendMsg(Message msg)
 {

@@ -11,7 +11,7 @@ const TCHAR* const kMaxButtonControlName = _T("maxbtn");
 const TCHAR* const kRestoreButtonControlName = _T("restorebtn");
 
 
-
+#define SKIPTIME    300000
 
 void  SpeakerWindowSample::InitWindow()
 {
@@ -29,6 +29,9 @@ void  SpeakerWindowSample::InitWindow()
 	CacheKeyMap.insert(pair<wstring, bool>(L"Q", false));
 	CacheKeyMap.insert(pair<wstring, bool>(L"W", false));
 	CacheKeyMap.insert(pair<wstring, bool>(L"E", false));
+
+    
+
 	HWND hwnd = m_PaintManager.GetPaintWindow();
 	SetWindowText(hwnd, L"电子公告栏");
 	SetTimer(hwnd, 1, 1000, NULL);
@@ -73,6 +76,8 @@ void  SpeakerWindowSample::InitWindow()
 	COptionUI* pAutoControl = static_cast<COptionUI*>(m_PaintManager.FindControl(_T("auto")));
 	pAutoControl->Selected(true);
 	m_bAuto = true;
+
+    SetTimer(m_hWnd, 4, SKIPTIME, NULL);
 	LOGI("简版电子公告栏启动");
 }
 CControlUI* SpeakerWindowSample::CreateControl(LPCTSTR pstrClassName)
@@ -89,7 +94,7 @@ void SpeakerWindowSample::SelectItem()
 	if (pRControl)
 	{
 
-		m_CurrentFindPos = m_CurrentMsgStr.Find('#');
+		m_CurrentFindPos = m_CurrentMsgStr.Find('$');
 		if (m_CurrentFindPos >= 0)
 		{
 			m_CurrentReplaceStr = m_CurrentMsgStr.Mid(m_CurrentFindPos, 2);
@@ -97,7 +102,7 @@ void SpeakerWindowSample::SelectItem()
 			list<wstring>   templist;
 			bool	bPerson = false;
 
-			if (m_CurrentReplaceStr == L"#P")
+			if (m_CurrentReplaceStr == L"$P")
 			{
 				if (m_CurrentTeam == 0)
 				{
@@ -117,7 +122,7 @@ void SpeakerWindowSample::SelectItem()
 
 
 			}
-			else if (m_CurrentReplaceStr == L"#C")
+			else if (m_CurrentReplaceStr == L"$C")
 			{
 				if (m_CurrentTeam == 0)
 				{
@@ -132,11 +137,11 @@ void SpeakerWindowSample::SelectItem()
 					std::copy(C2list.begin(), C2list.end(), std::back_inserter(templist));
 				}
 			}
-			else if (m_CurrentReplaceStr == L"#R")
+			else if (m_CurrentReplaceStr == L"$R")
 			{
 				std::copy(Rlist.begin(), Rlist.end(), std::back_inserter(templist));
 			}				
-			else if (m_CurrentReplaceStr == L"#T")
+			else if (m_CurrentReplaceStr == L"$T")
 			{
 				m_bStartSelectTeam = true;
 				std::copy(Tlist.begin(), Tlist.end(), std::back_inserter(templist));
@@ -178,7 +183,7 @@ void SpeakerWindowSample::SelectItem()
 				m_CurrentMsgStr = ReplaceOneItem(m_CurrentMsgStr, m_CurrentFindPos - 2, 2, (*item).c_str());
 				//m_CurrentMsgStr.Replace(m_CurrentReplaceStr, (*item).c_str());
 				pRControl->SetText(m_CurrentMsgStr);
-				int pos = m_CurrentMsgStr.Find('#');
+				int pos = m_CurrentMsgStr.Find('$');
 				if (pos >= 0)
 				{
 					SelectItem();
@@ -259,7 +264,7 @@ LRESULT SpeakerWindowSample::HandleCustomMessage(UINT uMsg, WPARAM wParam, LPARA
 		{
 			
 			pRControl->SetText(m_CurrentMsgStr);
-			int pos = strMenuName.Find('#');
+			int pos = strMenuName.Find('$');
 			if (pos >= 0)
 			{
 				m_CurrentTeam = 0;
@@ -286,7 +291,7 @@ LRESULT SpeakerWindowSample::HandleCustomMessage(UINT uMsg, WPARAM wParam, LPARA
 					}
 					m_bStartSelectTeam = false;
 				}
-				pos = m_CurrentMsgStr.Find('#');
+				pos = m_CurrentMsgStr.Find('$');
 				if (pos >= 0)
 				{
 					SetTimer(m_hWnd, 2, 1, NULL);
@@ -401,11 +406,22 @@ LRESULT SpeakerWindowSample::MessageHandler(UINT uMsg, WPARAM wParam, LPARAM lPa
 		if (wParam == 1)
 		{
 			SYSTEMTIME st;
-			GetSystemTime(&st);
+			GetLocalTime(&st);
 			wchar_t timestr[1024] = { 0 };
-			wsprintf(timestr, L"%02d:%02d:%02d", (st.wHour + 8) % 24, st.wMinute, st.wSecond);
+			wsprintf(timestr, L"%02d:%02d:%02d", st.wHour, st.wMinute, st.wSecond);
 			CTextUI* pControl = static_cast<CTextUI*>(m_PaintManager.FindControl(_T("time")));
 			pControl->SetText(timestr);
+
+            if (!m_bresetmsg)
+            {
+                //if(st.wMinute>20)
+                if (st.wHour == m_resethour && st.wMinute == m_resetmin*10)
+                {
+                    m_bresetmsg = true;
+                    pStateManger->SendCmdMsg(L"CLEAR");
+                }
+            }
+
 			
 		}
 		if (wParam == 2)
@@ -422,6 +438,12 @@ LRESULT SpeakerWindowSample::MessageHandler(UINT uMsg, WPARAM wParam, LPARAM lPa
 				pListControl->EndDown();
 			}
 		}
+        //空闲时段每隔固定时长发送个自动消息
+        if (wParam == 4)
+        {
+            //KillTimer(m_hWnd, 4);
+            SendNewMessage(pStateManger->m_keepalivemsg);
+        }
 	}
 	//else if (uMsg == WM_KEYUP)
 	//{
@@ -710,6 +732,37 @@ void SpeakerWindowSample::Notify(TNotifyUI& msg)
 			}
 
 		}
+        if (name == L"sthour")
+        {
+            CComboUI* pControl = static_cast<CComboUI*>(m_PaintManager.FindControl(_T("sthour")));
+            if (pControl)
+            {
+                int cur = pControl->GetCurSel();
+                if (pStateManger)
+                {
+                    pStateManger->SetResetMsgTimeHour(cur);
+                    pStateManger->SaveCasterSetting();
+                    m_resethour = pStateManger->GetResetMsgTimeHour();
+                    LOGI("更新重置消息时间小时 %d", cur);
+                }
+            }
+        }
+        if (name == L"stmin")
+        {
+            CComboUI* pControl = static_cast<CComboUI*>(m_PaintManager.FindControl(_T("stmin")));
+            if (pControl)
+            {
+                int cur = pControl->GetCurSel();
+                if (pStateManger)
+                {
+                    pStateManger->SetResetMsgTimeMin(cur);
+                    pStateManger->SaveCasterSetting();
+                    LOGI("更新重置消息时间分钟 %d", cur);
+                    
+                    m_resetmin = pStateManger->GetResetMsgTimeMin();
+                }
+            }
+        }
 		if (name == L"nfontsize")
 		{
 			CComboUI* pControl = static_cast<CComboUI*>(m_PaintManager.FindControl(_T("nfontsize")));
@@ -829,7 +882,7 @@ int SpeakerWindowSample::SendNewMessage(wstring str)
 		int pos = str.find(L"。", 0);
 		if (pos != wstring::npos)
 		{
-			int pos1 = str.find(L"#", 0);
+			int pos1 = str.find(L"$", 0);
 			if (pos1 != wstring::npos)
 			{
 				if (pos1 > pos)
@@ -841,6 +894,8 @@ int SpeakerWindowSample::SendNewMessage(wstring str)
 		}
 		OutputDebugString(str.c_str());
 		OutputDebugString(L"\n");
+        KillTimer(m_hWnd, 4);
+        SetTimer(m_hWnd, 4, SKIPTIME, NULL);
 		return AddNewMessage(str);
 	}
 	return -1;
@@ -1926,6 +1981,15 @@ void SpeakerWindowSample::UpdateSettingUI()
 	pComboControl->SetInternVisible();
 	int lofont = atoi(pStateManger->SettingValue["SOfont"].asCString());
 	pComboControl->SelectItem(lofont-1);
+
+    m_resethour = pStateManger->GetResetMsgTimeHour();
+    m_resetmin = pStateManger->GetResetMsgTimeMin();
+    pComboControl = static_cast<CComboUI*>(m_PaintManager.FindControl(_T("sthour")));
+    pComboControl->SetInternVisible();
+    pComboControl->SelectItem(m_resethour);
+    pComboControl = static_cast<CComboUI*>(m_PaintManager.FindControl(_T("stmin")));
+    pComboControl->SetInternVisible();
+    pComboControl->SelectItem(m_resetmin);
 
 	pComboControl = static_cast<CComboUI*>(m_PaintManager.FindControl(_T("team1combo")));
 	pComboControl->SelectItem(pStateManger->GetTeam1());

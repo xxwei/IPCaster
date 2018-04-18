@@ -58,6 +58,7 @@ public:
 private:
 	StateManger		*pStateManger = NULL;
 	wstring			m_newmsg = L"";
+    wstring         m_newcmd = L"";
 	void UpdateMainUI();
 	void UpdateSettingUI();
 	bool	m_bInit = false;

@@ -5,7 +5,8 @@ using namespace Json;
 enum MSGTYPE {
 	KEEPALIVE=0, //time|name
 	MATCHMSG,//time|matchinfo
-	PUBMSG  //time|text
+	PUBMSG,  //time|text
+    CMDMSG
 };
 
 
