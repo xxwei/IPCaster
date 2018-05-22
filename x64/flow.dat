@@ -1,7 +1,7 @@
 {
     "main":{
         "进球":{
-            "itemmsg":"VAR正在对进球进行会看分析$T $P $D",
+            "itemmsg":"0xFF00FF00 VAR正在对进球进行会看分析$T $P $D",
             "itemchild":{
                 "无效":{
                     "itemmsg":"回看分析表明，进球无效",

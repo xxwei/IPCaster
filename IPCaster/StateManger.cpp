@@ -249,8 +249,8 @@ void StateManger::ReadCasterSettting()
 	//SettingValue["SNfont"]
 	//SettingValue["SOfont"]
 	//SettingValue["EventMap"]
-	int m = 0;
-    m_keepalivemsg = String2WString(SettingValue["KeepAliveMsg"].asString());
+    m_keepalivemsg  =  String2WString(U2G(SettingValue["KeepAliveMsg"].asCString()));
+
 
 }
 
